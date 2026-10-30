@@ -35,23 +35,11 @@ Development builds have their own package ID (`dev.robinsiegl.nia.debug`) so the
 
 ## Production APK in a few clicks
 
-There is one private setup step for your persistent release signing key:
+Configure the same four repository Actions secrets used by pip-os: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD`, using your nia keystore and credentials. The [one-time signing instructions](docs/RELEASING.md#one-time-signing-setup) include the keystore command and PowerShell copy-to-clipboard step.
 
-```sh
-python scripts/setup_signing.py --upload
-```
+If those secrets are already added, setup is complete. Open **[Actions → Production APK → Run workflow](https://github.com/robin-siegl/Nia/actions/workflows/production.yml)** on `main`. Leave the version blank for `0.1.0`, or enter a new version. Enable **publish_release** for a public APK download under **[Releases](https://github.com/robin-siegl/Nia/releases)**. The signed APK and checksum are also uploaded as the **nia-production-VERSION** artifact.
 
-This uses JDK 17+ (or Android Studio's bundled Java) and an authenticated [GitHub CLI](https://cli.github.com/). It creates a local key once and sets **one** repository Actions secret: `NIA_SIGNING_BUNDLE`. Re-running reuses the same key. On Windows you can use:
-
-```powershell
-.\scripts\setup-signing.ps1 --upload
-```
-
-Without GitHub CLI, run the Python script without `--upload`, then copy its generated JSON into **Settings → Secrets and variables → Actions → New repository secret → NIA_SIGNING_BUNDLE**. The script prints the local file path, not its contents.
-
-Then open **[Actions → Production APK → Run workflow](https://github.com/robin-siegl/Nia/actions/workflows/production.yml)**. Leave the version blank to use `gradle.properties`. Download the **nia-production-VERSION** artifact after the checks and signed build pass. Optionally enable **publish_release** to attach the signed APK and checksum to a public GitHub release.
-
-The production workflow requires signing configuration and does not substitute a debug key. Keep a private backup of `.signing/`; those files are excluded from Git. See [release instructions](docs/RELEASING.md).
+Keep a private backup of your keystore and passwords and use the same key for future updates. No additional signing-bundle secret is required. See [release instructions](docs/RELEASING.md) for the optional setup helper, local builds and troubleshooting.
 
 ## Build locally
 

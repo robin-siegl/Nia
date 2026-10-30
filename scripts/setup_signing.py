@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create a persistent private release key and optionally configure the GitHub secret."""
+"""Create a persistent private release key and optionally configure GitHub secrets."""
 import argparse
 import base64
 import json
@@ -25,7 +25,7 @@ def find_keytool():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--upload", action="store_true", help="Set NIA_SIGNING_BUNDLE using an authenticated GitHub CLI")
+    parser.add_argument("--upload", action="store_true", help="Set the four ANDROID_* secrets using an authenticated GitHub CLI")
     parser.add_argument("--repo", default="robin-siegl/Nia")
     args = parser.parse_args()
     folder = Path(__file__).resolve().parent.parent / ".signing"
@@ -53,15 +53,26 @@ def main():
         print("Created the release signing key. Keep a private backup of the .signing directory.")
     else:
         print("Reusing the existing signing bundle; no new key was generated.")
+    bundle = json.loads(bundle_path.read_text(encoding="utf-8"))
+    fields = {
+        "ANDROID_KEYSTORE_BASE64": "keystoreBase64",
+        "ANDROID_KEYSTORE_PASSWORD": "storePassword",
+        "ANDROID_KEY_ALIAS": "keyAlias",
+        "ANDROID_KEY_PASSWORD": "keyPassword",
+    }
     if args.upload:
         if not shutil.which("gh"):
-            raise SystemExit("GitHub CLI is not installed. Add the JSON file below as the NIA_SIGNING_BUNDLE repository Actions secret.\n" + str(bundle_path))
-        subprocess.run(["gh", "secret", "set", "NIA_SIGNING_BUNDLE", "--repo", args.repo],
-                       input=bundle_path.read_bytes(), check=True)
-        print("NIA_SIGNING_BUNDLE configured. Run the Production APK workflow on GitHub.")
+            raise SystemExit("GitHub CLI is not installed. Add the four ANDROID_* secrets manually using docs/RELEASING.md. Local backup:\n" + str(bundle_path))
+        for secret_name, field in fields.items():
+            subprocess.run(["gh", "secret", "set", secret_name, "--repo", args.repo],
+                           input=bundle[field].encode("utf-8"), check=True)
+        print("The four ANDROID_* signing secrets are configured. Run the Production APK workflow on GitHub.")
     else:
-        print("Add the complete contents of this file as the NIA_SIGNING_BUNDLE repository Actions secret:")
+        print("Your private signing backup is saved at:")
         print(bundle_path)
+        print("To configure repository Actions secrets manually, copy each JSON field's value separately:")
+        for secret_name, field in fields.items():
+            print(secret_name + " <- " + field)
         print("Or run this script again with --upload after signing into GitHub CLI with gh auth login.")
 
 

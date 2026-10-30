@@ -15,7 +15,7 @@ MVP specification · 30 October 2026
 - Kotlin + Compose, persistent DataStore settings, personal profile only. No network permission or account.
 - Compile/target SDK 36, minimum SDK 29. Pixel 10 Pro on the user's reported Android 17 is the primary physical acceptance target; an SDK target level is distinct from the OS versions on which the app can run. Physical validation is still required.
 - Backup: strict, versioned personal-profile JSON with validation, preview, atomic application and recovery from unreadable existing settings.
-- Production: manually triggered **Production APK** workflow, persistent release key configured once through the **NIA_SIGNING_BUNDLE** Actions secret, optional GitHub release publication. Missing signing configuration fails with setup instructions.
+- Production: manually triggered **Production APK** workflow, persistent release key configured once through the four **ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD / ANDROID_KEY_ALIAS / ANDROID_KEY_PASSWORD** Actions secrets, matching pip-os. Optional GitHub release publication. Missing signing configuration fails with setup instructions.
 
 The detailed planning record follows. Where it describes independently selected background/foreground colors or lists the product name/repository as open, the decisions above supersede it.
 

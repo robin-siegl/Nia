@@ -1,36 +1,46 @@
 #!/usr/bin/env python3
-"""Decode the repository Actions secret without exposing signing credentials in logs."""
+"""Restore the four Android signing secrets used by the production workflow."""
 import base64
-import json
+import binascii
 import os
 from pathlib import Path
-import re
 import sys
 
-raw = os.environ.get("NIA_SIGNING_BUNDLE", "")
-if not raw:
-    sys.exit("Add the NIA_SIGNING_BUNDLE repository Actions secret first. See docs/RELEASING.md or run python scripts/setup_signing.py --upload locally.")
-try:
-    bundle = json.loads(raw)
-    for key in ["keystoreBase64", "storePassword", "keyAlias", "keyPassword"]:
-        value = bundle[key]
-        if not isinstance(value, str) or not value or any(c in value for c in "\r\n"):
-            raise ValueError("Invalid signing field")
-    if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", bundle["keyAlias"]):
-        raise ValueError("Invalid alias")
-    key_bytes = base64.b64decode(bundle["keystoreBase64"], validate=True)
-    if not 100 <= len(key_bytes) <= 40000:
-        raise ValueError("Invalid key size")
-except (KeyError, ValueError, TypeError):
-    sys.exit("NIA_SIGNING_BUNDLE is invalid. Upload the complete JSON created by scripts/setup_signing.py.")
-for key in ["storePassword", "keyPassword", "keystoreBase64"]:
-    print("::add-mask::" + bundle[key].replace("%", "%25"))
-path = Path(os.environ["RUNNER_TEMP"]) / "nia-release.p12"
-path.write_bytes(key_bytes)
-path.chmod(0o600)
-with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as output:
-    output.write("NIA_KEYSTORE_PATH=" + str(path) + "\n")
-    output.write("NIA_STORE_PASSWORD=" + bundle["storePassword"] + "\n")
-    output.write("NIA_KEY_ALIAS=" + bundle["keyAlias"] + "\n")
-    output.write("NIA_KEY_PASSWORD=" + bundle["keyPassword"] + "\n")
-print("Release signing configured.")
+SIGNING_FIELDS = {
+    "ANDROID_KEYSTORE_PASSWORD": "NIA_STORE_PASSWORD",
+    "ANDROID_KEY_ALIAS": "NIA_KEY_ALIAS",
+    "ANDROID_KEY_PASSWORD": "NIA_KEY_PASSWORD",
+}
+
+
+def main():
+    required = ["ANDROID_KEYSTORE_BASE64", *SIGNING_FIELDS]
+    missing = [name for name in required if not os.environ.get(name)]
+    if missing:
+        sys.exit("Missing repository Actions secrets: " + ", ".join(missing) + ". See docs/RELEASING.md.")
+    for name in SIGNING_FIELDS:
+        if any(c in os.environ[name] for c in "\r\n\0"):
+            sys.exit(name + " must be a single-line value. See docs/RELEASING.md.")
+    try:
+        # Accept base64 copied with line wrapping or a trailing newline.
+        encoded = "".join(os.environ["ANDROID_KEYSTORE_BASE64"].split())
+        key_bytes = base64.b64decode(encoded, validate=True)
+        if not 100 <= len(key_bytes) <= 1024 * 1024:
+            raise ValueError("Invalid key size")
+    except (ValueError, binascii.Error):
+        sys.exit("ANDROID_KEYSTORE_BASE64 is invalid. Encode the whole keystore file. See docs/RELEASING.md.")
+    for name in required:
+        value = os.environ[name].replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+        print("::add-mask::" + value)
+    path = Path(os.environ["RUNNER_TEMP"]) / "nia-release.p12"
+    path.write_bytes(key_bytes)
+    path.chmod(0o600)
+    with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as output:
+        output.write("NIA_KEYSTORE_PATH=" + str(path) + "\n")
+        for secret_name, variable in SIGNING_FIELDS.items():
+            output.write(variable + "=" + os.environ[secret_name] + "\n")
+    print("Release signing configured.")
+
+
+if __name__ == "__main__":
+    main()
