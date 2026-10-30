@@ -1,0 +1,108 @@
+name: Production APK
+run-name: nia production APK${{ inputs.publish_release && ' + GitHub release' || '' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version name (for example 0.1.0); leave empty to use gradle.properties'
+        type: string
+        default: ''
+      publish_release:
+        description: 'Also publish a public GitHub release'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nia-production
+  cancel-in-progress: false
+
+jobs:
+  checks:
+    name: Release checks
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    name: Signed production APK
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Validate version
+        id: version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          python3 - <<'PY'
+          import os, re
+          from pathlib import Path
+          properties = dict(line.split('=', 1) for line in Path('gradle.properties').read_text().splitlines() if '=' in line)
+          version = os.environ['REQUESTED_VERSION'].strip() or properties['nia.versionName']
+          if not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.-]+)?', version):
+              raise SystemExit('Use a version such as 0.1.0 or 0.2.0-beta.1')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write('version=' + version + '\n')
+          PY
+      - name: Configure release signing
+        env:
+          NIA_SIGNING_BUNDLE: ${{ secrets.NIA_SIGNING_BUNDLE }}
+        run: python3 scripts/prepare_signing.py
+      - name: Build production APK
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: ./gradlew :app:assembleRelease :app:lintRelease -Pnia.versionName="$VERSION" -Pnia.versionCode="$((100 + GITHUB_RUN_NUMBER))" --stacktrace
+      - name: Verify signature and prepare download
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs app/build/outputs/apk/release/app-release.apk
+          mkdir -p dist
+          cp app/build/outputs/apk/release/app-release.apk "dist/nia-$VERSION.apk"
+          cd dist
+          sha256sum *.apk > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nia-production-${{ steps.version.outputs.version }}
+          path: dist/
+          if-no-files-found: error
+      - name: Remove temporary signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/nia-release.p12"
+      - name: Download instructions
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          echo "### nia $VERSION" >> "$GITHUB_STEP_SUMMARY"
+          echo "Download the nia-production-$VERSION artifact below. It contains the signed APK and SHA-256 checksum." >> "$GITHUB_STEP_SUMMARY"
+
+  publish:
+    name: GitHub release
+    if: inputs.publish_release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: nia-production-${{ needs.build.outputs.version }}
+          path: dist
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.build.outputs.version }}
+          COMMIT: ${{ github.sha }}
+        run: gh release create "v$VERSION" dist/* --target "$COMMIT" --title "nia $VERSION" --generate-notes
