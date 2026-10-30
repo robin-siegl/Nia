@@ -2,6 +2,12 @@
 
 Product specification · 30 October 2026
 
+## 1.1.1 release flow
+
+- `gradle.properties` owns the production version name and Android version code. Prepare and commit both values with a release's changes.
+- Running Production APK on `main` builds that exact version, with no version inputs, automatic bump or Gradle command-line version overrides.
+- Reject existing/older stable release versions and inconsistent version codes before tests/signing. Keep atomic tag creation after build/signature verification and publication enabled by default.
+
 ## 1.1.0 lock-screen alignment
 
 - The default portrait clock/date header follows the supplied Pixel 10 Pro reference with fixed full-screen anchors, spaced time and stronger date typography. Existing assignments and Home shortcut order are preserved.
@@ -16,7 +22,7 @@ Product specification · 30 October 2026
 - Settings has an overview and focused Home, Appearance, App assignments, App list, Backup & reset and About pages. Changing the default launcher is always available from the overview.
 - App search accepts accent/case-insensitive substrings, initials (including camel-case names), and multiple word prefixes in any order. Results stay alphabetical and app assignments retain their explicit launch targets.
 - About displays the version, local-data privacy summary, project/issue links and third-party notices. The source-license status is reported accurately; a license has not been selected for nia.
-- Production defaults to a public release. A stable patch/minor/major bump or exact override resolves against current Git tags, with a source floor of 1.0.0. Semantic versions determine increasing Android version codes. Tests, lint, signing and verification precede tag creation/publication.
+- Production defaults to a public release using the exact committed Gradle project version. Semantic versions determine matching, increasing Android version codes. Tests, lint, signing and verification precede tag creation/publication.
 - Setup progress remains internal and is excluded from exported settings. Existing preferences and schema-1/schema-2 backups remain compatible. Theme sharing stays deferred.
 
 ## 0.2.0 Home and appearance update

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1
+
+- Production builds now use the exact version name and Android version code committed in `gradle.properties`, matching local builds and About nia.
+- Removed patch/minor/major selection, exact-version overrides and automatic version bumps from the production workflow.
+- Added validation for matching version names/codes and clearer errors for missing, duplicate, already-released or older project versions. Signing, verification and publication retain their existing flow.
+
 ## 1.1.0
 
 - Added a portrait clock/date layout measured from the supplied Pixel 10 Pro lock-screen captures, accounting for the status-bar inset.
