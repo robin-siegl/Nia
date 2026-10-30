@@ -84,10 +84,18 @@ fun SettingsDetailScreen(
 internal fun HomeSettings(preferences: LauncherPreferences, onChange: ((LauncherPreferences) -> LauncherPreferences) -> Unit) {
     ChoiceRow(listOf(HomeLayout.GRID to "Icon grid", HomeLayout.LIST to "Text list"), preferences.layout,
         { value -> onChange { it.copy(layout = value) } })
-    Text("Home text size", fontSize = 16.sp, modifier = Modifier.padding(top = 20.dp, bottom = 10.dp))
-    ChoiceRow(listOf(HomeTextSize.SMALL to "Small", HomeTextSize.DEFAULT to "Default", HomeTextSize.LARGE to "Large"),
-        preferences.homeTextSize, { value -> onChange { it.copy(homeTextSize = value) } })
-    Text("Applies to the clock, date and Home list.", fontSize = 12.sp, modifier = Modifier.padding(top = 10.dp))
+    Spacer(Modifier.height(16.dp))
+    SettingSwitch("Pixel clock layout", "Keep the clock and date aligned when you unlock.", preferences.pixelClockLayout) {
+        value -> onChange { it.copy(pixelClockLayout = value) }
+    }
+    if (!preferences.pixelClockLayout || preferences.layout == HomeLayout.LIST) {
+        Text(if (preferences.pixelClockLayout) "App text size" else "Home text size", fontSize = 16.sp,
+            modifier = Modifier.padding(top = 20.dp, bottom = 10.dp))
+        ChoiceRow(listOf(HomeTextSize.SMALL to "Small", HomeTextSize.DEFAULT to "Default", HomeTextSize.LARGE to "Large"),
+            preferences.homeTextSize, { value -> onChange { it.copy(homeTextSize = value) } })
+        Text(if (preferences.pixelClockLayout) "Applies to app names. The clock and date keep their lock-screen sizing."
+            else "Applies to the clock, date and Home list.", fontSize = 12.sp, modifier = Modifier.padding(top = 10.dp))
+    }
     HomePreview(preferences, Modifier.padding(top = 20.dp))
 }
 

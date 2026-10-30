@@ -217,7 +217,7 @@ class ScreensTest {
     }
 
     @Test fun `Home text size selection updates its preview and preference`() {
-        var p by mutableStateOf(LauncherPreferences(layout = HomeLayout.LIST))
+        var p by mutableStateOf(LauncherPreferences(layout = HomeLayout.LIST, pixelClockLayout = false))
         render {
             detail(SettingsSection.HOME, p, onChange = { change -> p = change(p) })
         }
@@ -226,6 +226,66 @@ class ScreensTest {
         assertEquals(HomeTextSize.LARGE, p.homeTextSize)
         assertTrue(rule.onNodeWithText("09:41").fetchSemanticsNode().boundsInRoot.height > before)
         screenshot("settings-home-size")
+    }
+
+    @Test @Config(qualifiers = "w344dp-h768dp-xhdpi")
+    fun `Pixel header matches screenshot ink anchors and stays fixed with status bar insets`() {
+        var inset by mutableStateOf(0.dp)
+        var clockOpened = false
+        var category: HomeCategory? = null
+        render {
+            Box(Modifier.fillMaxSize().padding(top = inset)) {
+                HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", { clockOpened = true }, { category = it }, {},
+                    contentTopInset = inset)
+            }
+        }
+        fun ink(bitmap: android.graphics.Bitmap, area: android.graphics.Rect): android.graphics.Rect {
+            val result = android.graphics.Rect(area.right, area.bottom, area.left, area.top)
+            for (y in area.top until area.bottom) for (x in area.left until area.right) {
+                val pixel = bitmap.getPixel(x, y)
+                if (android.graphics.Color.red(pixel) > 120 && android.graphics.Color.green(pixel) > 120 && android.graphics.Color.blue(pixel) > 120) {
+                    result.left = minOf(result.left, x); result.top = minOf(result.top, y)
+                    result.right = maxOf(result.right, x + 1); result.bottom = maxOf(result.bottom, y + 1)
+                }
+            }
+            return result
+        }
+        fun check(bitmap: android.graphics.Bitmap) {
+            val clock = ink(bitmap, android.graphics.Rect(15, 130, 340, 300))
+            val date = ink(bitmap, android.graphics.Rect(30, 320, 220, 410))
+            assertEquals(46f, clock.left.toFloat(), 2f); assertEquals(186f, clock.top.toFloat(), 2f)
+            assertEquals(272f, clock.width().toFloat(), 2f); assertEquals(89f, clock.height().toFloat(), 2f)
+            assertEquals(54f, date.left.toFloat(), 2f); assertEquals(350f, date.top.toFloat(), 2f)
+            assertEquals(126f, date.width().toFloat(), 2f); assertEquals(23f, date.height().toFloat(), 2f)
+        }
+        rule.onNodeWithText("14 03").assertIsDisplayed()
+        check(screenshot("home-pixel-reference"))
+        rule.onNodeWithTag("home-clock").performClick()
+        rule.onNodeWithTag("home-date").performClick()
+        assertTrue(clockOpened)
+        assertEquals(HomeCategory.CALENDAR, category)
+        rule.runOnIdle { inset = 24.dp }
+        check(screenshot("home-pixel-reference-insets"))
+    }
+
+    @Test fun `Home settings can switch between the Pixel header and the scalable classic clock`() {
+        var p by mutableStateOf(LauncherPreferences(layout = HomeLayout.LIST))
+        render { detail(SettingsSection.HOME, p, onChange = { p = it(p) }) }
+        rule.onNodeWithText("App text size").assertIsDisplayed()
+        rule.onNodeWithTag("pixel-clock-header").assertExists()
+        rule.onNodeWithContentDescription("Pixel clock layout").performClick()
+        assertFalse(p.pixelClockLayout)
+        rule.onNodeWithText("Home text size").assertIsDisplayed()
+        rule.onNodeWithText("09:41").assertExists()
+        rule.onNodeWithTag("pixel-clock-header").assertDoesNotExist()
+    }
+
+    @Test @Config(qualifiers = "w892dp-h412dp-xhdpi")
+    fun `landscape uses the compact scalable clock instead of portrait lock screen anchors`() {
+        render { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}) }
+        rule.onNodeWithTag("pixel-clock-header").assertDoesNotExist()
+        rule.onNodeWithText("14:03").assertIsDisplayed()
+        rule.onNodeWithContentDescription("Settings").assertIsDisplayed()
     }
 
     @Test fun `color wheel and brightness save the chosen seed and render both previews`() {

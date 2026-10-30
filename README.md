@@ -26,6 +26,7 @@ Rendered from the app's Compose screens; phone screenshots will also include the
 - Apps completes the six-item icon grid or appears as a matching text entry. A settings gear is available on Home and in the app list.
 - Small, Default or Large Home text, with a preview in Settings.
 - Time opens Clock; date opens your assigned Calendar.
+- A Pixel-style clock/date layout matches the supplied Pixel 10 Pro lock-screen reference: spaced time, a stronger date and fixed screen anchors. Disable **Settings → Home → Pixel clock layout** for the previous scalable clock. In Pixel mode, text-size choices apply to Home app names.
 - Swipe up or tap **Apps** for an alphabetical, text-only app list.
 - Search by name, initials (including camel-case names) or word prefixes in any order. Matching apps stay alphabetical. Search can focus automatically if enabled.
 - Optional alphabet navigation: drag the right edge of the app list to jump to a letter. Letters appear during interaction; searching hides the scrubber.
@@ -51,7 +52,7 @@ Development builds have their own package ID (`dev.robinsiegl.nia.debug`) so the
 
 Configure the same four repository Actions secrets used by pip-os: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD`, using your nia keystore and credentials. The [one-time signing instructions](docs/RELEASING.md#one-time-signing-setup) include the keystore command and PowerShell copy-to-clipboard step.
 
-If those secrets are already added, setup is complete. Open **[Actions → Production APK → Run workflow](https://github.com/robin-siegl/Nia/actions/workflows/production.yml)** on `main`. Leave **patch** selected, the exact version blank, and **publish_release** enabled. The first run selects **1.0.0**. Later runs choose the next patch/minor/major version from the latest stable Git tag. An optional exact version overrides the bump.
+If those secrets are already added, setup is complete. Open **[Actions → Production APK → Run workflow](https://github.com/robin-siegl/Nia/actions/workflows/production.yml)** on `main`. Leave **patch** selected, the exact version blank, and **publish_release** enabled. The current source minimum is **1.1.0**. Later runs choose the next patch/minor/major version from the latest stable Git tag. An optional exact version overrides the bump.
 
 Public release publication is enabled by default. The signed APK and checksum are also uploaded as the **nia-production-VERSION** artifact. Existing or older versions are rejected, and the tag is created only after tests, lint, build and signature verification succeed.
 
@@ -87,3 +88,7 @@ nia 1.0 supports the personal profile. Work profiles and Private Space are defer
 - [Privacy](docs/PRIVACY.md)
 
 The source license is still to be selected.
+
+The clock fonts are static subsets of the officially published Google Sans font, bundled under the SIL Open Font License. They require no network access. See [third-party notices](THIRD_PARTY_NOTICES.md).
+
+Pixel's exact lock-screen weather elements remain pending a supported integration. This release does not display substitute weather icons or fabricated conditions. See [alignment notes](docs/LOCK_SCREEN_ALIGNMENT.md).

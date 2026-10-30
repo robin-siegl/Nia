@@ -14,6 +14,8 @@ Record the Android version, build number and gesture/button navigation setting i
 - Confirm Apps is the sixth grid icon or a text row matching the other entries. Open settings using the gear on Home and in Apps.
 - Select Small / Default / Large Home text. Verify the preview, clock, date and list entries; check that the settings gear stays reachable while a long Home list scrolls.
 - Try large system text/display scaling. Keep Apps, settings and every category reachable.
+- Compare the Pixel clock layout with the reference lock screen after unlocking. Check both grid and list, time/date tap actions, the spaced time, date weight and screen anchors. Toggle Pixel clock layout off to verify the old scalable header; rotate to landscape and back.
+- With Pixel clock layout enabled, changing app text sizes should not move the clock/date. Check a signed upgrade keeps the selected layout and assignments, and older backups enable the aligned header with the old layout still selectable.
 
 ## Apps
 

@@ -46,14 +46,14 @@ Skip this helper if you have already created nia's key and configured its secret
 ## Trigger a production build
 
 1. Open **[Actions → Production APK → Run workflow](https://github.com/robin-siegl/Nia/actions/workflows/production.yml)** on `main`.
-2. Leave **patch** selected for the usual next version, or choose **minor** / **major**. Optionally enter an exact stable version such as `1.0.0`, which overrides the bump.
+2. Leave **patch** selected for the usual next version, or choose **minor** / **major**. Optionally enter an exact stable version such as `1.1.0`, which overrides the bump.
 3. Leave **publish_release** enabled for the public APK download. Disable it only for an artifact-only build.
 4. Select **Run workflow**. The workflow resolves the version, runs tests and lint, builds and shrinks the release, verifies its APK signature, and uploads **nia-production-VERSION**.
 5. Open **Releases** and download `nia-VERSION.apk`. `SHA256SUMS.txt` records its checksum. Artifact-only builds are downloaded/extracted from the workflow run instead.
 
 With **publish_release** enabled, the APK and checksum are also available under **[Releases](https://github.com/robin-siegl/Nia/releases)** for public download. No artifact extraction or GitHub sign-in is needed for those release assets.
 
-**First 1.0 build:** keep the defaults and leave the exact version blank. The minimum source version is `1.0.0`, so absent tags or existing `0.x` MVP tags resolve to **1.0.0**. After `v1.0.0` is published, patch chooses `1.0.1`, minor chooses `1.1.0`, and major chooses `2.0.0`.
+**Current feature release:** keep the defaults and leave the exact version blank. The minimum source version is `1.1.0`, so absent tags or existing `0.x`/`1.0.x` tags resolve to **1.1.0**. After `v1.1.0` is published, patch chooses `1.1.1`, minor chooses `1.2.0`, and major chooses `2.0.0`.
 
 The latest stable `vMAJOR.MINOR.PATCH` Git tag is compared numerically. Prerelease and unrelated tags are ignored. Exact versions must be at least the source version and newer than all existing stable tags. Leading zeroes, prerelease suffixes, existing versions and builds from a branch other than `main` are rejected.
 

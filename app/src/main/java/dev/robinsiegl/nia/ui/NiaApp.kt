@@ -123,7 +123,8 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, onSystemBars: (Boolean) -
                                 val (time, date) = rememberClockText()
                                 HomeScreen(preferences.layout, time, date, model::openClock, model::openCategory,
                                     { model.navigate(Screen.Apps) }, textSize = preferences.homeTextSize,
-                                    onSettings = { model.navigate(Screen.Settings) })
+                                    onSettings = { model.navigate(Screen.Settings) }, pixelClockLayout = preferences.pixelClockLayout,
+                                    contentTopInset = padding.calculateTopPadding())
                             }
                             Screen.Apps -> AppListScreen(apps, loading, preferences.searchAutofocus,
                                 onBack = model::back, onSelect = { model.openApp(it.target) },

@@ -2,6 +2,14 @@
 
 Product specification · 30 October 2026
 
+## 1.1.0 lock-screen alignment
+
+- The default portrait clock/date header follows the supplied Pixel 10 Pro reference with fixed full-screen anchors, spaced time and stronger date typography. Existing assignments and Home shortcut order are preserved.
+- Pixel clock layout can be disabled in Home settings to restore the scalable classic header. Pixel mode's clock/date do not move with app text sizes; landscape falls back to compact typography.
+- Header fonts are bundled static subsets of the open Google Sans release with original OFL licensing and renamed derivative family metadata.
+- Backup exports use schema 3, retaining import compatibility with schemas 1 and 2. Older settings default to the new header and can select the previous layout.
+- Exact Pixel weather UI/data integration remains deferred; substitute icons and fabricated weather are outside this change.
+
 ## 1.0.0 release scope
 
 - Guided setup has Layout, Apps, Appearance and Default Home stages. It stores progress locally, preserves the step through app selection/restarts, and keeps skip, restore and all-app access available. Existing completed setups are not repeated on upgrade.
