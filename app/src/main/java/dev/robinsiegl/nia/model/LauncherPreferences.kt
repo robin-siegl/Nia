@@ -8,6 +8,7 @@ enum class HomeCategory(val label: String) {
 }
 
 @Serializable enum class HomeLayout { GRID, LIST }
+@Serializable enum class HomeTextSize(val scale: Float) { SMALL(0.85f), DEFAULT(1f), LARGE(1.15f) }
 @Serializable enum class ColorStyle { MONOCHROME, COLOR }
 @Serializable enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
@@ -21,11 +22,13 @@ data class AppEntry(val target: AppTarget, val label: String)
 @Serializable
 data class LauncherPreferences(
     val layout: HomeLayout = HomeLayout.GRID,
+    val homeTextSize: HomeTextSize = HomeTextSize.DEFAULT,
     val colorStyle: ColorStyle = ColorStyle.MONOCHROME,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val seedColor: String = "#7C3AED",
     val pureBlackColorBackground: Boolean = false,
     val searchAutofocus: Boolean = false,
+    val alphabetScrubber: Boolean = false,
     val assignments: Map<HomeCategory, AppTarget> = emptyMap(),
     val clock: AppTarget? = null,
 )

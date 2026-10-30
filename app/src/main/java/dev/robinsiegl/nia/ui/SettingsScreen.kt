@@ -1,11 +1,9 @@
 package dev.robinsiegl.nia.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -13,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -23,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.robinsiegl.nia.BuildConfig
 import dev.robinsiegl.nia.model.*
-import dev.robinsiegl.nia.theme.Palette
 
 @Composable
 fun SettingsScreen(
@@ -41,6 +37,11 @@ fun SettingsScreen(
         SectionLabel("HOME")
         ChoiceRow(listOf(HomeLayout.GRID to "Icon grid", HomeLayout.LIST to "Text list"), preferences.layout,
             { value -> onChange { it.copy(layout = value) } })
+        Text("Home text size", fontSize = 16.sp, modifier = Modifier.padding(top = 20.dp, bottom = 10.dp))
+        ChoiceRow(listOf(HomeTextSize.SMALL to "Small", HomeTextSize.DEFAULT to "Default", HomeTextSize.LARGE to "Large"),
+            preferences.homeTextSize, { value -> onChange { it.copy(homeTextSize = value) } })
+        Text("Applies to the clock, date and Home list.", fontSize = 12.sp, modifier = Modifier.padding(top = 10.dp))
+        HomeTextPreview(preferences.layout, preferences.homeTextSize)
         SectionLabel("APPEARANCE")
         ChoiceRow(listOf(ColorStyle.MONOCHROME to "Black & white", ColorStyle.COLOR to "Color"), preferences.colorStyle,
             { value -> onChange { it.copy(colorStyle = value) } })
@@ -61,6 +62,9 @@ fun SettingsScreen(
         SectionLabel("APP LIST")
         SettingSwitch("Focus search automatically", "Show the keyboard when opening Apps.", preferences.searchAutofocus) {
             value -> onChange { it.copy(searchAutofocus = value) }
+        }
+        SettingSwitch("Alphabet scrubber", "Drag along the right edge to jump to a letter.", preferences.alphabetScrubber) {
+            value -> onChange { it.copy(alphabetScrubber = value) }
         }
         SectionLabel("BACKUP")
         TextButton(onClick = onExport, enabled = !storageError, modifier = Modifier.fillMaxWidth()) { Text("Export settings") }
@@ -101,7 +105,7 @@ private fun AssignmentRow(
 }
 
 @Composable
-private fun SettingSwitch(label: String, description: String, checked: Boolean, onChange: (Boolean) -> Unit) {
+internal fun SettingSwitch(label: String, description: String, checked: Boolean, onChange: (Boolean) -> Unit) {
     Row(Modifier.fillMaxWidth().heightIn(min = 64.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f).padding(end = 12.dp)) {
             Text(label, fontSize = 16.sp)
@@ -112,41 +116,13 @@ private fun SettingSwitch(label: String, description: String, checked: Boolean, 
 }
 
 @Composable
-private fun ColorSettings(preferences: LauncherPreferences, onChange: ((LauncherPreferences) -> LauncherPreferences) -> Unit) {
-    var input by rememberSaveable(preferences.seedColor) { mutableStateOf(preferences.seedColor) }
-    val valid = PreferencesValidation.isColor(input)
-    Text("Pick one color. nia finds the matching background and text.", fontSize = 14.sp,
-        modifier = Modifier.padding(top = 24.dp, bottom = 16.dp))
-    val seeds = listOf("Violet" to "#7C3AED", "Rose" to "#D54778", "Blue" to "#2563EB", "Mint" to "#008B75", "Amber" to "#BD7900", "Coral" to "#D8553D")
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        seeds.forEach { (name, hex) ->
-            val active = preferences.seedColor.equals(hex, ignoreCase = true)
-            Box(Modifier.size(48.dp).clickable(role = Role.Button) { onChange { it.copy(seedColor = hex) } }
-                .semantics { contentDescription = "$name color" }, contentAlignment = Alignment.Center) {
-                Box(Modifier.size(30.dp).border(if (active) 2.dp else 0.dp,
-                    if (active) MaterialTheme.colorScheme.onSurface else Color.Transparent, CircleShape).padding(4.dp)
-                    .background(Color((0xFF000000L or hex.drop(1).toLong(16)).toInt()), CircleShape))
-            }
-        }
-    }
-    Row(Modifier.padding(top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-        OutlinedTextField(input, { input = it.take(7) }, label = { Text("Your color") }, singleLine = true,
-            isError = input.isNotEmpty() && !valid, modifier = Modifier.weight(1f),
-            supportingText = { if (!valid) Text("Use #RRGGBB") })
-        TextButton(onClick = { onChange { it.copy(seedColor = input.uppercase()) } }, enabled = valid,
-            modifier = Modifier.padding(start = 8.dp)) { Text("Apply") }
-    }
-    Row(Modifier.fillMaxWidth().padding(vertical = 16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        listOf(ThemeMode.LIGHT to "Light", ThemeMode.DARK to "Dark").forEach { (mode, label) ->
-            val colors = Palette.generate(preferences.copy(themeMode = mode), false)
-            Column(Modifier.weight(1f).background(Color(colors.background), RoundedCornerShape(8.dp))
-                .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.20f), RoundedCornerShape(8.dp)).padding(16.dp)) {
-                Text("Aa", fontSize = 28.sp, fontWeight = FontWeight.Light, color = Color(colors.foreground))
-                Text(label, fontSize = 12.sp, color = Color(colors.foreground))
-            }
-        }
-    }
-    SettingSwitch("Pure black in dark mode", "Keeps your colored text on an OLED-black background.", preferences.pureBlackColorBackground) {
-        value -> onChange { it.copy(pureBlackColorBackground = value) }
+private fun HomeTextPreview(layout: HomeLayout, size: HomeTextSize) {
+    Column(Modifier.fillMaxWidth().padding(top = 16.dp)
+        .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f), RoundedCornerShape(8.dp)).padding(16.dp)) {
+        Text("Home preview", fontSize = 12.sp, modifier = Modifier.padding(bottom = 8.dp))
+        Text("09:41", fontSize = (40 * size.scale).sp, fontWeight = FontWeight.Light)
+        Text("Friday, October 30", fontSize = (16 * size.scale).sp)
+        if (layout == HomeLayout.LIST) Text("Music", fontSize = (29 * size.scale).sp,
+            fontWeight = FontWeight.Light, modifier = Modifier.padding(top = 10.dp))
     }
 }

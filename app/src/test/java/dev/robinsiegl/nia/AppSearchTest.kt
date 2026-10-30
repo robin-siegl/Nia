@@ -19,4 +19,21 @@ class AppSearchTest {
         assertEquals(listOf("test.first", "test.second"), AppSearch.filter(apps, "maps").map { it.target.packageName })
     }
     @Test fun `no matches returns an empty result`() { assertTrue(AppSearch.filter(listOf(app("Music")), "xyz").isEmpty()) }
+    @Test fun `alphabet sections point at the first app for each actual letter`() {
+        val apps = AppSearch.filter(listOf(app("Zebra"), app("École"), app("Email"), app("Calendar"),
+            app("Camera"), app("3D Viewer")), "")
+        assertEquals(listOf(AlphabetSection("#", 0), AlphabetSection("C", 1), AlphabetSection("E", 3),
+            AlphabetSection("Z", 5)), AppSearch.sections(apps))
+    }
+    @Test fun `alphabet sections handle empty names and non Latin labels without losing apps`() {
+        val apps = listOf(app(""), app("日本語"), app(" alpha"), app("Ärger"))
+        assertEquals(listOf(AlphabetSection("#", 0), AlphabetSection("A", 2)), AppSearch.sections(apps))
+        assertTrue(AppSearch.sections(emptyList()).isEmpty())
+    }
+    @Test fun `names outside the English alphabet share one contiguous bucket`() {
+        val apps = listOf(app("日本語"), app("Zebra"), app("3D Viewer"), app("Alphabet"), app("Календарь"))
+        val sorted = AppSearch.filter(apps, "")
+        assertEquals(apps.size, sorted.size)
+        assertEquals(listOf(AlphabetSection("#", 0), AlphabetSection("A", 3), AlphabetSection("Z", 4)), AppSearch.sections(sorted))
+    }
 }

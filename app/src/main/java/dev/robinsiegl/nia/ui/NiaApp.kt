@@ -111,14 +111,16 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, onSystemBars: (Boolean) -
                             } else {
                                 val (time, date) = rememberClockText()
                                 HomeScreen(preferences.layout, time, date, model::openClock, model::openCategory,
-                                    { model.navigate(Screen.Apps) })
+                                    { model.navigate(Screen.Apps) }, textSize = preferences.homeTextSize,
+                                    onSettings = { model.navigate(Screen.Settings) })
                             }
                             Screen.Apps -> AppListScreen(apps, loading, preferences.searchAutofocus,
                                 onBack = model::back, onSelect = { model.openApp(it.target) },
-                                onSettings = { model.navigate(Screen.Settings) }, onInfo = { model.showAppInfo(it.target) })
+                                onSettings = { model.navigate(Screen.Settings) }, onInfo = { model.showAppInfo(it.target) },
+                                alphabetScrubber = preferences.alphabetScrubber)
                             is Screen.Picker -> AppListScreen(apps, loading, false,
                                 title = screen.category?.label ?: "Clock", onBack = model::back,
-                                onSelect = { model.chooseApp(screen.category, it.target) })
+                                onSelect = { model.chooseApp(screen.category, it.target) }, alphabetScrubber = preferences.alphabetScrubber)
                             Screen.Settings -> SettingsScreen(preferences, apps, isDefault, storageError,
                                 onBack = model::back, onChange = model::updatePreferences,
                                 onAssign = { model.navigate(Screen.Picker(it)) }, onClear = model::clearAssignment,
@@ -132,7 +134,7 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, onSystemBars: (Boolean) -
         }
         restore?.let { preview ->
             AlertDialog(onDismissRequest = model::cancelRestore, title = { Text("Restore settings?") },
-                text = { Text("Replace your Home layout, appearance, app assignments and search preference with this backup." +
+                text = { Text("Replace your Home layout, appearance, app assignments and app-list preferences with this backup." +
                     if (preview.missingApps > 0) "\n\n${preview.missingApps} unavailable app assignment(s) will need to be chosen again." else "") },
                 confirmButton = { TextButton(onClick = model::applyRestore) { Text("Restore") } },
                 dismissButton = { TextButton(onClick = model::cancelRestore) { Text("Cancel") } })

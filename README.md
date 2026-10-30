@@ -8,6 +8,7 @@ nia is a native Kotlin/Jetpack Compose MVP. It can become your actual default Ho
   <img src="docs/screenshots/home-oled-grid.png" width="220" alt="nia OLED black icon grid" />
   <img src="docs/screenshots/home-violet-light.png" width="220" alt="nia pastel violet text list" />
   <img src="docs/screenshots/home-violet-dark.png" width="220" alt="nia dark violet text list" />
+  <img src="docs/screenshots/color-picker.png" width="220" alt="nia color wheel with live light and dark previews" />
 </p>
 
 Rendered from the app's Compose screens; phone screenshots will also include the system bars.
@@ -16,12 +17,15 @@ Rendered from the app's Compose screens; phone screenshots will also include the
 
 - Fixed Phone, Messages, Music, Calendar and Maps shortcuts, each assigned to an installed app.
 - Top-aligned icon grid or a text-only Home list.
+- Apps completes the six-item icon grid or appears as a matching text entry. A settings gear is available on Home and in the app list.
+- Small, Default or Large Home text, with a preview in Settings.
 - Time opens Clock; date opens your assigned Calendar.
 - Swipe up or tap **Apps** for an alphabetical, text-only app list.
 - Search by name, with an optional automatic keyboard/focus setting.
+- Optional alphabet navigation: drag the right edge of the app list to jump to a letter. Letters appear during interaction; searching hides the scrubber.
 - First-launch setup and Android's default-launcher selection.
 - Black/white or one-color themes, with **System / Light / Dark** modes.
-- Select violet, rose, blue, mint, amber, coral or a custom hex color: nia generates matching pastel/dark background and foreground pairs. Both variants are previewed together. Generated pairs target at least **7:1** text contrast.
+- Use the visual color wheel and brightness slider, a preset, or a custom hex color: nia generates matching pastel/dark background and foreground pairs. Both variants preview live; wheel/slider changes save when released, and hex input uses Apply. Generated pairs target at least **7:1** text contrast.
 - Pure `#000000` in monochrome dark mode, plus an OLED-black option for colored dark themes.
 - Persistent preferences and versioned settings export/import, including app assignments.
 - Missing-app recovery, live package-list updates and a settings reset/recovery path.
@@ -37,7 +41,7 @@ Development builds have their own package ID (`dev.robinsiegl.nia.debug`) so the
 
 Configure the same four repository Actions secrets used by pip-os: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD`, using your nia keystore and credentials. The [one-time signing instructions](docs/RELEASING.md#one-time-signing-setup) include the keystore command and PowerShell copy-to-clipboard step.
 
-If those secrets are already added, setup is complete. Open **[Actions → Production APK → Run workflow](https://github.com/robin-siegl/Nia/actions/workflows/production.yml)** on `main`. Leave the version blank for `0.1.0`, or enter a new version. Enable **publish_release** for a public APK download under **[Releases](https://github.com/robin-siegl/Nia/releases)**. The signed APK and checksum are also uploaded as the **nia-production-VERSION** artifact.
+If those secrets are already added, setup is complete. Open **[Actions → Production APK → Run workflow](https://github.com/robin-siegl/Nia/actions/workflows/production.yml)** on `main`. Leave the version blank for `0.2.0`, or enter a new version. Enable **publish_release** for a public APK download under **[Releases](https://github.com/robin-siegl/Nia/releases)**. The signed APK and checksum are also uploaded as the **nia-production-VERSION** artifact.
 
 Keep a private backup of your keystore and passwords and use the same key for future updates. No additional signing-bundle secret is required. See [release instructions](docs/RELEASING.md) for the optional setup helper, local builds and troubleshooting.
 
@@ -67,5 +71,6 @@ The MVP supports the personal profile. Work profiles and Private Space are defer
 - [Release setup](docs/RELEASING.md)
 - [Device acceptance](docs/DEVICE_TESTING.md)
 - [Prioritized roadmap](docs/ROADMAP.md)
+- [Changelog](CHANGELOG.md)
 
 The source license is still to be selected.

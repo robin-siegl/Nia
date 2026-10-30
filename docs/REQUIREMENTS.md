@@ -2,6 +2,16 @@
 
 MVP specification · 30 October 2026
 
+## 0.2.0 Home and appearance update
+
+- Apps is the sixth fixed entry: a four-square symbol in the 3×2 grid or a text row matching the five categories.
+- Settings uses an outlined gear on Home and in the app-list header.
+- Home text size has Small / Default / Large choices and a live preview. It scales the clock, date and list entries alongside Android's font scaling.
+- A visual hue/saturation wheel and brightness slider supplement the presets and hex field. Light/dark palette previews update while picking; dragging commits on release and valid hex commits with Apply. Accessible wheel actions and keyboard controls are available.
+- Optional alphabet scrubbing uses a 48dp-wide target on the right edge. Letter labels appear while interacting or using keyboard focus; the scrubber hides during search. It defaults off and also works in app-assignment lists.
+- Existing saved settings and version-1 backups load with Default text size and the scrubber off. Exports use schema 2 with both new preferences; imports accept schemas 1 and 2.
+- Theme-only sharing remains deferred.
+
 **Status:** Implementation specification for nia in [robin-siegl/Nia](https://github.com/robin-siegl/Nia). The MVP includes all core launcher flows and a production build workflow. The implementation decisions below resolve earlier proposed defaults; the selected-color theme replaces the earlier manual foreground/background design.
 
 ## MVP implementation decisions

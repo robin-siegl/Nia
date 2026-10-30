@@ -5,6 +5,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -13,6 +19,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
 import dev.robinsiegl.nia.model.HomeCategory
 
@@ -27,6 +34,47 @@ private val categoryVectors = HomeCategory.entries.associateWith { category ->
     ImageVector.Builder(category.label, 24.dp, 24.dp, 24f, 24f)
         .addPath(addPathNodes(path), fill = null, stroke = SolidColor(Color.Black), strokeLineWidth = 1.5f,
             strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round).build()
+}
+
+private fun outlineIcon(name: String, path: String) = ImageVector.Builder(name, 24.dp, 24.dp, 24f, 24f)
+    .addPath(addPathNodes(path), fill = null, stroke = SolidColor(Color.Black), strokeLineWidth = 1.5f,
+        strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round).build()
+
+private val appsVector = outlineIcon("Apps", "M4,4H10V10H4Z M14,4H20V10H14Z M4,14H10V20H4Z M14,14H20V20H14Z")
+private val settingsVector = outlineIcon("Settings",
+    "M9,3H15L15.7,5.3L17.4,6.3L19.7,5.8L21.2,8.4L19.6,10.1V13.9L21.2,15.6L19.7,18.2L17.4,17.7L15.7,18.7L15,21H9L8.3,18.7L6.6,17.7L4.3,18.2L2.8,15.6L4.4,13.9V10.1L2.8,8.4L4.3,5.8L6.6,6.3L8.3,5.3Z M16,12A4,4 0,1 1,8,12A4,4 0,1 1,16,12")
+
+@Composable
+fun AppsIcon(modifier: Modifier = Modifier) {
+    Icon(appsVector, contentDescription = null, modifier = modifier)
+}
+
+@Composable
+fun SettingsButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    IconButton(onClick, modifier = modifier.size(48.dp)) {
+        Icon(settingsVector, contentDescription = "Settings", modifier = Modifier.size(24.dp))
+    }
+}
+
+/** A continuous selector that also accepts a single tap without touch-slop delay. */
+@Composable
+internal fun Modifier.dragToSelect(onSelect: (Offset, IntSize) -> Unit, onFinished: () -> Unit): Modifier {
+    val select by rememberUpdatedState(onSelect)
+    val finish by rememberUpdatedState(onFinished)
+    return pointerInput(Unit) {
+        awaitEachGesture {
+            val down = awaitFirstDown()
+            select(down.position, size)
+            down.consume()
+            do {
+                val event = awaitPointerEvent()
+                val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                select(change.position, size)
+                change.consume()
+            } while (change.pressed)
+            finish()
+        }
+    }
 }
 
 @Composable

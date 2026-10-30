@@ -10,7 +10,9 @@ Done when the primary phone passes the checklist and an in-place signed update p
 
 ## 2. Theme refinement
 
-Add a visual hue/chroma picker so custom colors need no hex input. Offer a few curated seed palettes and adjustable pastel strength while preserving measured text contrast. Allow importing/exporting just a theme independently from app assignments. Consider respecting Android's enhanced contrast preference.
+The visual color wheel, brightness slider, curated presets and live paired previews are available in 0.2.0. Home text sizes and optional alphabet scrubbing are also implemented.
+
+For a later release, allow importing/exporting just a theme independently from app assignments. Theme sharing is explicitly postponed. Consider adjustable pastel strength and respecting Android's enhanced contrast preference.
 
 Done when any supported picker color produces readable matched light/dark pairs and System changes remain reliable.
 
