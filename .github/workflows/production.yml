@@ -1,19 +1,9 @@
 name: Production APK
-run-name: nia production ${{ inputs.version || inputs.bump }}${{ inputs.publish_release && ' + GitHub release' || '' }}
+run-name: nia production from gradle.properties${{ inputs.publish_release && ' + GitHub release' || '' }}
 
 on:
   workflow_dispatch:
     inputs:
-      bump:
-        description: 'Next version (ignored when an exact version is entered)'
-        required: true
-        type: choice
-        default: patch
-        options: [patch, minor, major]
-      version:
-        description: 'Optional exact stable version, for example 1.1.0'
-        type: string
-        default: ''
       publish_release:
         description: 'Publish a public GitHub release with the signed APK'
         type: boolean
@@ -28,7 +18,7 @@ concurrency:
 
 jobs:
   version:
-    name: Resolve release version
+    name: Validate project version
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -39,11 +29,8 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - name: Choose a new version
+      - name: Read the committed Gradle version
         id: version
-        env:
-          RELEASE_VERSION: ${{ inputs.version }}
-          RELEASE_BUMP: ${{ inputs.bump }}
         run: python3 scripts/release_version.py
 
   checks:
@@ -76,10 +63,7 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: python3 scripts/prepare_signing.py
       - name: Build production APK
-        env:
-          VERSION: ${{ needs.version.outputs.version }}
-          VERSION_CODE: ${{ needs.version.outputs.version_code }}
-        run: ./gradlew :app:assembleRelease :app:lintRelease -Pnia.versionName="$VERSION" -Pnia.versionCode="$VERSION_CODE" --stacktrace
+        run: ./gradlew :app:assembleRelease :app:lintRelease --stacktrace
       - name: Verify signature and prepare download
         env:
           VERSION: ${{ needs.version.outputs.version }}

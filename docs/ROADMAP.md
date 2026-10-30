@@ -32,7 +32,7 @@ Done when profile lock/unlock/removal and cross-device restore cannot leak or mi
 
 ## 5. Distribution and maintainability
 
-A changelog, privacy document and automatic patch/minor/major release workflow are available in 1.0. Choose a source license, add a contribution guide, expand CI with emulator/device checks, and consider a public APK update-notification channel. Any network feature should remain optional and explain its purpose.
+A changelog, privacy document and a production workflow using the committed Gradle version are available. Choose a source license, add a contribution guide, expand CI with emulator/device checks, and consider a public APK update-notification channel. Any network feature should remain optional and explain its purpose.
 
 Done when releases have a stable signing identity, an upgrade test and clear compatibility notes.
 

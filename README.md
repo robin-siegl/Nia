@@ -52,9 +52,9 @@ Development builds have their own package ID (`dev.robinsiegl.nia.debug`) so the
 
 Configure the same four repository Actions secrets used by pip-os: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD`, using your nia keystore and credentials. The [one-time signing instructions](docs/RELEASING.md#one-time-signing-setup) include the keystore command and PowerShell copy-to-clipboard step.
 
-If those secrets are already added, setup is complete. Open **[Actions → Production APK → Run workflow](https://github.com/robin-siegl/Nia/actions/workflows/production.yml)** on `main`. Leave **patch** selected, the exact version blank, and **publish_release** enabled. The current source minimum is **1.1.0**. Later runs choose the next patch/minor/major version from the latest stable Git tag. An optional exact version overrides the bump.
+If those secrets are already added, setup is complete. Open **[Actions → Production APK → Run workflow](https://github.com/robin-siegl/Nia/actions/workflows/production.yml)** on `main`, leave **publish_release** enabled and select **Run workflow**. The APK, tag and release use the exact `nia.versionName` and `nia.versionCode` committed in [gradle.properties](gradle.properties), currently **1.1.1 / 1001001**. There are no version inputs or automatic bumps; the project version is updated with the changes before each new release.
 
-Public release publication is enabled by default. The signed APK and checksum are also uploaded as the **nia-production-VERSION** artifact. Existing or older versions are rejected, and the tag is created only after tests, lint, build and signature verification succeed.
+Public release publication is enabled by default. The signed APK and checksum are also uploaded as the **nia-production-VERSION** artifact. Existing or older versions and mismatched Android version codes are rejected before building, and the tag is created only after tests, lint, build and signature verification succeed.
 
 Keep a private backup of your keystore and passwords and use the same key for future updates. No additional signing-bundle secret is required. See [release instructions](docs/RELEASING.md) for the optional setup helper, local builds and troubleshooting.
 
