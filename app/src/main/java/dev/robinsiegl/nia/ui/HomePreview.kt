@@ -20,8 +20,12 @@ internal fun HomePreview(preferences: LauncherPreferences, modifier: Modifier = 
     Column(modifier.fillMaxWidth().testTag("home-preview")
         .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f), RoundedCornerShape(8.dp)).padding(16.dp)) {
         Text("Home preview", fontSize = 12.sp, modifier = Modifier.padding(bottom = 8.dp))
-        Text("09:41", fontSize = (36 * scale).sp, fontWeight = FontWeight.Light)
-        Text("Friday, October 30", fontSize = (12 * scale).sp)
+        if (preferences.pixelClockLayout) {
+            PixelClockHeader("09:41", "Fri, 30 Oct", {}, {}, interactive = false)
+        } else {
+            Text("09:41", fontSize = (36 * scale).sp, fontWeight = FontWeight.Light)
+            Text("Friday, October 30", fontSize = (12 * scale).sp)
+        }
         Spacer(Modifier.height(16.dp))
         if (preferences.layout == HomeLayout.GRID) {
             val shortcuts = HomeCategory.entries.toList() + listOf(null)

@@ -23,7 +23,7 @@ class BackupException(message: String) : IllegalArgumentException(message)
 
 object BackupCodec {
     const val MAX_BYTES = 256 * 1024
-    private const val CURRENT_VERSION = 2
+    private const val CURRENT_VERSION = 3
     val json = Json { encodeDefaults = true; prettyPrint = true; explicitNulls = false }
 
     fun export(preferences: LauncherPreferences, exportedAt: String = Instant.now().toString()): ByteArray {
@@ -41,7 +41,7 @@ object BackupCodec {
                 throw BackupException("Choose a nia settings backup.")
             }
             val version = root["schemaVersion"]?.jsonPrimitive?.intOrNull
-            if (version != 1 && version != CURRENT_VERSION) {
+            if (version == null || version !in 1..CURRENT_VERSION) {
                 throw BackupException("This backup version is not supported. Update nia and try again.")
             }
             if (root["profile"]?.jsonPrimitive?.content != "personal") {

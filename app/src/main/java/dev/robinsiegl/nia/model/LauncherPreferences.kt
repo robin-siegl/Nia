@@ -24,6 +24,7 @@ data class AppEntry(val target: AppTarget, val label: String)
 data class LauncherPreferences(
     val layout: HomeLayout = HomeLayout.GRID,
     val homeTextSize: HomeTextSize = HomeTextSize.DEFAULT,
+    val pixelClockLayout: Boolean = true,
     val colorStyle: ColorStyle = ColorStyle.MONOCHROME,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val seedColor: String = "#7C3AED",

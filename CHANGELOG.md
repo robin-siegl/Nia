@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0
+
+- Added a portrait clock/date layout measured from the supplied Pixel 10 Pro lock-screen captures, accounting for the status-bar inset.
+- Added bundled Google Sans-derived clock fonts, spaced time and a stronger date, with matching OLED monochrome tones.
+- Added a Home setting to return to the previous clock layout. Pixel mode keeps header sizing fixed while Home app-name sizes remain adjustable; landscape uses the compact layout.
+- Updated Home previews and backup schema 3; imports still accept schemas 1 and 2.
+- Kept exact Pixel weather integration deferred because the system Smartspace clock/weather UI has no supported public launcher interface.
+
 ## 1.0.0
 
 - Added a guided four-step first launch with persistent progress, app assignment, appearance choices and Home previews.
