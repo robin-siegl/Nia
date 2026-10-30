@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.robinsiegl.nia.model.AppEntry
 import dev.robinsiegl.nia.model.AppSearch
+import dev.robinsiegl.nia.model.CornerPosition
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -42,6 +43,7 @@ fun AppListScreen(
     alphabetScrubber: Boolean = false,
     interactionEnabled: Boolean = true, gesturesEnabled: Boolean = true,
     listState: LazyListState = rememberLazyListState(), headerDragModifier: Modifier = Modifier,
+    onAssignCorner: ((AppEntry, CornerPosition) -> Unit)? = null,
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     val results = remember(apps, query) { AppSearch.filter(apps, query) }
@@ -54,15 +56,16 @@ fun AppListScreen(
     val keyboard = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+    var menuApp by remember { mutableStateOf<AppEntry?>(null) }
     BackHandler(enabled = interactionEnabled) {
         if (imeVisible) { focusManager.clearFocus(); keyboard?.hide() } else onBack()
     }
     BackHandler(enabled = !interactionEnabled) { /* Do not leave midway through a transition or saved selection. */ }
     LaunchedEffect(autofocus, interactionEnabled) {
-        if (!interactionEnabled) { focusManager.clearFocus(); keyboard?.hide() }
+        if (!interactionEnabled) { menuApp = null; focusManager.clearFocus(); keyboard?.hide() }
         else if (autofocus) { focus.requestFocus(); keyboard?.show() }
     }
-    LaunchedEffect(query) { listState.scrollToItem(0) }
+    LaunchedEffect(query) { menuApp = null; listState.scrollToItem(0) }
     fun submitSearch() {
         if (!interactionEnabled) return
         keyboard?.hide(); focusManager.clearFocus()
@@ -98,15 +101,32 @@ fun AppListScreen(
                 LazyColumn(Modifier.fillMaxSize().testTag("apps-list").padding(end = if (showScrubber) 48.dp else 12.dp),
                     state = listState, userScrollEnabled = gesturesEnabled) {
                     items(results, key = { it.target.key }) { app ->
+                        Box {
                         Column(Modifier.fillMaxWidth().combinedClickable(
                             enabled = interactionEnabled,
                             role = Role.Button, onClick = { onSelect(app) },
-                            onLongClick = onInfo?.let { action -> { action(app) } },
-                            onLongClickLabel = if (onInfo != null) "App info" else null,
+                            onLongClick = if (onInfo != null || onAssignCorner != null) ({
+                                focusManager.clearFocus(); keyboard?.hide(); menuApp = app
+                            }) else null,
+                            onLongClickLabel = if (onInfo != null || onAssignCorner != null) "App actions" else null,
                         ).padding(vertical = 14.dp)) {
                             Text(app.label, fontSize = 22.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                             if (app.label in duplicates) Text(app.target.key, fontSize = 11.sp, maxLines = 1,
                                 overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f))
+                        }
+                        DropdownMenu(expanded = interactionEnabled && menuApp?.target == app.target,
+                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                            onDismissRequest = { menuApp = null }) {
+                            Text(app.label, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp))
+                            if (onInfo != null) DropdownMenuItem(text = { Text("App info") }, onClick = {
+                                menuApp = null; onInfo(app)
+                            })
+                            if (onAssignCorner != null) CornerPosition.entries.forEach { position ->
+                                DropdownMenuItem(text = { Text("Assign to ${position.label.lowercase()} corner") }, onClick = {
+                                    menuApp = null; onAssignCorner(app, position)
+                                })
+                            }
+                        }
                         }
                     }
                     item { Spacer(Modifier.height(24.dp)) }

@@ -85,28 +85,31 @@ class ScreensTest {
         assertTrue(opened)
     }
 
-    @Test fun `Apps icon and optional settings corner open their destinations`() {
+    @Test fun `Apps icon and optional app corner open their destinations`() {
         var openedApps = false
-        var openedSettings = false
+        var openedCorner = false
         render {
             HomeScreen(HomeLayout.GRID, "09:41", "Friday, October 30", {}, {}, { openedApps = true },
-                rightShortcut = CornerShortcut(ShortcutAction.SETTINGS), onCorner = { openedSettings = true })
+                rightShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.CAMERA, AppTarget("example.camera", ".Main")),
+                onCorner = { openedCorner = true }, cornerLabel = { "Camera" })
         }
         rule.onNodeWithContentDescription("Apps").performClick()
-        rule.onNodeWithContentDescription("Settings").performClick()
-        assertTrue(openedApps && openedSettings)
+        rule.onNodeWithContentDescription("Camera").performClick()
+        assertTrue(openedApps && openedCorner)
     }
 
     @Test @Config(qualifiers = "w320dp-h600dp-xhdpi")
-    fun `large Home text and system font scaling keep Apps and settings reachable`() {
+    fun `large Home text and system font scaling keep Apps and corner shortcuts reachable`() {
         var opened = false
         render {
             CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 2f)) {
                 HomeScreen(HomeLayout.LIST, "09:41", "Friday, October 30", {}, {}, { opened = true },
-                    textSize = HomeTextSize.LARGE, rightShortcut = CornerShortcut(ShortcutAction.SETTINGS))
+                    textSize = HomeTextSize.LARGE,
+                    rightShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.CAMERA, AppTarget("example.camera", ".Main")),
+                    cornerLabel = { "Camera" })
             }
         }
-        rule.onNodeWithContentDescription("Settings").assertIsDisplayed()
+        rule.onNodeWithContentDescription("Camera").assertIsDisplayed()
         rule.onNodeWithText("Apps").performScrollTo().performClick()
         assertTrue(opened)
         screenshot("home-large-system-text")

@@ -58,6 +58,7 @@ fun SettingsDetailScreen(
     onExport: () -> Unit, onImport: () -> Unit, onResetAppearance: () -> Unit, onResetAll: () -> Unit,
     onOpenLink: (String) -> Unit,
     onAssignCorner: (CornerPosition) -> Unit = {},
+    updateCheck: UpdateCheck = UpdateCheck.Idle, onCheckUpdates: () -> Unit = {},
 ) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
         ScreenHeader(section.title, onBack)
@@ -77,7 +78,7 @@ fun SettingsDetailScreen(
                     fontSize = 14.sp, modifier = Modifier.padding(top = 20.dp))
             }
             SettingsSection.BACKUP -> BackupSettings(storageError, onExport, onImport, onResetAppearance, onResetAll)
-            SettingsSection.ABOUT -> AboutContent(onOpenLink)
+            SettingsSection.ABOUT -> AboutContent(onOpenLink, updateCheck, onCheckUpdates)
         }
     }
 }

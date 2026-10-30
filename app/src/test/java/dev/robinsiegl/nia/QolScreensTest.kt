@@ -195,11 +195,12 @@ class QolScreensTest {
         val left = CornerShortcut(ShortcutAction.APP, ShortcutIcon.NOTES, apps.first().target)
         render {
             HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}, leftShortcut = left,
-                rightShortcut = CornerShortcut(ShortcutAction.SETTINGS), onCorner = { chosen = it }, cornerLabel = { "Notes" })
+                rightShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.HEADPHONES, apps.last().target),
+                onCorner = { chosen = it }, cornerLabel = { if (it == CornerPosition.LEFT) "Notes" else "Podcasts" })
         }
         rule.onNodeWithContentDescription("Notes").performClick()
         assertEquals(CornerPosition.LEFT, chosen)
-        rule.onNodeWithContentDescription("Settings").performClick()
+        rule.onNodeWithContentDescription("Podcasts").performClick()
         assertEquals(CornerPosition.RIGHT, chosen)
         capture("home-corner-shortcuts")
     }
@@ -213,9 +214,7 @@ class QolScreensTest {
         rule.onNodeWithText("Icon: Notes").performClick()
         rule.onNodeWithContentDescription("Camera").performClick()
         assertEquals(ShortcutIcon.CAMERA, p.leftShortcut.icon)
-        val right = rule.onNodeWithTag("corner-settings-RIGHT")
-        right.onChildren().filter(hasText("Settings")).onFirst().performClick()
-        assertEquals(ShortcutAction.SETTINGS, p.rightShortcut.action)
+        rule.onNodeWithText("Settings", substring = false).assertDoesNotExist()
         rule.onAllNodesWithText("App").onLast().performClick()
         assertEquals(CornerPosition.RIGHT, picker)
         assertTrue(p.assignments.isEmpty())
@@ -224,7 +223,7 @@ class QolScreensTest {
 
     @Test fun `unlock reveal leaves header fixed and does not replay on ordinary recomposition`() {
         var locked by mutableStateOf(false)
-        var unlock by mutableIntStateOf(0)
+        var unlock by mutableStateOf<UnlockRevealRequest?>(null)
         var time by mutableStateOf("14:03")
         render { HomeScreen(HomeLayout.GRID, time, "Fri, 30 Oct", {}, {}, {}, unlockRequest = unlock, deviceLocked = locked) }
         val bounds = rule.onNodeWithTag("home-clock").fetchSemanticsNode().boundsInRoot
@@ -233,12 +232,12 @@ class QolScreensTest {
         rule.runOnIdle { locked = true; Snapshot.sendApplyNotifications() }
         rule.mainClock.advanceTimeBy(32)
         rule.onNodeWithContentDescription("Music").assertIsNotEnabled()
-        rule.runOnIdle { locked = false; unlock++; Snapshot.sendApplyNotifications() }
+        rule.runOnIdle { locked = false; unlock = UnlockRevealRequest(); Snapshot.sendApplyNotifications() }
         rule.mainClock.advanceTimeBy(64)
         assertEquals(bounds, rule.onNodeWithTag("home-clock").fetchSemanticsNode().boundsInRoot)
         rule.onNodeWithContentDescription("Music").assertIsNotEnabled()
         capture("unlock-reveal-middle")
-        rule.mainClock.advanceTimeBy(500)
+        rule.mainClock.advanceTimeBy(700)
         rule.onNodeWithContentDescription("Music").assertIsEnabled()
         rule.runOnIdle { time = "14:04"; Snapshot.sendApplyNotifications() }
         rule.mainClock.advanceTimeByFrame()

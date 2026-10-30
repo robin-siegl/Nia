@@ -3,17 +3,37 @@ package dev.robinsiegl.nia.model
 /** Unlocks are consumed only while nia is foreground; returning from another app is not an unlock. */
 internal class UnlockTracker {
     private var armed = false
+    private var wasForeground = false
+    private var backgroundDeadline: Long? = null
     val awaitingUnlock: Boolean get() = armed
 
-    fun screenOff() { armed = true }
-    fun userPresent(launcherResumed: Boolean) { if (!launcherResumed) armed = false }
-    fun leaveForeground(locked: Boolean, interactive: Boolean) { if (!locked && interactive) armed = false }
-
-    fun foreground(locked: Boolean, interactive: Boolean, focused: Boolean): Boolean {
-        if (locked) { armed = true; return false }
-        if (!interactive || !focused) return false
-        return armed.also { armed = false }
+    fun screenOff() {
+        if (wasForeground) { armed = true; backgroundDeadline = null }
     }
+    fun userPresent(launcherResumed: Boolean, nowMillis: Long = 0) {
+        // USER_PRESENT can precede onStart/onResume. Allow that handoff, then expire it
+        // if Android unlocked into a different app instead of retaining a stale reveal.
+        if (armed && !launcherResumed) backgroundDeadline = nowMillis + 1_500
+    }
+    fun leaveForeground(locked: Boolean, interactive: Boolean) {
+        if (!locked && interactive) { armed = false; wasForeground = false; backgroundDeadline = null }
+        else if (wasForeground) { armed = true; backgroundDeadline = null }
+    }
+
+    fun foreground(locked: Boolean, interactive: Boolean, focused: Boolean, nowMillis: Long = 0): Boolean {
+        if (locked || !interactive) { armed = true; wasForeground = true; backgroundDeadline = null; return false }
+        if (backgroundDeadline?.let { nowMillis >= it } == true) armed = false
+        if (!focused) return false
+        wasForeground = true
+        return armed.also { armed = false; backgroundDeadline = null }
+    }
+}
+
+/** An event survives delayed settings loading but cannot replay when Home is remounted. */
+class UnlockRevealRequest {
+    var pending: Boolean = true
+        private set
+    fun consume(): Boolean = pending.also { pending = false }
 }
 
 /** Uses monotonic time; shared by all app/Clock launches to reject rapid duplicate taps. */

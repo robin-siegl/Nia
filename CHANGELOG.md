@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.0
+
+- App-name long presses now offer App info and assignment to either corner, keeping the chosen icon and fixed Home categories.
+- About can manually check the latest public GitHub release and open its APK or release page. Added loading, retry, rate-limit, no-release, current-version and missing-APK states. Internet permission is used only for this requested check; no automatic checks/downloads or install permission.
+- Restore previews each changed preference and app assignment with current/backup values, lists unavailable apps and rechecks the result before applying. Duplicate restore submissions are blocked.
+- Removed Settings as a corner action and expanded the matching outline icon collection from 12 to 27. Upgrades/older imports clear legacy Settings corners and replace legacy app gear icons with Star while preserving other preferences.
+- Fixed pending unlocks lost when user-present precedes resume and reveal requests lost before Home first composes. Reveals are consumed once across Home remounts, use a scaled lead-in and a longer fade/rise, and keep the clock/date stationary. The system lock-screen exit still needs testing on the actual Pixel.
+- Backups now use schema 5 and accept schemas 1–4. Production still builds the exact committed Gradle version, now 1.3.0 / 1003000.
+
 ## 1.2.0
 
 - Added an Apps drawer that follows vertical swipes, settles according to distance/velocity and shares its opening/closing animation with taps and Back. Home stays mounted underneath; pulling down at the top of Apps closes it.

@@ -16,14 +16,14 @@ class PreferencesStore(context: Context) {
     private val store = context.applicationContext.niaDataStore
     private val key = stringPreferencesKey("state.v1")
     val state: Flow<SavedState> = store.data.map { data ->
-        val state = data[key]?.let { BackupCodec.json.decodeFromString<SavedState>(it) } ?: SavedState()
+        val state = data[key]?.let(BackupCodec::decodeState) ?: SavedState()
         PreferencesValidation.validate(state.preferences)
         state
     }
 
     suspend fun update(transform: (SavedState) -> SavedState) {
         store.edit { data ->
-            val current = data[key]?.let { BackupCodec.json.decodeFromString<SavedState>(it) } ?: SavedState()
+            val current = data[key]?.let(BackupCodec::decodeState) ?: SavedState()
             val next = transform(current)
             PreferencesValidation.validate(next.preferences)
             data[key] = BackupCodec.json.encodeToString(next)

@@ -13,10 +13,13 @@ enum class HomeCategory(val label: String) {
 @Serializable enum class ThemeMode { SYSTEM, LIGHT, DARK }
 @Serializable enum class SetupStep { LAYOUT, APPS, APPEARANCE, DEFAULT }
 @Serializable enum class MotionMode { SYSTEM, REDUCED }
-@Serializable enum class ShortcutAction { EMPTY, SETTINGS, APP }
+@Serializable enum class ShortcutAction { EMPTY, APP }
 @Serializable enum class ShortcutIcon(val label: String) {
     STAR("Star"), CAMERA("Camera"), BROWSER("Browser"), NOTES("Notes"), WALLET("Wallet"), HEART("Heart"),
-    PHONE("Phone"), MESSAGES("Messages"), MUSIC("Music"), CALENDAR("Calendar"), MAPS("Maps"), SETTINGS("Settings")
+    PHONE("Phone"), MESSAGES("Messages"), MUSIC("Music"), CALENDAR("Calendar"), MAPS("Maps"),
+    SEARCH("Search"), MAIL("Mail"), PHOTOS("Photos"), FILES("Files"), BOOK("Book"), HEADPHONES("Headphones"),
+    PODCAST("Podcast"), VIDEO("Video"), SHOPPING("Shopping"), TRAIN("Train"), BIKE("Bike"), FITNESS("Fitness"),
+    COFFEE("Coffee"), CALCULATOR("Calculator"), CLOCK("Clock"), CLOUD("Cloud")
 }
 enum class CornerPosition(val label: String) { LEFT("Left"), RIGHT("Right") }
 
@@ -75,7 +78,7 @@ object PreferencesValidation {
         val shortcuts = listOf(preferences.leftShortcut, preferences.rightShortcut)
         shortcuts.forEach {
             require((it.action == ShortcutAction.APP) == (it.app != null)) {
-                "An app shortcut must have an assigned app. Empty and settings shortcuts cannot contain an app."
+                "An app shortcut must have an assigned app. Empty shortcuts cannot contain an app."
             }
         }
         (preferences.assignments.values + listOfNotNull(preferences.clock) + shortcuts.mapNotNull { it.app }).forEach { target ->

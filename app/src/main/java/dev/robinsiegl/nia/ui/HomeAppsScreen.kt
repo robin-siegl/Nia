@@ -99,7 +99,8 @@ internal fun HomeAppsScreen(
     drawerOpen: Boolean, onDrawerOpenChanged: (Boolean) -> Unit,
     onClock: () -> Unit, onCategory: (HomeCategory) -> Unit, onSettings: () -> Unit,
     onApp: (AppEntry) -> Unit, onAppInfo: (AppEntry) -> Unit, onCorner: (CornerPosition) -> Unit,
-    contentTopInset: Dp = 0.dp, unlockRequest: Int = 0, deviceLocked: Boolean = false, homeRequest: Int = 0,
+    contentTopInset: Dp = 0.dp, unlockRequest: UnlockRevealRequest? = null, deviceLocked: Boolean = false, homeRequest: Int = 0,
+    onAssignCorner: ((AppEntry, CornerPosition) -> Unit)? = null,
 ) {
     val scope = rememberCoroutineScope()
     val state = remember { DrawerMotion(drawerOpen, scope) }
@@ -201,7 +202,7 @@ internal fun HomeAppsScreen(
                 AppListScreen(apps, loading, preferences.searchAutofocus, onBack = { if (appsReady) request(false) },
                     onSelect = { if (appsReady) onApp(it) }, onSettings = { if (appsReady) onSettings() }, onInfo = onAppInfo,
                     alphabetScrubber = preferences.alphabetScrubber, interactionEnabled = appsReady,
-                    gesturesEnabled = !state.settling && !deviceLocked, listState = listState,
+                    gesturesEnabled = !state.settling && !deviceLocked, listState = listState, onAssignCorner = onAssignCorner,
                     headerDragModifier = Modifier.draggable(headerDrag, Orientation.Vertical,
                         enabled = !state.settling && !deviceLocked, onDragStopped = { finish(it) }))
             }

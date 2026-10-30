@@ -16,7 +16,7 @@ class BackupCodecTest {
         homeTextSize = HomeTextSize.LARGE, alphabetScrubber = true, pixelClockLayout = false,
         motionMode = MotionMode.REDUCED,
         leftShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.NOTES, AppTarget("org.example.notes", ".Main")),
-        rightShortcut = CornerShortcut(ShortcutAction.SETTINGS),
+        rightShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.HEADPHONES, AppTarget("org.example.music", ".Main")),
         assignments = mapOf(HomeCategory.MESSAGES to AppTarget("org.example.messages", "org.example.messages.MainActivity")),
         clock = AppTarget("org.example.clock", ".ClockActivity"))
     private fun exported() = BackupCodec.export(p, "2026-10-30T09:00:00Z").decodeToString()
@@ -75,7 +75,7 @@ class BackupCodecTest {
     }
     @Test fun `other files and future schemas are rejected`() {
         rejected("{}"); rejected(exported().replace("nia.settings", "other.settings"))
-        rejected(exported().replace("\"schemaVersion\": 4", "\"schemaVersion\": 5"))
+        rejected(exported().replace("\"schemaVersion\": 5", "\"schemaVersion\": 6"))
     }
     @Test fun `private and work profile backups are rejected`() {
         rejected(exported().replace("\"personal\"", "\"private\""))
@@ -92,5 +92,23 @@ class BackupCodecTest {
     @Test fun `truncated malformed and oversized input is rejected`() {
         rejected(exported().dropLast(4)); rejected("[]"); rejected("not json")
         assertThrows(BackupException::class.java) { BackupCodec.decode(ByteArray(BackupCodec.MAX_BYTES + 1)) }
+    }
+
+    @Test fun `schema four and stored Settings shortcuts migrate to empty without losing other preferences`() {
+        val root = BackupCodec.json.parseToJsonElement(exported()).jsonObject
+        val legacyCorner = BackupCodec.json.parseToJsonElement("""{"action":"SETTINGS","icon":"SETTINGS"}""")
+        val settings = JsonObject(root.getValue("settings").jsonObject + ("rightShortcut" to legacyCorner))
+        val legacy = JsonObject(root + mapOf("schemaVersion" to JsonPrimitive(4), "settings" to settings))
+        val expected = p.copy(rightShortcut = CornerShortcut())
+        assertEquals(expected, BackupCodec.decode(legacy.toString().encodeToByteArray()))
+        val state = BackupCodec.decodeState("""{"preferences":$settings,"setupComplete":true,"setupStep":"DEFAULT"}""")
+        assertEquals(SavedState(expected, true, SetupStep.DEFAULT), state)
+        assertFalse(BackupCodec.export(state.preferences).decodeToString().contains("SETTINGS"))
+    }
+
+    @Test fun `legacy gear used for an app becomes a star while preserving its app`() {
+        val legacy = exported().replace("\"schemaVersion\": 5", "\"schemaVersion\": 4").replace("\"HEADPHONES\"", "\"SETTINGS\"")
+        assertEquals(p.copy(rightShortcut = p.rightShortcut.copy(icon = ShortcutIcon.STAR)), BackupCodec.decode(legacy.encodeToByteArray()))
+        rejected(exported().replace("\"HEADPHONES\"", "\"SETTINGS\""))
     }
 }

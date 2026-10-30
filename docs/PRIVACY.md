@@ -1,6 +1,6 @@
 # nia privacy
 
-nia is an offline Android launcher. It has no accounts, advertising, analytics or crash-reporting service, and requests no Internet permission.
+nia's launcher, search, preferences and backups work offline. It has no accounts, advertising, analytics or crash-reporting service. Internet permission is used only when you manually check GitHub for an update in About nia.
 
 ## Installed apps
 
@@ -15,6 +15,14 @@ Your app assignments, layout, appearance, app-list options and unfinished setup 
 Exporting creates a JSON file at the location you select through Android's document picker. It includes appearance, layout, app-list preferences and assigned app identifiers. It does not include installed-app inventories, search history or setup progress. If you choose a cloud document provider, that provider handles the file under its own policies.
 
 Importing reads only the file you select. Android's automatic app-data backup and transfer are disabled; use nia's explicit settings export/import when moving settings.
+
+Before restoring, nia shows the current and backup values for every setting/app assignment that will change. Unavailable assignments are identified and cleared in the preview. Cancel leaves preferences unchanged. App availability is checked again when applying; a changed result requires reviewing the new preview.
+
+## Manual update checks
+
+Settings → About nia → Check for updates makes an HTTPS request to `api.github.com/repos/robin-siegl/Nia/releases/latest`. GitHub receives the normal connection metadata, including your IP address and the generic `nia-Android` client header. nia does not send your installed apps, app assignments, preferences, device identifier or search history. No account or access token is used.
+
+There are no automatic checks, background update jobs or automatic APK downloads. Results remain in memory for the current nia process. The download/release buttons open GitHub in another app, usually your browser; Android handles any installation you choose. nia does not request permission to install packages.
 
 ## External links
 

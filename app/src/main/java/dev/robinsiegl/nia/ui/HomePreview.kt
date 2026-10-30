@@ -49,8 +49,7 @@ internal fun HomePreview(preferences: LauncherPreferences, modifier: Modifier = 
             Row(Modifier.fillMaxWidth().padding(top = 24.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                 corners.forEach { shortcut ->
                     Box(Modifier.size(24.dp)) {
-                        if (shortcut.action != ShortcutAction.EMPTY) ShortcutGlyph(
-                            if (shortcut.action == ShortcutAction.SETTINGS) ShortcutIcon.SETTINGS else shortcut.icon, Modifier.size(24.dp))
+                        if (shortcut.action != ShortcutAction.EMPTY) ShortcutGlyph(shortcut.icon, Modifier.size(24.dp))
                     }
                 }
             }

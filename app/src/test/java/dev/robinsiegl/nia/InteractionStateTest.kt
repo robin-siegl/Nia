@@ -14,6 +14,7 @@ class InteractionStateTest {
     }
     @Test fun `unlock waits for an interactive focused launcher and is consumed once`() {
         val tracker = UnlockTracker()
+        tracker.foreground(false, true, true)
         tracker.screenOff()
         assertFalse(tracker.foreground(true, false, false))
         assertFalse(tracker.foreground(false, true, false))
@@ -24,14 +25,16 @@ class InteractionStateTest {
         tracker.userPresent(true)
         assertFalse(tracker.foreground(false, true, true))
     }
-    @Test fun `unlocking into another app never queues a later Home reveal`() {
+    @Test fun `unlocking into another app expires the pending Home reveal`() {
         val tracker = UnlockTracker()
+        tracker.foreground(false, true, true)
         tracker.screenOff()
-        tracker.userPresent(false)
-        assertFalse(tracker.foreground(false, true, true))
+        tracker.userPresent(false, 100)
+        assertFalse(tracker.foreground(false, true, true, 1600))
     }
     @Test fun `screen off pause retains unlock but leaving for an app clears it`() {
         val tracker = UnlockTracker()
+        tracker.foreground(false, true, true)
         tracker.screenOff()
         tracker.leaveForeground(false, false)
         assertTrue(tracker.foreground(false, true, true))
@@ -59,12 +62,40 @@ class InteractionStateTest {
         assertTrue(drawerShouldOpen(0.51f, 0f, 700f))
     }
     @Test fun `changing one corner keeps the other corner and fixed assignments intact`() {
-        val right = CornerShortcut(ShortcutAction.SETTINGS)
+        val right = CornerShortcut(ShortcutAction.APP, ShortcutIcon.HEADPHONES, AppTarget("example.podcast", ".Main"))
         val p = LauncherPreferences(rightShortcut = right, assignments = mapOf(HomeCategory.MUSIC to AppTarget("example.music", ".Main")))
         val left = CornerShortcut(ShortcutAction.APP, ShortcutIcon.CAMERA, AppTarget("example.camera", ".Main"))
         val changed = p.withShortcut(CornerPosition.LEFT, left)
         assertEquals(left, changed.shortcut(CornerPosition.LEFT))
         assertEquals(right, changed.shortcut(CornerPosition.RIGHT))
         assertEquals(p.assignments, changed.assignments)
+    }
+
+    @Test fun `user present before onResume retains the actual Home unlock`() {
+        val tracker = UnlockTracker()
+        tracker.foreground(false, true, true)
+        tracker.leaveForeground(true, false)
+        tracker.screenOff()
+        tracker.userPresent(false, 200)
+        assertFalse(tracker.foreground(false, true, false, 240))
+        assertTrue(tracker.foreground(false, true, true, 280))
+        assertFalse(tracker.foreground(false, true, true, 300))
+    }
+
+    @Test fun `screen off while a different app is foreground does not animate a later app return`() {
+        val tracker = UnlockTracker()
+        tracker.foreground(false, true, true)
+        tracker.leaveForeground(false, true)
+        tracker.screenOff()
+        tracker.userPresent(false, 100)
+        assertFalse(tracker.foreground(false, true, true, 150))
+    }
+
+    @Test fun `reveal event is consumed once across Home recreation`() {
+        val request = UnlockRevealRequest()
+        assertTrue(request.pending)
+        assertTrue(request.consume())
+        assertFalse(request.pending)
+        assertFalse(request.consume())
     }
 }
