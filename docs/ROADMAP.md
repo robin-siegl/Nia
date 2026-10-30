@@ -38,4 +38,4 @@ Done when releases have a stable signing identity, an upgrade test and clear com
 
 ## Deliberate scope boundaries
 
-User-added Home shortcuts, rearrangement, widgets and social feeds change the fixed minimal Home concept. Revisit them only through an explicit product decision. Contacts, unread counts, embedded music playback and calendar-event previews would also add data-access requirements and should each be justified independently.
+The two optional corner shortcuts are an explicit addition in 1.2.0. The five main categories retain their order. Arbitrary extra Home entries, rearrangement, widgets and social feeds remain outside the fixed minimal Home concept. Contacts, unread counts, embedded music playback and calendar-event previews would add data-access requirements and should each be justified independently.

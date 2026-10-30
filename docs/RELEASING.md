@@ -48,11 +48,11 @@ Skip this helper if you have already created nia's key and configured its secret
 The committed `gradle.properties` is the source of the production version. Update both values with the release's changes and commit them to `main`:
 
 ```properties
-nia.versionName=1.1.1
-nia.versionCode=1001001
+nia.versionName=1.2.0
+nia.versionCode=1002000
 ```
 
-The production workflow builds these exact values. It does not choose a version from Git tags, increment it or accept a version override. For example, a future `1.2.0` release uses `nia.versionName=1.2.0` and `nia.versionCode=1002000`.
+The production workflow builds these exact values. It does not choose a version from Git tags, increment it or accept a version override. For example, a future `1.2.1` release uses `nia.versionName=1.2.1` and `nia.versionCode=1002001`.
 
 ## Trigger a production build
 
@@ -63,7 +63,7 @@ The production workflow builds these exact values. It does not choose a version 
 
 With **publish_release** enabled, the APK and checksum are also available under **[Releases](https://github.com/robin-siegl/Nia/releases)** for public download. No artifact extraction or GitHub sign-in is needed for those release assets.
 
-**Current project version:** `1.1.1`. A production build creates `nia-1.1.1.apk` and, when publication is enabled, the tag/release `v1.1.1`. After that version is published, prepare and commit a newer project version before another production build.
+**Current project version:** `1.2.0`. A production build creates `nia-1.2.0.apk` and, when publication is enabled, the tag/release `v1.2.0`. After that version is published, prepare and commit a newer project version before another production build.
 
 The latest stable `vMAJOR.MINOR.PATCH` Git tag is used only to reject duplicate or older versions. Tags are compared numerically; prerelease and unrelated tags are ignored. Leading zeroes, prerelease suffixes, existing versions and builds from a branch other than `main` are rejected. These checks also apply to artifact-only production builds. If a run fails before creating its tag, the same project version can be retried.
 

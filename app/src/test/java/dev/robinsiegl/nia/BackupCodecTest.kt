@@ -14,6 +14,9 @@ class BackupCodecTest {
     private val p = LauncherPreferences(layout = HomeLayout.LIST, colorStyle = ColorStyle.COLOR,
         themeMode = ThemeMode.SYSTEM, seedColor = "#F184AA", pureBlackColorBackground = true, searchAutofocus = true,
         homeTextSize = HomeTextSize.LARGE, alphabetScrubber = true, pixelClockLayout = false,
+        motionMode = MotionMode.REDUCED,
+        leftShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.NOTES, AppTarget("org.example.notes", ".Main")),
+        rightShortcut = CornerShortcut(ShortcutAction.SETTINGS),
         assignments = mapOf(HomeCategory.MESSAGES to AppTarget("org.example.messages", "org.example.messages.MainActivity")),
         clock = AppTarget("org.example.clock", ".ClockActivity"))
     private fun exported() = BackupCodec.export(p, "2026-10-30T09:00:00Z").decodeToString()
@@ -24,18 +27,39 @@ class BackupCodecTest {
     }
     @Test fun `older backups and saved settings use defaults for the new preferences`() {
         val root = BackupCodec.json.parseToJsonElement(exported()).jsonObject
-        val legacy = JsonObject(root.getValue("settings").jsonObject.filterKeys { it !in setOf("homeTextSize", "alphabetScrubber", "pixelClockLayout") })
+        val legacy = JsonObject(root.getValue("settings").jsonObject.filterKeys {
+            it !in setOf("homeTextSize", "alphabetScrubber", "pixelClockLayout", "motionMode", "leftShortcut", "rightShortcut")
+        })
         val backup = JsonObject(root + mapOf("settings" to legacy, "schemaVersion" to JsonPrimitive(1))).toString().encodeToByteArray()
-        val expected = p.copy(homeTextSize = HomeTextSize.DEFAULT, alphabetScrubber = false, pixelClockLayout = true)
+        val expected = p.copy(homeTextSize = HomeTextSize.DEFAULT, alphabetScrubber = false, pixelClockLayout = true,
+            motionMode = MotionMode.SYSTEM, leftShortcut = CornerShortcut(), rightShortcut = CornerShortcut())
         assertEquals(expected, BackupCodec.decode(backup))
         val saved = """{"setupComplete":true,"preferences":$legacy}"""
         assertEquals(SavedState(expected, setupComplete = true), BackupCodec.json.decodeFromString<SavedState>(saved))
     }
     @Test fun `schema two backups preserve text sizes and assignments while enabling the new header`() {
         val root = BackupCodec.json.parseToJsonElement(exported()).jsonObject
-        val legacy = JsonObject(root.getValue("settings").jsonObject - "pixelClockLayout")
+        val legacy = JsonObject(root.getValue("settings").jsonObject - setOf("pixelClockLayout", "motionMode", "leftShortcut", "rightShortcut"))
         val backup = JsonObject(root + mapOf("settings" to legacy, "schemaVersion" to JsonPrimitive(2))).toString().encodeToByteArray()
-        assertEquals(p.copy(pixelClockLayout = true), BackupCodec.decode(backup))
+        assertEquals(p.copy(pixelClockLayout = true, motionMode = MotionMode.SYSTEM,
+            leftShortcut = CornerShortcut(), rightShortcut = CornerShortcut()), BackupCodec.decode(backup))
+    }
+    @Test fun `schema three preserves header options while new corners stay empty`() {
+        val root = BackupCodec.json.parseToJsonElement(exported()).jsonObject
+        val legacy = JsonObject(root.getValue("settings").jsonObject - setOf("motionMode", "leftShortcut", "rightShortcut"))
+        val backup = JsonObject(root + mapOf("settings" to legacy, "schemaVersion" to JsonPrimitive(3))).toString().encodeToByteArray()
+        assertEquals(p.copy(motionMode = MotionMode.SYSTEM, leftShortcut = CornerShortcut(), rightShortcut = CornerShortcut()), BackupCodec.decode(backup))
+    }
+    @Test fun `invalid corner actions and app identities cannot enter preferences`() {
+        assertThrows(IllegalArgumentException::class.java) {
+            PreferencesValidation.validate(p.copy(leftShortcut = CornerShortcut(ShortcutAction.APP)))
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            PreferencesValidation.validate(p.copy(leftShortcut = p.leftShortcut.copy(action = ShortcutAction.EMPTY)))
+        }
+        rejected(exported().replace(".Main\"", "intent://invalid\""))
+        rejected(exported().replace("\"NOTES\"", "\"UNKNOWN_ICON\""))
+        rejected(exported().replace("\"REDUCED\"", "\"UNKNOWN_MOTION\""))
     }
     @Test fun `export contains no setup or runtime state`() {
         val text = exported()
@@ -51,7 +75,7 @@ class BackupCodecTest {
     }
     @Test fun `other files and future schemas are rejected`() {
         rejected("{}"); rejected(exported().replace("nia.settings", "other.settings"))
-        rejected(exported().replace("\"schemaVersion\": 3", "\"schemaVersion\": 4"))
+        rejected(exported().replace("\"schemaVersion\": 4", "\"schemaVersion\": 5"))
     }
     @Test fun `private and work profile backups are rejected`() {
         rejected(exported().replace("\"personal\"", "\"private\""))

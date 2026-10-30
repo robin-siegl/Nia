@@ -2,6 +2,16 @@
 
 Product specification · 30 October 2026
 
+## 1.2.0 quality of life
+
+- Keep Home mounted beneath a gesture-driven Apps drawer. Tap, swipe and Back share its resting positions and transitions. Downward list gestures dismiss only at the top; list scrolling and search remain usable.
+- Wait for a settled drawer before search autofocus. Enter/Search launches only one unambiguous result. Block additional screen input during transitions and rapid duplicate app launches.
+- Animate only Home shortcuts after a real foreground unlock, leaving the header stationary. Do not replay the reveal when returning from another app. The OS lock-screen transition itself remains system-controlled and needs physical Pixel validation.
+- Replace the permanent Home gear with two fixed optional corner slots, both empty by default. Each supports Empty, nia Settings or an installed app with one of twelve matching outline icons. The five main categories keep their fixed order.
+- Keep Settings accessible through Apps and long pressing blank Home. Corner assignment uses the normal app selector; missing corner apps recover through reassignment.
+- Respect system animation duration and haptic settings. Offer a Reduced motion mode using short fades without translation/stagger; request no new permissions.
+- Export schema 4 with corner and motion preferences. Schemas 1–3 use empty corners and system motion while retaining existing assignments, themes and header options. Reset appearance keeps corner app assignments.
+
 ## 1.1.1 release flow
 
 - `gradle.properties` owns the production version name and Android version code. Prepare and commit both values with a release's changes.

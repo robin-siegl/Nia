@@ -9,7 +9,7 @@ The [rendered Home capture](screenshots/home-pixel-reference.png) shows the resu
 | Clock sample `14 03` | 46 | 186 | 272 | 89 |
 | Date sample `Fri, 30 Oct` | 54 | 350 | 126 | 23 |
 
-These are measured text-ink bounds in reference pixels, not Android view bounds. Anchors scale with window width. The Home surface subtracts its already-applied safe-drawing top inset once, so the clock/date occupy the intended full-screen positions. App shortcuts begin below the date's touch target, and settings stays accessible at the bottom.
+These are measured text-ink bounds in reference pixels, not Android view bounds. Anchors scale with window width. The Home surface subtracts its already-applied safe-drawing top inset once, so the clock/date occupy the intended full-screen positions. App shortcuts begin below the date's touch target. Optional shortcuts occupy the bottom corners; Settings is always available in Apps and by holding blank Home space.
 
 The header uses locally bundled Google Sans-derived Regular and SemiBold fonts with calibrated ink sizes and widths. OLED monochrome uses the reference's soft clock and white date; other themes retain their shared foreground color. Time and date retain their Clock and Calendar tap actions, spoken labels and at least 48dp touch targets.
 
@@ -18,6 +18,12 @@ The header uses locally bundled Google Sans-derived Regular and SemiBold fonts w
 Settings → Home → Pixel clock layout selects the aligned portrait header. Its clock/date metrics stay independent of Home app text sizes. Turning it off restores the previous scalable clock/date behavior. Landscape uses the compact layout. The setup and Settings previews reflect this choice.
 
 This matches the supplied clock style and settings. nia does not read or automatically track Pixel's lock-screen clock selection, width slider, animation state or future OS layout changes. A different system clock style may need a different calibration.
+
+## Unlock motion
+
+nia listens for screen/keyguard state while its activity exists and consumes an unlock only when its window is foreground, interactive and focused. The header remains stationary while shortcut rows fade and rise by up to 12dp, with a subtle stagger. Ordinary app returns do not replay the effect; unlocking into another app discards the pending reveal.
+
+Reduced motion uses a short fade with no movement or stagger. Compose animations inherit Android's duration scale, including zero-duration animations. The two clocks remain separate system/app views: nia does not own or replace Android's lock-screen exit animation. Warm/cold unlocks, biometric unlock and the visual handoff require validation on the physical Pixel.
 
 ## Weather status
 

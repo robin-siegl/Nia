@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0
+
+- Added an Apps drawer that follows vertical swipes, settles according to distance/velocity and shares its opening/closing animation with taps and Back. Home stays mounted underneath; pulling down at the top of Apps closes it.
+- Delayed search autofocus until the drawer settles. Enter/Search now opens a sole result; ambiguous searches do not launch an app.
+- Added a shortcut-only reveal after unlocking into nia, keeping its clock/date fixed and avoiding replay on ordinary app returns. Android's system unlock transition remains outside nia's control.
+- Replaced the fixed Home gear with optional left/right corner shortcuts: empty, nia Settings or a selected app with one of twelve outline icons. Both default empty; holding blank Home space opens Settings, which is also available through Apps.
+- Added subtle shortcut press feedback, system-respecting haptics and a reduced-motion preference. Drawer/reveal animations follow Android's animation-duration scale, including disabled animations.
+- Blocked extra input while drawer transitions settle and guarded rapid duplicate app launches. Missing corner apps recover through app selection.
+- Exported settings now use schema 4, including corners and motion; schemas 1–3 and existing saved preferences remain supported.
+
 ## 1.1.1
 
 - Production builds now use the exact version name and Android version code committed in `gradle.properties`, matching local builds and About nia.
