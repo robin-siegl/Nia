@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -16,6 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.input.key.*
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -36,44 +40,66 @@ fun AppListScreen(
     onBack: () -> Unit, onSelect: (AppEntry) -> Unit, onSettings: (() -> Unit)? = null,
     onInfo: ((AppEntry) -> Unit)? = null,
     alphabetScrubber: Boolean = false,
+    interactionEnabled: Boolean = true, gesturesEnabled: Boolean = true,
+    listState: LazyListState = rememberLazyListState(), headerDragModifier: Modifier = Modifier,
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     val results = remember(apps, query) { AppSearch.filter(apps, query) }
     val duplicates = remember(apps) { apps.groupingBy { it.label }.eachCount().filterValues { it > 1 }.keys }
     val sections = remember(results) { AppSearch.sections(results) }
-    val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     var jumpJob by remember { mutableStateOf<Job?>(null) }
-    val showScrubber = alphabetScrubber && query.isBlank() && sections.size > 1
+    val showScrubber = alphabetScrubber && interactionEnabled && query.isBlank() && sections.size > 1
     val focus = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
-    BackHandler {
+    BackHandler(enabled = interactionEnabled) {
         if (imeVisible) { focusManager.clearFocus(); keyboard?.hide() } else onBack()
     }
-    LaunchedEffect(autofocus) { if (autofocus) { focus.requestFocus(); keyboard?.show() } }
+    BackHandler(enabled = !interactionEnabled) { /* Do not leave midway through a transition or saved selection. */ }
+    LaunchedEffect(autofocus, interactionEnabled) {
+        if (!interactionEnabled) { focusManager.clearFocus(); keyboard?.hide() }
+        else if (autofocus) { focus.requestFocus(); keyboard?.show() }
+    }
     LaunchedEffect(query) { listState.scrollToItem(0) }
-    Column(Modifier.fillMaxSize().padding(start = 24.dp, end = 12.dp)) {
-        ScreenHeader(title, onBack, trailing = if (onSettings != null) {
-            { SettingsButton(onSettings) }
+    fun submitSearch() {
+        if (!interactionEnabled) return
+        keyboard?.hide(); focusManager.clearFocus()
+        if (!loading && results.size == 1) onSelect(results.single())
+    }
+    Column(Modifier.fillMaxSize().testTag("apps-screen").padding(start = 24.dp, end = 12.dp)) {
+        Column(headerDragModifier) {
+        ScreenHeader(title, { if (interactionEnabled) onBack() }, trailing = if (onSettings != null) {
+            { SettingsButton({ if (interactionEnabled) onSettings() }) }
         } else null)
         OutlinedTextField(query, { query = it }, singleLine = true, label = { Text("Search apps") },
-            modifier = Modifier.fillMaxWidth().padding(end = 12.dp).focusRequester(focus),
+            readOnly = !interactionEnabled,
+            modifier = Modifier.fillMaxWidth().padding(end = 12.dp).focusRequester(focus)
+                .focusProperties { canFocus = interactionEnabled }.onPreviewKeyEvent { event ->
+                    if (interactionEnabled && (event.key == Key.Enter || event.key == Key.NumPadEnter)) {
+                        if (event.type == KeyEventType.KeyUp) submitSearch()
+                        true
+                    } else false
+                },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { keyboard?.hide(); focusManager.clearFocus() }),
+            keyboardActions = KeyboardActions(onSearch = { submitSearch() }),
             trailingIcon = if (query.isNotEmpty()) {
-                { TextButton(onClick = { query = "" }) { Text("Clear", fontSize = 12.sp) } }
+                { TextButton(onClick = { if (interactionEnabled) query = "" }) { Text("Clear", fontSize = 12.sp) } }
             } else null)
         Spacer(Modifier.height(16.dp))
+        }
         when {
-            loading -> Text("Loading apps…", modifier = Modifier.padding(vertical = 24.dp))
-            results.isEmpty() -> Text(if (apps.isEmpty()) "No launchable apps available." else "No apps found.",
-                modifier = Modifier.padding(vertical = 24.dp))
+            loading || results.isEmpty() -> Box(Modifier.weight(1f).fillMaxWidth().then(headerDragModifier)) {
+                Text(if (loading) "Loading apps…" else if (apps.isEmpty()) "No launchable apps available." else "No apps found.",
+                    modifier = Modifier.padding(vertical = 24.dp))
+            }
             else -> Box(Modifier.weight(1f).fillMaxWidth()) {
-                LazyColumn(Modifier.fillMaxSize().padding(end = if (showScrubber) 48.dp else 12.dp), state = listState) {
+                LazyColumn(Modifier.fillMaxSize().testTag("apps-list").padding(end = if (showScrubber) 48.dp else 12.dp),
+                    state = listState, userScrollEnabled = gesturesEnabled) {
                     items(results, key = { it.target.key }) { app ->
                         Column(Modifier.fillMaxWidth().combinedClickable(
+                            enabled = interactionEnabled,
                             role = Role.Button, onClick = { onSelect(app) },
                             onLongClick = onInfo?.let { action -> { action(app) } },
                             onLongClickLabel = if (onInfo != null) "App info" else null,

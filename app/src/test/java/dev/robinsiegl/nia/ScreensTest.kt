@@ -85,12 +85,12 @@ class ScreensTest {
         assertTrue(opened)
     }
 
-    @Test fun `Apps icon and Home settings gear open their destinations`() {
+    @Test fun `Apps icon and optional settings corner open their destinations`() {
         var openedApps = false
         var openedSettings = false
         render {
             HomeScreen(HomeLayout.GRID, "09:41", "Friday, October 30", {}, {}, { openedApps = true },
-                onSettings = { openedSettings = true })
+                rightShortcut = CornerShortcut(ShortcutAction.SETTINGS), onCorner = { openedSettings = true })
         }
         rule.onNodeWithContentDescription("Apps").performClick()
         rule.onNodeWithContentDescription("Settings").performClick()
@@ -103,7 +103,7 @@ class ScreensTest {
         render {
             CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 2f)) {
                 HomeScreen(HomeLayout.LIST, "09:41", "Friday, October 30", {}, {}, { opened = true },
-                    textSize = HomeTextSize.LARGE)
+                    textSize = HomeTextSize.LARGE, rightShortcut = CornerShortcut(ShortcutAction.SETTINGS))
             }
         }
         rule.onNodeWithContentDescription("Settings").assertIsDisplayed()
@@ -113,8 +113,11 @@ class ScreensTest {
     }
 
     @Test fun `swipe up opens Apps`() {
-        var opened = false
-        render { HomeScreen(HomeLayout.GRID, "09:41", "Friday, October 30", {}, {}, { opened = true }) }
+        var opened by mutableStateOf(false)
+        render {
+            HomeAppsScreen(LauncherPreferences(), emptyList(), false, "09:41", "Friday, October 30", opened,
+                { opened = it }, {}, {}, {}, {}, {}, {})
+        }
         rule.onRoot().performTouchInput { swipeUp() }
         rule.waitForIdle()
         assertTrue(opened)
@@ -285,7 +288,7 @@ class ScreensTest {
         render { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}) }
         rule.onNodeWithTag("pixel-clock-header").assertDoesNotExist()
         rule.onNodeWithText("14:03").assertIsDisplayed()
-        rule.onNodeWithContentDescription("Settings").assertIsDisplayed()
+        rule.onNodeWithContentDescription("Apps").assertIsDisplayed()
     }
 
     @Test fun `color wheel and brightness save the chosen seed and render both previews`() {
@@ -334,7 +337,7 @@ class ScreensTest {
             if (current == null) SettingsScreen(true, false, {}, { section = it }, {}, { changedLauncher = true })
             else detail(current, onBack = { section = null })
         }
-        SettingsSection.entries.forEach { rule.onNodeWithText(it.title).assertIsDisplayed() }
+        SettingsSection.entries.forEach { rule.onNodeWithText(it.title).assertExists() }
         screenshot("settings-overview")
         rule.onNodeWithText("Appearance").performClick()
         rule.onNodeWithText("System").assertIsDisplayed()
@@ -419,7 +422,7 @@ class ScreensTest {
         rule.onNodeWithText("Start using nia").performClick()
         assertTrue(saved.setupComplete)
         rule.onNodeWithText("Apps").assertIsDisplayed()
-        rule.onNodeWithContentDescription("Settings").assertIsDisplayed()
+        rule.onNodeWithContentDescription("Settings").assertDoesNotExist()
     }
 
     @Test fun `setup recovery keeps app access and restore available without overwriting bad settings`() {

@@ -57,15 +57,17 @@ fun SettingsDetailScreen(
     onAssign: (HomeCategory?) -> Unit, onClear: (HomeCategory?) -> Unit,
     onExport: () -> Unit, onImport: () -> Unit, onResetAppearance: () -> Unit, onResetAll: () -> Unit,
     onOpenLink: (String) -> Unit,
+    onAssignCorner: (CornerPosition) -> Unit = {},
 ) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
         ScreenHeader(section.title, onBack)
         when (section) {
             SettingsSection.HOME -> HomeSettings(preferences, onChange)
+            SettingsSection.SHORTCUTS -> CornerSettings(preferences, apps, onChange, onAssignCorner)
             SettingsSection.APPEARANCE -> AppearanceSettings(preferences, onChange)
             SettingsSection.ASSIGNMENTS -> AssignmentsSettings(preferences, apps, onAssign, onClear)
             SettingsSection.APP_LIST -> {
-                SettingSwitch("Focus search automatically", "Show the keyboard when opening Apps.", preferences.searchAutofocus) {
+                SettingSwitch("Focus search automatically", "Show the keyboard once Apps has opened.", preferences.searchAutofocus) {
                     value -> onChange { it.copy(searchAutofocus = value) }
                 }
                 SettingSwitch("Alphabet scrubber", "Drag along the right edge to jump to a letter.", preferences.alphabetScrubber) {
@@ -108,6 +110,11 @@ internal fun AppearanceSettings(preferences: LauncherPreferences, onChange: ((La
         preferences.themeMode, { value -> onChange { it.copy(themeMode = value) } })
     Text("System follows your phone’s light or dark appearance.", fontSize = 12.sp,
         modifier = Modifier.padding(top = 10.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f))
+    SectionLabel("MOTION")
+    ChoiceRow(listOf(MotionMode.SYSTEM to "Follow Android", MotionMode.REDUCED to "Reduced"), preferences.motionMode,
+        { value -> onChange { it.copy(motionMode = value) } })
+    Text("Android’s animation speed is always respected. Reduced uses short fades without movement or stagger.",
+        fontSize = 12.sp, modifier = Modifier.padding(top = 10.dp))
     if (preferences.colorStyle == ColorStyle.COLOR) ColorSettings(preferences, onChange)
 }
 

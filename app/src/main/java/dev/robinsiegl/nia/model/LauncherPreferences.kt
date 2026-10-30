@@ -12,6 +12,20 @@ enum class HomeCategory(val label: String) {
 @Serializable enum class ColorStyle { MONOCHROME, COLOR }
 @Serializable enum class ThemeMode { SYSTEM, LIGHT, DARK }
 @Serializable enum class SetupStep { LAYOUT, APPS, APPEARANCE, DEFAULT }
+@Serializable enum class MotionMode { SYSTEM, REDUCED }
+@Serializable enum class ShortcutAction { EMPTY, SETTINGS, APP }
+@Serializable enum class ShortcutIcon(val label: String) {
+    STAR("Star"), CAMERA("Camera"), BROWSER("Browser"), NOTES("Notes"), WALLET("Wallet"), HEART("Heart"),
+    PHONE("Phone"), MESSAGES("Messages"), MUSIC("Music"), CALENDAR("Calendar"), MAPS("Maps"), SETTINGS("Settings")
+}
+enum class CornerPosition(val label: String) { LEFT("Left"), RIGHT("Right") }
+
+@Serializable
+data class CornerShortcut(
+    val action: ShortcutAction = ShortcutAction.EMPTY,
+    val icon: ShortcutIcon = ShortcutIcon.STAR,
+    val app: AppTarget? = null,
+)
 
 @Serializable
 data class AppTarget(val packageName: String, val activityName: String) {
@@ -31,9 +45,16 @@ data class LauncherPreferences(
     val pureBlackColorBackground: Boolean = false,
     val searchAutofocus: Boolean = false,
     val alphabetScrubber: Boolean = false,
+    val motionMode: MotionMode = MotionMode.SYSTEM,
+    val leftShortcut: CornerShortcut = CornerShortcut(),
+    val rightShortcut: CornerShortcut = CornerShortcut(),
     val assignments: Map<HomeCategory, AppTarget> = emptyMap(),
     val clock: AppTarget? = null,
-)
+) {
+    fun shortcut(position: CornerPosition) = if (position == CornerPosition.LEFT) leftShortcut else rightShortcut
+    fun withShortcut(position: CornerPosition, shortcut: CornerShortcut) =
+        if (position == CornerPosition.LEFT) copy(leftShortcut = shortcut) else copy(rightShortcut = shortcut)
+}
 
 @Serializable
 data class SavedState(
@@ -51,7 +72,13 @@ object PreferencesValidation {
 
     fun validate(preferences: LauncherPreferences) {
         require(isColor(preferences.seedColor)) { "Choose a color in #RRGGBB format." }
-        (preferences.assignments.values + listOfNotNull(preferences.clock)).forEach { target ->
+        val shortcuts = listOf(preferences.leftShortcut, preferences.rightShortcut)
+        shortcuts.forEach {
+            require((it.action == ShortcutAction.APP) == (it.app != null)) {
+                "An app shortcut must have an assigned app. Empty and settings shortcuts cannot contain an app."
+            }
+        }
+        (preferences.assignments.values + listOfNotNull(preferences.clock) + shortcuts.mapNotNull { it.app }).forEach { target ->
             require(target.packageName.length <= 255 && packagePattern.matches(target.packageName)) {
                 "The settings file contains an invalid app package."
             }

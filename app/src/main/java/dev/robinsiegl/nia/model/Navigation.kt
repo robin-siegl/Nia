@@ -1,7 +1,8 @@
 package dev.robinsiegl.nia.model
 
 enum class SettingsSection(val title: String, val description: String) {
-    HOME("Home", "Layout and text size"),
+    HOME("Home", "Layout, clock and text size"),
+    SHORTCUTS("Corner shortcuts", "Optional left and right shortcuts"),
     APPEARANCE("Appearance", "Themes, colors and OLED black"),
     ASSIGNMENTS("App assignments", "Your everyday apps and Clock"),
     APP_LIST("App list", "Search and alphabet navigation"),
@@ -15,6 +16,7 @@ sealed interface Screen {
     data object Settings : Screen
     data class SettingsDetail(val section: SettingsSection) : Screen
     data class Picker(val category: HomeCategory?) : Screen
+    data class CornerPicker(val position: CornerPosition) : Screen
 }
 
 data class Navigation(val stack: List<Screen> = listOf(Screen.Home)) {

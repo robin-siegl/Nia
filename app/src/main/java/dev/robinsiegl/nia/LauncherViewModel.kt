@@ -2,6 +2,7 @@ package dev.robinsiegl.nia
 
 import android.app.Application
 import android.net.Uri
+import android.os.SystemClock
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import dev.robinsiegl.nia.data.BackupCodec
@@ -29,6 +30,8 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     val apps = _apps.asStateFlow()
     private val _loadingApps = MutableStateFlow(true)
     val loadingApps = _loadingApps.asStateFlow()
+    private val _selectingApp = MutableStateFlow(false)
+    val selectingApp = _selectingApp.asStateFlow()
     private val _navigation = MutableStateFlow(Navigation())
     val navigation = _navigation.asStateFlow()
     private val _isDefault = MutableStateFlow(false)
@@ -40,6 +43,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     private val events = Channel<String>(Channel.BUFFERED)
     val messages = events.receiveAsFlow()
     private var settingsObserver: Job? = null
+    private val launchGate = LaunchGate()
 
     init {
         observeSettings()
@@ -88,43 +92,76 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         store.update { it.copy(setupComplete = true) }; home()
     }
 
-    fun chooseApp(category: HomeCategory?, target: AppTarget) = perform("The app assignment could not be saved.") {
-        store.update { state ->
-            val p = state.preferences
-            state.copy(preferences = if (category == null) p.copy(clock = target)
-            else p.copy(assignments = p.assignments + (category to target)))
+    fun chooseApp(category: HomeCategory?, target: AppTarget) = selectApp { p ->
+        if (category == null) p.copy(clock = target) else p.copy(assignments = p.assignments + (category to target))
+    }
+
+    private fun selectApp(transform: (LauncherPreferences) -> LauncherPreferences) {
+        if (!_selectingApp.compareAndSet(false, true)) return
+        perform("The app assignment could not be saved.") {
+            try {
+                store.update { it.copy(preferences = transform(it.preferences)) }
+                back()
+            } finally { _selectingApp.value = false }
         }
-        back()
     }
 
     fun clearAssignment(category: HomeCategory?) = updatePreferences {
         if (category == null) it.copy(clock = null) else it.copy(assignments = it.assignments - category)
     }
 
-    fun openCategory(category: HomeCategory) {
-        val target = _saved.value?.preferences?.assignments?.get(category)
-        if (target == null) { navigate(Screen.Picker(category)); return }
-        try { repository.launch(target); home() }
-        catch (_: RuntimeException) {
-            navigate(Screen.Picker(category))
-            events.trySend("That app is unavailable. Choose another app for ${category.label}.")
+    fun chooseCornerApp(position: CornerPosition, target: AppTarget) = selectApp { p ->
+        p.withShortcut(position, p.shortcut(position).copy(action = ShortcutAction.APP, app = target))
+    }
+
+    fun openCorner(position: CornerPosition) {
+        val shortcut = _saved.value?.preferences?.shortcut(position) ?: return
+        when (shortcut.action) {
+            ShortcutAction.EMPTY -> Unit
+            ShortcutAction.SETTINGS -> navigate(Screen.Settings)
+            ShortcutAction.APP -> launch {
+                try { repository.launch(requireNotNull(shortcut.app)); home() }
+                catch (_: RuntimeException) {
+                    launchGate.reset()
+                    navigate(Screen.CornerPicker(position))
+                    events.trySend("That shortcut app is unavailable. Choose another app.")
+                }
+            }
         }
     }
 
+    private fun launch(action: () -> Unit) {
+        if (launchGate.accept(SystemClock.elapsedRealtime())) action()
+    }
+
+    fun openCategory(category: HomeCategory) {
+        val target = _saved.value?.preferences?.assignments?.get(category)
+        if (target == null) { navigate(Screen.Picker(category)); return }
+        launch { try { repository.launch(target); home() }
+        catch (_: RuntimeException) {
+            launchGate.reset()
+            navigate(Screen.Picker(category))
+            events.trySend("That app is unavailable. Choose another app for ${category.label}.")
+        } }
+    }
+
     fun openClock() {
-        try {
+        launch { try {
             val clock = _saved.value?.preferences?.clock
             if (clock == null) repository.openClock() else repository.launch(clock)
             home()
         } catch (_: RuntimeException) {
+            launchGate.reset()
             navigate(Screen.Picker(null))
             events.trySend("Choose the clock app you want to open.")
-        }
+        } }
     }
 
     fun openApp(target: AppTarget) {
-        try { repository.launch(target); home() }
-        catch (_: RuntimeException) { events.trySend("This app is currently unavailable.") }
+        launch {
+            try { repository.launch(target); home() }
+            catch (_: RuntimeException) { launchGate.reset(); events.trySend("This app is currently unavailable.") }
+        }
     }
 
     fun showAppInfo(target: AppTarget) {
@@ -161,11 +198,16 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         }
         // Re-query before sanitizing: a just-installed app may not yet be in the UI catalog.
         val available = withContext(Dispatchers.IO) { repository.listApps().map { it.target }.toSet() }
+        val corners = listOf(decoded.leftShortcut, decoded.rightShortcut)
         val missing = decoded.assignments.values.count { it !in available } +
-            if (decoded.clock != null && decoded.clock !in available) 1 else 0
+            (if (decoded.clock != null && decoded.clock !in available) 1 else 0) +
+            corners.count { it.app != null && it.app !in available }
+        fun availableShortcut(shortcut: CornerShortcut) =
+            if (shortcut.app != null && shortcut.app !in available) CornerShortcut(icon = shortcut.icon) else shortcut
         _restore.value = RestorePreview(decoded.copy(
             assignments = decoded.assignments.filterValues { it in available },
             clock = decoded.clock?.takeIf { it in available },
+            leftShortcut = availableShortcut(decoded.leftShortcut), rightShortcut = availableShortcut(decoded.rightShortcut),
         ), missing)
     }
 
@@ -182,7 +224,8 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun resetAppearance() = updatePreferences { current ->
-        LauncherPreferences(assignments = current.assignments, clock = current.clock)
+        LauncherPreferences(assignments = current.assignments, clock = current.clock,
+            leftShortcut = current.leftShortcut, rightShortcut = current.rightShortcut)
     }
 
     fun resetAll() = perform("nia could not be reset.") {

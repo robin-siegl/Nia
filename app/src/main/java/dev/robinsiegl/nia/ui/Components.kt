@@ -36,12 +36,12 @@ private val categoryVectors = HomeCategory.entries.associateWith { category ->
             strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round).build()
 }
 
-private fun outlineIcon(name: String, path: String) = ImageVector.Builder(name, 24.dp, 24.dp, 24f, 24f)
+internal fun outlineIcon(name: String, path: String) = ImageVector.Builder(name, 24.dp, 24.dp, 24f, 24f)
     .addPath(addPathNodes(path), fill = null, stroke = SolidColor(Color.Black), strokeLineWidth = 1.5f,
         strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round).build()
 
 private val appsVector = outlineIcon("Apps", "M4,4H10V10H4Z M14,4H20V10H14Z M4,14H10V20H4Z M14,14H20V20H14Z")
-private val settingsVector = outlineIcon("Settings",
+internal val settingsVector = outlineIcon("Settings",
     "M9,3H15L15.7,5.3L17.4,6.3L19.7,5.8L21.2,8.4L19.6,10.1V13.9L21.2,15.6L19.7,18.2L17.4,17.7L15.7,18.7L15,21H9L8.3,18.7L6.6,17.7L4.3,18.2L2.8,15.6L4.4,13.9V10.1L2.8,8.4L4.3,5.8L6.6,6.3L8.3,5.3Z M16,12A4,4 0,1 1,8,12A4,4 0,1 1,16,12")
 
 @Composable
@@ -50,8 +50,8 @@ fun AppsIcon(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun SettingsButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    IconButton(onClick, modifier = modifier.size(48.dp)) {
+fun SettingsButton(onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
+    IconButton(onClick, modifier = modifier.size(48.dp), enabled = enabled) {
         Icon(settingsVector, contentDescription = "Settings", modifier = Modifier.size(24.dp))
     }
 }
@@ -83,10 +83,10 @@ fun CategoryIcon(category: HomeCategory, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ScreenHeader(title: String, onBack: () -> Unit, trailing: (@Composable () -> Unit)? = null) {
+fun ScreenHeader(title: String, onBack: () -> Unit, trailing: (@Composable () -> Unit)? = null, enabled: Boolean = true) {
     Row(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 16.dp), horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-        TextButton(onClick = onBack, contentPadding = PaddingValues(end = 12.dp)) { Text("Back", fontSize = 14.sp) }
+        TextButton(onClick = onBack, enabled = enabled, contentPadding = PaddingValues(end = 12.dp)) { Text("Back", fontSize = 14.sp) }
         Text(title, fontSize = 18.sp)
         if (trailing != null) trailing() else Spacer(Modifier.width(48.dp))
     }

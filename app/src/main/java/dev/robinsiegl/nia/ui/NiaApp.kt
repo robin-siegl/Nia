@@ -53,10 +53,12 @@ fun NiaTheme(palette: NiaPalette, content: @Composable () -> Unit) {
 }
 
 @Composable
-fun NiaApp(model: LauncherViewModel, homeRequest: Int, onSystemBars: (Boolean) -> Unit) {
+fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: Int = 0, deviceLocked: Boolean = false,
+    onSystemBars: (Boolean) -> Unit) {
     val saved by model.saved.collectAsStateWithLifecycle()
     val apps by model.apps.collectAsStateWithLifecycle()
     val loading by model.loadingApps.collectAsStateWithLifecycle()
+    val selectingApp by model.selectingApp.collectAsStateWithLifecycle()
     val navigation by model.navigation.collectAsStateWithLifecycle()
     val isDefault by model.isDefault.collectAsStateWithLifecycle()
     val storageError by model.storageError.collectAsStateWithLifecycle()
@@ -109,9 +111,18 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, onSystemBars: (Boolean) -
                     val screen = navigation.screen
                     BackHandler(enabled = screen == Screen.Home) { /* Keep the Home surface available. */ }
                     BackHandler(enabled = screen == Screen.Settings || screen is Screen.SettingsDetail) { model.back() }
-                    key(screen) {
+                    if (saved?.setupComplete == true && (screen == Screen.Home || screen == Screen.Apps)) {
+                        val (time, date) = rememberClockText()
+                        HomeAppsScreen(preferences, apps, loading, time, date, drawerOpen = screen == Screen.Apps,
+                            onDrawerOpenChanged = { if (it) model.navigate(Screen.Apps) else model.back() },
+                            onClock = model::openClock, onCategory = model::openCategory,
+                            onSettings = { model.navigate(Screen.Settings) }, onApp = { model.openApp(it.target) },
+                            onAppInfo = { model.showAppInfo(it.target) }, onCorner = model::openCorner,
+                            contentTopInset = padding.calculateTopPadding(), unlockRequest = unlockRequest,
+                            deviceLocked = deviceLocked, homeRequest = homeRequest)
+                    } else key(screen) {
                         when (screen) {
-                            Screen.Home -> if (saved?.setupComplete != true) {
+                            Screen.Home -> {
                                 OnboardingScreen(preferences, apps, saved?.setupStep ?: SetupStep.LAYOUT, isDefault,
                                     onChange = model::updatePreferences, onStep = model::moveSetup,
                                     onAssign = { model.navigate(Screen.Picker(it)) }, onClear = model::clearAssignment,
@@ -119,12 +130,6 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, onSystemBars: (Boolean) -
                                     onApps = { model.navigate(Screen.Apps) }, onImport = beginImport,
                                     storageError = storageError,
                                     onRecovery = { model.navigate(Screen.SettingsDetail(SettingsSection.BACKUP)) })
-                            } else {
-                                val (time, date) = rememberClockText()
-                                HomeScreen(preferences.layout, time, date, model::openClock, model::openCategory,
-                                    { model.navigate(Screen.Apps) }, textSize = preferences.homeTextSize,
-                                    onSettings = { model.navigate(Screen.Settings) }, pixelClockLayout = preferences.pixelClockLayout,
-                                    contentTopInset = padding.calculateTopPadding())
                             }
                             Screen.Apps -> AppListScreen(apps, loading, preferences.searchAutofocus,
                                 onBack = model::back, onSelect = { model.openApp(it.target) },
@@ -132,7 +137,12 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, onSystemBars: (Boolean) -
                                 alphabetScrubber = preferences.alphabetScrubber)
                             is Screen.Picker -> AppListScreen(apps, loading, false,
                                 title = screen.category?.label ?: "Clock", onBack = model::back,
-                                onSelect = { model.chooseApp(screen.category, it.target) }, alphabetScrubber = preferences.alphabetScrubber)
+                                onSelect = { model.chooseApp(screen.category, it.target) }, alphabetScrubber = preferences.alphabetScrubber,
+                                interactionEnabled = !selectingApp)
+                            is Screen.CornerPicker -> AppListScreen(apps, loading, false,
+                                title = screen.position.label + " shortcut", onBack = model::back,
+                                onSelect = { model.chooseCornerApp(screen.position, it.target) }, alphabetScrubber = preferences.alphabetScrubber,
+                                interactionEnabled = !selectingApp)
                             Screen.Settings -> SettingsScreen(isDefault, storageError, onBack = model::back,
                                 onSection = { model.navigate(Screen.SettingsDetail(it)) },
                                 onSetDefault = setDefault, onChangeDefault = changeDefault)
@@ -140,7 +150,8 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, onSystemBars: (Boolean) -
                                 onBack = model::back, onChange = model::updatePreferences,
                                 onAssign = { model.navigate(Screen.Picker(it)) }, onClear = model::clearAssignment,
                                 onExport = { export.launch("nia-settings-${LocalDate.now()}.json") }, onImport = beginImport,
-                                onResetAppearance = model::resetAppearance, onResetAll = model::resetAll, onOpenLink = openLink)
+                                onResetAppearance = model::resetAppearance, onResetAll = model::resetAll, onOpenLink = openLink,
+                                onAssignCorner = { model.navigate(Screen.CornerPicker(it)) })
                         }
                     }
                 }

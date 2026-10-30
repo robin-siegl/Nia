@@ -44,5 +44,16 @@ internal fun HomePreview(preferences: LauncherPreferences, modifier: Modifier = 
                     modifier = Modifier.padding(vertical = 3.dp))
             }
         }
+        val corners = listOf(preferences.leftShortcut, preferences.rightShortcut)
+        if (corners.any { it.action != ShortcutAction.EMPTY }) {
+            Row(Modifier.fillMaxWidth().padding(top = 24.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                corners.forEach { shortcut ->
+                    Box(Modifier.size(24.dp)) {
+                        if (shortcut.action != ShortcutAction.EMPTY) ShortcutGlyph(
+                            if (shortcut.action == ShortcutAction.SETTINGS) ShortcutIcon.SETTINGS else shortcut.icon, Modifier.size(24.dp))
+                    }
+                }
+            }
+        }
     }
 }

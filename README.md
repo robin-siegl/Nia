@@ -19,24 +19,32 @@ nia is a native Kotlin/Jetpack Compose launcher. It can become your actual defau
 
 Rendered from the app's Compose screens; phone screenshots will also include the system bars.
 
+<p>
+  <img src="docs/screenshots/drawer-motion.gif" width="220" alt="nia Apps drawer opening and closing, rendered from the native UI" />
+  <img src="docs/screenshots/home-corner-shortcuts.png" width="220" alt="nia Home with optional Notes and Settings corner shortcuts" />
+</p>
+
 ## What works
 
 - Fixed Phone, Messages, Music, Calendar and Maps shortcuts, each assigned to an installed app.
 - Top-aligned icon grid or a text-only Home list.
-- Apps completes the six-item icon grid or appears as a matching text entry. A settings gear is available on Home and in the app list.
+- Apps completes the six-item icon grid or appears as a matching text entry. Its drawer follows an upward swipe, settles smoothly and reverses on closing. Pull down at the top of the app list to return Home.
+- Two optional bottom-corner shortcuts: Empty, nia Settings, or an app with one of twelve matching outline icons. Both start empty. Configure them in **Settings → Corner shortcuts**; Settings is always available through the Apps gear or by holding empty Home space.
+- Unlocking into nia reveals the shortcuts with a short fade and slight stagger while leaving the clock/date stationary. Returning from another app does not replay it. Android controls the system side of the unlock transition; the physical Pixel handoff still needs device validation.
+- Shortcut presses have subtle feedback and use Android's haptic setting. **Settings → Appearance → Motion** offers Follow Android or Reduced; Android's animation-duration setting is always respected. Transitions block extra taps and app launches reject rapid duplicates.
 - Small, Default or Large Home text, with a preview in Settings.
 - Time opens Clock; date opens your assigned Calendar.
 - A Pixel-style clock/date layout matches the supplied Pixel 10 Pro lock-screen reference: spaced time, a stronger date and fixed screen anchors. Disable **Settings → Home → Pixel clock layout** for the previous scalable clock. In Pixel mode, text-size choices apply to Home app names.
 - Swipe up or tap **Apps** for an alphabetical, text-only app list.
-- Search by name, initials (including camel-case names) or word prefixes in any order. Matching apps stay alphabetical. Search can focus automatically if enabled.
+- Search by name, initials (including camel-case names) or word prefixes in any order. Matching apps stay alphabetical. Optional search autofocus waits until the drawer settles. Enter/Search launches a sole result; multiple matches remain a list.
 - Optional alphabet navigation: drag the right edge of the app list to jump to a letter. Letters appear during interaction; searching hides the scrubber.
 - Four-step first-launch setup: layout/text size, app assignments, appearance and default launcher. Progress survives app selection and reopening nia; previews show your Home before you finish.
-- Focused Settings pages for Home, Appearance, App assignments, App list, Backup & reset and About nia. Android's default launcher can be changed from the Settings overview.
+- Focused Settings pages for Home, Corner shortcuts, Appearance, App assignments, App list, Backup & reset and About nia. Android's default launcher can be changed from the Settings overview.
 - About includes the app version, privacy details, GitHub/issue links and third-party notices.
 - Black/white or one-color themes, with **System / Light / Dark** modes.
 - Use the visual color wheel and brightness slider, a preset, or a custom hex color: nia generates matching pastel/dark background and foreground pairs. Both variants preview live; wheel/slider changes save when released, and hex input uses Apply. Generated pairs target at least **7:1** text contrast.
 - Pure `#000000` in monochrome dark mode, plus an OLED-black option for colored dark themes.
-- Persistent preferences and versioned settings export/import, including app assignments.
+- Persistent preferences and versioned settings export/import, including corner shortcuts and motion preferences. Schema 4 imports older schemas 1–3.
 - Missing-app recovery, live package-list updates and a settings reset/recovery path.
 - Offline operation. The app requests no network, contacts, SMS, calendar-content or notification access.
 
@@ -52,7 +60,7 @@ Development builds have their own package ID (`dev.robinsiegl.nia.debug`) so the
 
 Configure the same four repository Actions secrets used by pip-os: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD`, using your nia keystore and credentials. The [one-time signing instructions](docs/RELEASING.md#one-time-signing-setup) include the keystore command and PowerShell copy-to-clipboard step.
 
-If those secrets are already added, setup is complete. Open **[Actions → Production APK → Run workflow](https://github.com/robin-siegl/Nia/actions/workflows/production.yml)** on `main`, leave **publish_release** enabled and select **Run workflow**. The APK, tag and release use the exact `nia.versionName` and `nia.versionCode` committed in [gradle.properties](gradle.properties), currently **1.1.1 / 1001001**. There are no version inputs or automatic bumps; the project version is updated with the changes before each new release.
+If those secrets are already added, setup is complete. Open **[Actions → Production APK → Run workflow](https://github.com/robin-siegl/Nia/actions/workflows/production.yml)** on `main`, leave **publish_release** enabled and select **Run workflow**. The APK, tag and release use the exact `nia.versionName` and `nia.versionCode` committed in [gradle.properties](gradle.properties), currently **1.2.0 / 1002000**. There are no version inputs or automatic bumps; the project version is updated with the changes before each new release.
 
 Public release publication is enabled by default. The signed APK and checksum are also uploaded as the **nia-production-VERSION** artifact. Existing or older versions and mismatched Android version codes are rejected before building, and the tag is created only after tests, lint, build and signature verification succeed.
 
@@ -74,7 +82,7 @@ Minimum Android is 10 (API 29); the build compiles/targets API 36. The user's An
 
 ## Verification
 
-The test suite covers palette contrast across RGB samples, theme behavior, smart search/order, backup compatibility, saved setup progress, navigation, guided setup, Settings pages, About links, Home gestures, keyboard focus and screen rendering. Python tests also exercise signing helpers and release version selection. Robolectric renders the Compose UI at API 35; screenshots are included in CI's test-report artifact. Use the [device acceptance checklist](docs/DEVICE_TESTING.md) for physical Pixel gestures, Recents and signed upgrades.
+The test suite covers palette contrast across RGB samples, theme behavior, smart search/order, backup compatibility, saved setup progress, navigation, guided setup, Settings pages, About links, drawer drag/cancellation, keyboard readiness, corner actions, unlock state, disabled system animations and screen rendering. Python tests also exercise signing helpers and release version validation. Robolectric renders the Compose UI at API 35; screenshots are included in CI's test-report artifact. Use the [device acceptance checklist](docs/DEVICE_TESTING.md) for physical Pixel unlocks/gestures, Recents and signed upgrades.
 
 ## Scope and next steps
 

@@ -23,7 +23,7 @@ class BackupException(message: String) : IllegalArgumentException(message)
 
 object BackupCodec {
     const val MAX_BYTES = 256 * 1024
-    private const val CURRENT_VERSION = 3
+    private const val CURRENT_VERSION = 4
     val json = Json { encodeDefaults = true; prettyPrint = true; explicitNulls = false }
 
     fun export(preferences: LauncherPreferences, exportedAt: String = Instant.now().toString()): ByteArray {
