@@ -80,6 +80,10 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, onSystemBars: (Boolean) -
         uri -> if (uri != null) model.previewImport(uri)
     }
     val role = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { model.refreshDefault() }
+    val changeDefault: () -> Unit = {
+        try { role.launch(Intent(Settings.ACTION_HOME_SETTINGS)) }
+        catch (_: RuntimeException) { scope.launch { snackbar.showSnackbar("Open Android Settings → Apps → Default apps → Home app to change your launcher.") } }
+    }
     val setDefault: () -> Unit = {
         try { role.launch(model.homeSelectionIntent()) }
         catch (_: RuntimeException) {
@@ -89,6 +93,10 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, onSystemBars: (Boolean) -
     }
     val beginImport: () -> Unit = {
         import.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
+    }
+    val openLink: (String) -> Unit = { url ->
+        try { context.startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url))) }
+        catch (_: RuntimeException) { scope.launch { snackbar.showSnackbar("No browser is available to open this link.") } }
     }
     NiaTheme(palette) {
         Scaffold(containerColor = Color(palette.background), contentColor = Color(palette.foreground),
@@ -100,14 +108,17 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, onSystemBars: (Boolean) -
                 } else {
                     val screen = navigation.screen
                     BackHandler(enabled = screen == Screen.Home) { /* Keep the Home surface available. */ }
-                    BackHandler(enabled = screen == Screen.Settings) { model.back() }
+                    BackHandler(enabled = screen == Screen.Settings || screen is Screen.SettingsDetail) { model.back() }
                     key(screen) {
                         when (screen) {
                             Screen.Home -> if (saved?.setupComplete != true) {
-                                OnboardingScreen(preferences.layout, isDefault,
-                                    { layout -> model.updatePreferences { it.copy(layout = layout) } },
-                                    { model.navigate(Screen.Settings) }, setDefault, model::finishSetup,
-                                    { model.navigate(Screen.Apps) }, beginImport)
+                                OnboardingScreen(preferences, apps, saved?.setupStep ?: SetupStep.LAYOUT, isDefault,
+                                    onChange = model::updatePreferences, onStep = model::moveSetup,
+                                    onAssign = { model.navigate(Screen.Picker(it)) }, onClear = model::clearAssignment,
+                                    onDefault = setDefault, onStart = model::finishSetup,
+                                    onApps = { model.navigate(Screen.Apps) }, onImport = beginImport,
+                                    storageError = storageError,
+                                    onRecovery = { model.navigate(Screen.SettingsDetail(SettingsSection.BACKUP)) })
                             } else {
                                 val (time, date) = rememberClockText()
                                 HomeScreen(preferences.layout, time, date, model::openClock, model::openCategory,
@@ -121,12 +132,14 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, onSystemBars: (Boolean) -
                             is Screen.Picker -> AppListScreen(apps, loading, false,
                                 title = screen.category?.label ?: "Clock", onBack = model::back,
                                 onSelect = { model.chooseApp(screen.category, it.target) }, alphabetScrubber = preferences.alphabetScrubber)
-                            Screen.Settings -> SettingsScreen(preferences, apps, isDefault, storageError,
+                            Screen.Settings -> SettingsScreen(isDefault, storageError, onBack = model::back,
+                                onSection = { model.navigate(Screen.SettingsDetail(it)) },
+                                onSetDefault = setDefault, onChangeDefault = changeDefault)
+                            is Screen.SettingsDetail -> SettingsDetailScreen(screen.section, preferences, apps, storageError,
                                 onBack = model::back, onChange = model::updatePreferences,
                                 onAssign = { model.navigate(Screen.Picker(it)) }, onClear = model::clearAssignment,
-                                onSetDefault = setDefault,
                                 onExport = { export.launch("nia-settings-${LocalDate.now()}.json") }, onImport = beginImport,
-                                onResetAppearance = model::resetAppearance, onResetAll = model::resetAll)
+                                onResetAppearance = model::resetAppearance, onResetAll = model::resetAll, onOpenLink = openLink)
                         }
                     }
                 }

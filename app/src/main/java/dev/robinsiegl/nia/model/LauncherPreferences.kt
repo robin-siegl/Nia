@@ -11,6 +11,7 @@ enum class HomeCategory(val label: String) {
 @Serializable enum class HomeTextSize(val scale: Float) { SMALL(0.85f), DEFAULT(1f), LARGE(1.15f) }
 @Serializable enum class ColorStyle { MONOCHROME, COLOR }
 @Serializable enum class ThemeMode { SYSTEM, LIGHT, DARK }
+@Serializable enum class SetupStep { LAYOUT, APPS, APPEARANCE, DEFAULT }
 
 @Serializable
 data class AppTarget(val packageName: String, val activityName: String) {
@@ -37,6 +38,7 @@ data class LauncherPreferences(
 data class SavedState(
     val preferences: LauncherPreferences = LauncherPreferences(),
     val setupComplete: Boolean = false,
+    val setupStep: SetupStep = SetupStep.LAYOUT,
 )
 
 object PreferencesValidation {

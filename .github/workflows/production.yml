@@ -1,17 +1,23 @@
 name: Production APK
-run-name: nia production APK${{ inputs.publish_release && ' + GitHub release' || '' }}
+run-name: nia production ${{ inputs.version || inputs.bump }}${{ inputs.publish_release && ' + GitHub release' || '' }}
 
 on:
   workflow_dispatch:
     inputs:
+      bump:
+        description: 'Next version (ignored when an exact version is entered)'
+        required: true
+        type: choice
+        default: patch
+        options: [patch, minor, major]
       version:
-        description: 'Version name (for example 0.1.0); leave empty to use gradle.properties'
+        description: 'Optional exact stable version, for example 1.0.0'
         type: string
         default: ''
       publish_release:
-        description: 'Also publish a public GitHub release'
+        description: 'Publish a public GitHub release with the signed APK'
         type: boolean
-        default: false
+        default: true
 
 permissions:
   contents: read
@@ -21,17 +27,35 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  version:
+    name: Resolve release version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      version_code: ${{ steps.version.outputs.version_code }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Choose a new version
+        id: version
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_BUMP: ${{ inputs.bump }}
+        run: python3 scripts/release_version.py
+
   checks:
     name: Release checks
+    needs: version
     uses: ./.github/workflows/ci.yml
 
   build:
     name: Signed production APK
-    needs: checks
+    needs: [version, checks]
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    outputs:
-      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-java@v5
@@ -44,21 +68,6 @@ jobs:
           log-accepted-android-sdk-licenses: false
           packages: platform-tools platforms;android-36 build-tools;36.0.0
       - uses: gradle/actions/setup-gradle@v4
-      - name: Validate version
-        id: version
-        env:
-          REQUESTED_VERSION: ${{ inputs.version }}
-        run: |
-          python3 - <<'PY'
-          import os, re
-          from pathlib import Path
-          properties = dict(line.split('=', 1) for line in Path('gradle.properties').read_text().splitlines() if '=' in line)
-          version = os.environ['REQUESTED_VERSION'].strip() or properties['nia.versionName']
-          if not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.-]+)?', version):
-              raise SystemExit('Use a version such as 0.1.0 or 0.2.0-beta.1')
-          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-              f.write('version=' + version + '\n')
-          PY
       - name: Configure release signing
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -68,11 +77,12 @@ jobs:
         run: python3 scripts/prepare_signing.py
       - name: Build production APK
         env:
-          VERSION: ${{ steps.version.outputs.version }}
-        run: ./gradlew :app:assembleRelease :app:lintRelease -Pnia.versionName="$VERSION" -Pnia.versionCode="$((100 + GITHUB_RUN_NUMBER))" --stacktrace
+          VERSION: ${{ needs.version.outputs.version }}
+          VERSION_CODE: ${{ needs.version.outputs.version_code }}
+        run: ./gradlew :app:assembleRelease :app:lintRelease -Pnia.versionName="$VERSION" -Pnia.versionCode="$VERSION_CODE" --stacktrace
       - name: Verify signature and prepare download
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          VERSION: ${{ needs.version.outputs.version }}
         run: |
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs app/build/outputs/apk/release/app-release.apk
           mkdir -p dist
@@ -81,7 +91,7 @@ jobs:
           sha256sum *.apk > SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: nia-production-${{ steps.version.outputs.version }}
+          name: nia-production-${{ needs.version.outputs.version }}
           path: dist/
           if-no-files-found: error
       - name: Remove temporary signing key
@@ -89,27 +99,32 @@ jobs:
         run: rm -f "$RUNNER_TEMP/nia-release.p12"
       - name: Download instructions
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          VERSION: ${{ needs.version.outputs.version }}
         run: |
           echo "### nia $VERSION" >> "$GITHUB_STEP_SUMMARY"
-          echo "Download the nia-production-$VERSION artifact below. It contains the signed APK and SHA-256 checksum." >> "$GITHUB_STEP_SUMMARY"
+          echo "Download the nia-production-$VERSION artifact below. Public releases also attach the APK and checksum under Releases." >> "$GITHUB_STEP_SUMMARY"
 
   publish:
-    name: GitHub release
+    name: Publish GitHub release
     if: inputs.publish_release
-    needs: build
+    needs: [version, build]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: nia-production-${{ needs.build.outputs.version }}
+          name: nia-production-${{ needs.version.outputs.version }}
           path: dist
-      - name: Publish release
+      - name: Create tag and publish verified files
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          VERSION: ${{ needs.build.outputs.version }}
+          VERSION: ${{ needs.version.outputs.version }}
+          TAG: ${{ needs.version.outputs.tag }}
           COMMIT: ${{ github.sha }}
-        run: gh release create "v$VERSION" dist/* --target "$COMMIT" --title "nia $VERSION" --generate-notes
+        run: |
+          set -euo pipefail
+          # Atomic ref creation rejects a tag created by another publisher during the build.
+          gh api --method POST "repos/$GH_REPO/git/refs" -f "ref=refs/tags/$TAG" -f "sha=$COMMIT" --silent
+          gh release create "$TAG" dist/* --verify-tag --title "nia $VERSION" --generate-notes

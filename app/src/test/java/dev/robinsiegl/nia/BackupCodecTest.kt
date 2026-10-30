@@ -8,6 +8,7 @@ import org.junit.Test
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.encodeToString
 
 class BackupCodecTest {
     private val p = LauncherPreferences(layout = HomeLayout.LIST, colorStyle = ColorStyle.COLOR,
@@ -34,6 +35,13 @@ class BackupCodecTest {
         val text = exported()
         assertFalse(text.contains("setupComplete")); assertFalse(text.contains("isDefault"))
         assertFalse(text.contains("query")); assertFalse(text.contains("installedApps"))
+        assertFalse(text.contains("setupStep"))
+    }
+    @Test fun `setup step persists through saved state reload`() {
+        for (step in SetupStep.entries) {
+            val saved = SavedState(preferences = p, setupStep = step)
+            assertEquals(saved, BackupCodec.json.decodeFromString<SavedState>(BackupCodec.json.encodeToString(saved)))
+        }
     }
     @Test fun `other files and future schemas are rejected`() {
         rejected("{}"); rejected(exported().replace("nia.settings", "other.settings"))

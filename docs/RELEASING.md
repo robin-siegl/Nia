@@ -46,14 +46,20 @@ Skip this helper if you have already created nia's key and configured its secret
 ## Trigger a production build
 
 1. Open **[Actions → Production APK → Run workflow](https://github.com/robin-siegl/Nia/actions/workflows/production.yml)** on `main`.
-2. Optionally enter a version such as `0.1.0` or `0.2.0-beta.1`. Empty uses `nia.versionName` from `gradle.properties`.
-3. Leave **publish_release** disabled for an artifact-only build, or enable it for a public GitHub release.
-4. The workflow runs tests and lint, builds and shrinks the release, verifies its APK signature, and uploads **nia-production-VERSION**.
-5. Download/extract that artifact. Install `nia-VERSION.apk`. `SHA256SUMS.txt` records its checksum.
+2. Leave **patch** selected for the usual next version, or choose **minor** / **major**. Optionally enter an exact stable version such as `1.0.0`, which overrides the bump.
+3. Leave **publish_release** enabled for the public APK download. Disable it only for an artifact-only build.
+4. Select **Run workflow**. The workflow resolves the version, runs tests and lint, builds and shrinks the release, verifies its APK signature, and uploads **nia-production-VERSION**.
+5. Open **Releases** and download `nia-VERSION.apk`. `SHA256SUMS.txt` records its checksum. Artifact-only builds are downloaded/extracted from the workflow run instead.
 
 With **publish_release** enabled, the APK and checksum are also available under **[Releases](https://github.com/robin-siegl/Nia/releases)** for public download. No artifact extraction or GitHub sign-in is needed for those release assets.
 
-The release version code is `100 + GITHUB_RUN_NUMBER`. This remains increasing across normal runs of this workflow. The public tag is `vVERSION`; select a new version when publishing a new GitHub release. Publishing to an existing tag intentionally fails rather than replacing an existing release's APK.
+**First 1.0 build:** keep the defaults and leave the exact version blank. The minimum source version is `1.0.0`, so absent tags or existing `0.x` MVP tags resolve to **1.0.0**. After `v1.0.0` is published, patch chooses `1.0.1`, minor chooses `1.1.0`, and major chooses `2.0.0`.
+
+The latest stable `vMAJOR.MINOR.PATCH` Git tag is compared numerically. Prerelease and unrelated tags are ignored. Exact versions must be at least the source version and newer than all existing stable tags. Leading zeroes, prerelease suffixes, existing versions and builds from a branch other than `main` are rejected.
+
+Android `versionCode` is `major * 1000000 + minor * 1000 + patch`; `1.0.0` uses `1000000`, above the MVP run-number codes. Major is limited to 1999, minor and patch to 999, keeping codes positive and below Android's limit. Increasing supported versions produces increasing version codes independently of workflow run numbers.
+
+After build verification, the publish job atomically creates `vVERSION` at the exact source commit, rejecting an existing tag. It then publishes the APK and checksum with generated release notes. No tag is created by failed tests, lint, builds or signature verification. Artifact-only builds do not create tags.
 
 The workflow restores your existing keystore, masks signing values, verifies the APK signature, and deletes the temporary keystore afterward. It never generates a new production key during an APK build.
 
@@ -81,5 +87,6 @@ Debug installs are separate apps and use development signing. They are suitable 
 - **Missing repository Actions secrets:** Check all four names in the table above. Store them as repository secrets, not variables. No additional bundle secret is needed.
 - **Invalid base64:** Encode the complete keystore file, rather than its path or filename.
 - **Wrong password or alias:** Use the values from the same keystore you encoded. The alias does not need to match the app name.
-- **No public download:** Enable **publish_release** when running the workflow, then open **Releases** after it succeeds.
-- **Release tag already exists:** Use a new version. The workflow does not replace published APKs.
+- **No public download:** Keep **publish_release** enabled when running the workflow, then open **Releases** after it succeeds.
+- **Release version already exists or is too old:** Leave the exact version blank and choose a bump, or enter a newer stable version.
+- **Tag exists but publishing failed:** Download the verified APK/checksum artifact from that run and finish creating the GitHub Release for its existing tag. Keep the tag at its original commit; do not move it or rebuild a different APK under that version.

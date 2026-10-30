@@ -1,6 +1,15 @@
 # nia: MVP requirements
 
-MVP specification · 30 October 2026
+Product specification · 30 October 2026
+
+## 1.0.0 release scope
+
+- Guided setup has Layout, Apps, Appearance and Default Home stages. It stores progress locally, preserves the step through app selection/restarts, and keeps skip, restore and all-app access available. Existing completed setups are not repeated on upgrade.
+- Settings has an overview and focused Home, Appearance, App assignments, App list, Backup & reset and About pages. Changing the default launcher is always available from the overview.
+- App search accepts accent/case-insensitive substrings, initials (including camel-case names), and multiple word prefixes in any order. Results stay alphabetical and app assignments retain their explicit launch targets.
+- About displays the version, local-data privacy summary, project/issue links and third-party notices. The source-license status is reported accurately; a license has not been selected for nia.
+- Production defaults to a public release. A stable patch/minor/major bump or exact override resolves against current Git tags, with a source floor of 1.0.0. Semantic versions determine increasing Android version codes. Tests, lint, signing and verification precede tag creation/publication.
+- Setup progress remains internal and is excluded from exported settings. Existing preferences and schema-1/schema-2 backups remain compatible. Theme sharing stays deferred.
 
 ## 0.2.0 Home and appearance update
 

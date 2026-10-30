@@ -5,6 +5,8 @@ Record the Android version, build number and gesture/button navigation setting i
 ## Home and navigation
 
 - Install the APK, open nia, complete or skip setup, then choose nia in Android's default Home dialog.
+- Test all four setup stages, Back, Skip setup, restore and All apps. Select apps mid-setup, reopen nia, and confirm its current stage and assignments remain. The final preview should match the selected layout/theme.
+- Open every Settings page and return using Back. App selection must return to its originating page. Change the default launcher from the overview both while nia is default and while another launcher is default.
 - From several other apps, use the Home gesture. nia should return to its clean Home, without an old search or keyboard.
 - Open Apps using both swipe-up and the visible Apps entry. Confirm swiping does not interfere with Android Home/Back gestures or the notification shade.
 - Test normal Recents switching and returning to Home. Record any OS-controlled transition differences.
@@ -19,6 +21,8 @@ Record the Android version, build number and gesture/button navigation setting i
 - Tap the time and date. Confirm Clock opens and date uses the same Calendar assignment.
 - Install/uninstall an app while nia runs. Confirm the list refreshes and stale assignments recover through the app selector.
 - Search with mixed case, accents, no results and a blank query. Clear should restore alphabetical order.
+- Search app initials, camel-case initials and multiple word prefixes in different orders. Matches must stay alphabetical.
+- Open About nia and verify the version, privacy text and browser links for the project, issue reporting and notices.
 - Enable/disable autofocus, reopen Apps each time, and test the real keyboard. Back first dismisses the keyboard, then leaves the list.
 - Enable the alphabet scrubber and drag the right edge to the first, middle and final letters. Check the same behavior in assignment pickers, accent normalization and search hiding/restoring the scrubber. Try TalkBack adjustment and keyboard arrows.
 - Long-press an app name to open App info.

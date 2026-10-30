@@ -43,6 +43,14 @@ class ScreensTest {
         }
     }
 
+    @Composable
+    private fun detail(section: SettingsSection, preferences: LauncherPreferences = LauncherPreferences(),
+        onBack: () -> Unit = {}, onChange: ((LauncherPreferences) -> LauncherPreferences) -> Unit = {},
+        onResetAll: () -> Unit = {}, onOpenLink: (String) -> Unit = {}) {
+        SettingsDetailScreen(section, preferences, emptyList(), false, onBack, onChange,
+            {}, {}, {}, {}, {}, onResetAll, onOpenLink)
+    }
+
     private fun screenshot(name: String): android.graphics.Bitmap =
         rule.runOnIdle {
             val bitmap = android.graphics.Bitmap.createBitmap(host.width, host.height, android.graphics.Bitmap.Config.ARGB_8888)
@@ -202,7 +210,7 @@ class ScreensTest {
     @Test fun `color settings expose system mode and paired previews`() {
         val p = LauncherPreferences(colorStyle = ColorStyle.COLOR, themeMode = ThemeMode.DARK)
         render(p) {
-            SettingsScreen(p, emptyList(), false, false, {}, {}, {}, {}, {}, {}, {}, {}, {})
+            detail(SettingsSection.APPEARANCE, p)
         }
         rule.onNodeWithText("System").assertIsDisplayed()
         screenshot("settings-violet-dark")
@@ -211,7 +219,7 @@ class ScreensTest {
     @Test fun `Home text size selection updates its preview and preference`() {
         var p by mutableStateOf(LauncherPreferences(layout = HomeLayout.LIST))
         render {
-            SettingsScreen(p, emptyList(), false, false, {}, { change -> p = change(p) }, {}, {}, {}, {}, {}, {}, {})
+            detail(SettingsSection.HOME, p, onChange = { change -> p = change(p) })
         }
         val before = rule.onNodeWithText("09:41").fetchSemanticsNode().boundsInRoot.height
         rule.onNodeWithText("Large").performClick()
@@ -256,5 +264,135 @@ class ScreensTest {
         rule.onNodeWithText("Hex color").performTextReplacement("#00aaff")
         rule.onNodeWithText("Apply").performClick()
         assertEquals("#00AAFF", changed.seedColor)
+    }
+
+    @Test fun `settings overview opens focused pages and always offers changing launcher`() {
+        var section by mutableStateOf<SettingsSection?>(null)
+        var changedLauncher = false
+        render {
+            val current = section
+            if (current == null) SettingsScreen(true, false, {}, { section = it }, {}, { changedLauncher = true })
+            else detail(current, onBack = { section = null })
+        }
+        SettingsSection.entries.forEach { rule.onNodeWithText(it.title).assertIsDisplayed() }
+        screenshot("settings-overview")
+        rule.onNodeWithText("Appearance").performClick()
+        rule.onNodeWithText("System").assertIsDisplayed()
+        rule.onNodeWithText("App assignments").assertDoesNotExist()
+        rule.onNodeWithText("Back").performClick()
+        rule.onNodeWithText("App assignments").performClick()
+        rule.onNodeWithText("Clock").assertIsDisplayed()
+        rule.onNodeWithText("System").assertDoesNotExist()
+        rule.onNodeWithText("Back").performClick()
+        rule.onNodeWithText("Change default launcher").performScrollTo().performClick()
+        assertTrue(changedLauncher)
+    }
+
+    @Test fun `About shows the app version privacy and working project links`() {
+        var opened = ""
+        render { detail(SettingsSection.ABOUT, onOpenLink = { opened = it }) }
+        rule.onNodeWithText("Version ${BuildConfig.VERSION_NAME}").assertIsDisplayed()
+        rule.onNodeWithText("No accounts, advertising or analytics. nia works offline.").assertIsDisplayed()
+        screenshot("about-nia")
+        rule.onNodeWithText("View on GitHub").performScrollTo().performClick()
+        assertEquals(ProjectLinks.REPOSITORY, opened)
+        rule.onNodeWithText("Privacy details").performScrollTo().performClick()
+        assertEquals(ProjectLinks.PRIVACY, opened)
+        rule.onNodeWithText("Third-party notices").performScrollTo().performClick()
+        assertEquals(ProjectLinks.NOTICES, opened)
+    }
+
+    @Test fun `backup page keeps full reset behind explicit confirmation`() {
+        var resets = 0
+        render { detail(SettingsSection.BACKUP, onResetAll = { resets++ }) }
+        rule.onNodeWithText("Reset all settings").performClick()
+        rule.onNodeWithText("Cancel").performClick()
+        assertEquals(0, resets)
+        rule.onNodeWithText("Reset all settings").performClick()
+        rule.onNodeWithText("Reset").performClick()
+        assertEquals(1, resets)
+    }
+
+    @Test fun `guided setup keeps its step through app selection and completes all four stages`() {
+        var saved by mutableStateOf(SavedState(preferences = LauncherPreferences(themeMode = ThemeMode.DARK)))
+        var picker by mutableStateOf<Screen.Picker?>(null)
+        var isDefault by mutableStateOf(false)
+        val signal = AppEntry(AppTarget("org.example.signal", "Main"), "Signal")
+        render {
+            NiaTheme(Palette.generate(saved.preferences, false)) {
+                Surface(Modifier.fillMaxSize()) {
+                    val currentPicker = picker
+                    if (saved.setupComplete) HomeScreen(saved.preferences.layout, "09:41", "Friday, October 30", {}, {}, {})
+                    else if (currentPicker != null) AppListScreen(listOf(signal), false, false, onBack = { picker = null }, onSelect = { app ->
+                        val p = saved.preferences
+                        saved = saved.copy(preferences = if (currentPicker.category == null) p.copy(clock = app.target)
+                            else p.copy(assignments = p.assignments + (currentPicker.category to app.target)))
+                        picker = null
+                    }) else OnboardingScreen(saved.preferences, listOf(signal), saved.setupStep, isDefault,
+                        onChange = { change -> saved = saved.copy(preferences = change(saved.preferences)) },
+                        onStep = { saved = saved.copy(setupStep = it) }, onAssign = { picker = Screen.Picker(it) }, onClear = {},
+                        onDefault = { isDefault = true }, onStart = { saved = saved.copy(setupComplete = true) }, onApps = {}, onImport = {})
+                }
+            }
+        }
+        rule.onNodeWithText("1 of 4").assertIsDisplayed()
+        screenshot("onboarding-layout")
+        rule.onNodeWithText("Text list").performClick()
+        rule.onNodeWithText("Continue").performClick()
+        rule.onNodeWithText("Messages").performClick()
+        rule.onNodeWithText("Signal").performClick()
+        rule.onNodeWithText("2 of 4").assertIsDisplayed()
+        rule.onNodeWithText("Signal").assertIsDisplayed()
+        assertEquals(signal.target, saved.preferences.assignments[HomeCategory.MESSAGES])
+        rule.onNodeWithText("Continue").performClick()
+        rule.onNodeWithText("3 of 4").assertIsDisplayed()
+        rule.onNodeWithText("Color").performClick()
+        rule.onNodeWithTag("color-wheel").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithText("Continue").performClick()
+        rule.onNodeWithText("4 of 4").assertIsDisplayed()
+        rule.onNodeWithText("Set as default launcher").performClick()
+        rule.onNodeWithText("nia is your default launcher.").assertIsDisplayed()
+        screenshot("onboarding-ready")
+        rule.onNodeWithText("Back").performClick()
+        rule.onNodeWithText("3 of 4").assertIsDisplayed()
+        rule.onNodeWithText("Continue").performClick()
+        rule.onNodeWithText("Start using nia").performClick()
+        assertTrue(saved.setupComplete)
+        rule.onNodeWithText("Apps").assertIsDisplayed()
+        rule.onNodeWithContentDescription("Settings").assertIsDisplayed()
+    }
+
+    @Test fun `setup recovery keeps app access and restore available without overwriting bad settings`() {
+        var restored = false
+        var recovery = false
+        var apps = false
+        render {
+            OnboardingScreen(LauncherPreferences(), emptyList(), SetupStep.LAYOUT, false, {}, {}, {}, {}, {}, {},
+                { apps = true }, { restored = true }, storageError = true, onRecovery = { recovery = true })
+        }
+        rule.onNodeWithText("Continue").assertIsNotEnabled()
+        rule.onNodeWithText("Skip setup").assertDoesNotExist()
+        rule.onNodeWithText("All apps").performClick()
+        rule.onNodeWithText("Restore a settings backup").performClick()
+        rule.onNodeWithText("Open recovery settings").performClick()
+        assertTrue(apps && restored && recovery)
+    }
+
+    @Test @Config(qualifiers = "w320dp-h600dp-xhdpi")
+    fun `setup navigation remains reachable with large system text on a compact screen`() {
+        var step by mutableStateOf(SetupStep.APPEARANCE)
+        val p = LauncherPreferences(colorStyle = ColorStyle.COLOR, themeMode = ThemeMode.DARK)
+        render(p) {
+            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 2f)) {
+                OnboardingScreen(p, emptyList(), step, false, {}, { step = it }, {}, {}, {}, {}, {}, {})
+            }
+        }
+        rule.onNodeWithText("Continue").assertIsDisplayed()
+        rule.onNodeWithText("All apps").assertIsDisplayed()
+        rule.onNodeWithTag("color-wheel").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithText("Continue").performClick()
+        rule.onNodeWithText("Start using nia").assertIsDisplayed()
+        rule.onNodeWithText("Set as default launcher").performScrollTo().assertIsDisplayed()
+        screenshot("onboarding-large-text")
     }
 }

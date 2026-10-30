@@ -2,13 +2,19 @@
 
 A quiet Android launcher. Five everyday shortcuts, a clock and date, and a searchable app list made of names.
 
-nia is a native Kotlin/Jetpack Compose MVP. It can become your actual default Home app. The first acceptance device is a Pixel 10 Pro using its normal personal profile.
+nia is a native Kotlin/Jetpack Compose launcher. It can become your actual default Home app. The primary device is a Pixel 10 Pro using its normal personal profile.
 
 <p>
   <img src="docs/screenshots/home-oled-grid.png" width="220" alt="nia OLED black icon grid" />
   <img src="docs/screenshots/home-violet-light.png" width="220" alt="nia pastel violet text list" />
   <img src="docs/screenshots/home-violet-dark.png" width="220" alt="nia dark violet text list" />
   <img src="docs/screenshots/color-picker.png" width="220" alt="nia color wheel with live light and dark previews" />
+</p>
+
+<p>
+  <img src="docs/screenshots/onboarding-layout.png" width="220" alt="nia guided first-time setup with a Home preview" />
+  <img src="docs/screenshots/settings-overview.png" width="220" alt="nia focused Settings overview" />
+  <img src="docs/screenshots/about-nia.png" width="220" alt="About nia with version and privacy information" />
 </p>
 
 Rendered from the app's Compose screens; phone screenshots will also include the system bars.
@@ -21,9 +27,11 @@ Rendered from the app's Compose screens; phone screenshots will also include the
 - Small, Default or Large Home text, with a preview in Settings.
 - Time opens Clock; date opens your assigned Calendar.
 - Swipe up or tap **Apps** for an alphabetical, text-only app list.
-- Search by name, with an optional automatic keyboard/focus setting.
+- Search by name, initials (including camel-case names) or word prefixes in any order. Matching apps stay alphabetical. Search can focus automatically if enabled.
 - Optional alphabet navigation: drag the right edge of the app list to jump to a letter. Letters appear during interaction; searching hides the scrubber.
-- First-launch setup and Android's default-launcher selection.
+- Four-step first-launch setup: layout/text size, app assignments, appearance and default launcher. Progress survives app selection and reopening nia; previews show your Home before you finish.
+- Focused Settings pages for Home, Appearance, App assignments, App list, Backup & reset and About nia. Android's default launcher can be changed from the Settings overview.
+- About includes the app version, privacy details, GitHub/issue links and third-party notices.
 - Black/white or one-color themes, with **System / Light / Dark** modes.
 - Use the visual color wheel and brightness slider, a preset, or a custom hex color: nia generates matching pastel/dark background and foreground pairs. Both variants preview live; wheel/slider changes save when released, and hex input uses Apply. Generated pairs target at least **7:1** text contrast.
 - Pure `#000000` in monochrome dark mode, plus an OLED-black option for colored dark themes.
@@ -31,9 +39,11 @@ Rendered from the app's Compose screens; phone screenshots will also include the
 - Missing-app recovery, live package-list updates and a settings reset/recovery path.
 - Offline operation. The app requests no network, contacts, SMS, calendar-content or notification access.
 
-## Install an MVP build
+## Install nia
 
-Open **[Actions → Checks](https://github.com/robin-siegl/Nia/actions/workflows/ci.yml)**. Choose a successful run and download the **nia-debug** artifact. Extract and install the APK, open nia, assign your apps and tap **Set as default launcher**. Android's Home-app chooser must be completed to use nia when pressing Home.
+After a production build succeeds, download **nia-VERSION.apk** from **[Releases](https://github.com/robin-siegl/Nia/releases)**. Install it, open nia and follow the guided setup. Complete Android's Home-app chooser to use nia when pressing Home.
+
+Development APKs are also available under **[Actions → Checks](https://github.com/robin-siegl/Nia/actions/workflows/ci.yml)**: choose a successful run, download the **nia-debug** artifact and extract its APK.
 
 Development builds have their own package ID (`dev.robinsiegl.nia.debug`) so they can coexist with production builds. Prefer production APKs for long-term use and updates.
 
@@ -41,7 +51,9 @@ Development builds have their own package ID (`dev.robinsiegl.nia.debug`) so the
 
 Configure the same four repository Actions secrets used by pip-os: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD`, using your nia keystore and credentials. The [one-time signing instructions](docs/RELEASING.md#one-time-signing-setup) include the keystore command and PowerShell copy-to-clipboard step.
 
-If those secrets are already added, setup is complete. Open **[Actions → Production APK → Run workflow](https://github.com/robin-siegl/Nia/actions/workflows/production.yml)** on `main`. Leave the version blank for `0.2.0`, or enter a new version. Enable **publish_release** for a public APK download under **[Releases](https://github.com/robin-siegl/Nia/releases)**. The signed APK and checksum are also uploaded as the **nia-production-VERSION** artifact.
+If those secrets are already added, setup is complete. Open **[Actions → Production APK → Run workflow](https://github.com/robin-siegl/Nia/actions/workflows/production.yml)** on `main`. Leave **patch** selected, the exact version blank, and **publish_release** enabled. The first run selects **1.0.0**. Later runs choose the next patch/minor/major version from the latest stable Git tag. An optional exact version overrides the bump.
+
+Public release publication is enabled by default. The signed APK and checksum are also uploaded as the **nia-production-VERSION** artifact. Existing or older versions are rejected, and the tag is created only after tests, lint, build and signature verification succeed.
 
 Keep a private backup of your keystore and passwords and use the same key for future updates. No additional signing-bundle secret is required. See [release instructions](docs/RELEASING.md) for the optional setup helper, local builds and troubleshooting.
 
@@ -61,16 +73,17 @@ Minimum Android is 10 (API 29); the build compiles/targets API 36. The user's An
 
 ## Verification
 
-The test suite covers palette contrast across RGB samples, theme mode behavior, search normalization/order, backup validation/round trips, navigation, Home shortcuts, swipe access, search focus and screen rendering. Robolectric renders the Compose UI at API 35; screenshots are included in CI's test-report artifact. Host-side UI tests cannot establish Pixel gesture/Recents behavior: use the [device acceptance checklist](docs/DEVICE_TESTING.md) before calling the MVP phone-verified.
+The test suite covers palette contrast across RGB samples, theme behavior, smart search/order, backup compatibility, saved setup progress, navigation, guided setup, Settings pages, About links, Home gestures, keyboard focus and screen rendering. Python tests also exercise signing helpers and release version selection. Robolectric renders the Compose UI at API 35; screenshots are included in CI's test-report artifact. Use the [device acceptance checklist](docs/DEVICE_TESTING.md) for physical Pixel gestures, Recents and signed upgrades.
 
 ## Scope and next steps
 
-The MVP supports the personal profile. Work profiles and Private Space are deferred and are not advertised as supported. Home categories remain fixed. Widgets, folders and feeds are outside this design.
+nia 1.0 supports the personal profile. Work profiles and Private Space are deferred and are not advertised as supported. Home categories remain fixed. Widgets, folders and feeds are outside this design.
 
 - [Requirements and decisions](docs/REQUIREMENTS.md)
 - [Release setup](docs/RELEASING.md)
 - [Device acceptance](docs/DEVICE_TESTING.md)
 - [Prioritized roadmap](docs/ROADMAP.md)
 - [Changelog](CHANGELOG.md)
+- [Privacy](docs/PRIVACY.md)
 
 The source license is still to be selected.

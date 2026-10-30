@@ -80,6 +80,10 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     fun updatePreferences(transform: (LauncherPreferences) -> LauncherPreferences) =
         perform("Your settings could not be saved.") { store.update { it.copy(preferences = transform(it.preferences)) } }
 
+    fun moveSetup(step: SetupStep) = perform("Your setup progress could not be saved.") {
+        store.update { it.copy(setupStep = step) }
+    }
+
     fun finishSetup() = perform("Setup could not be saved.") {
         store.update { it.copy(setupComplete = true) }; home()
     }

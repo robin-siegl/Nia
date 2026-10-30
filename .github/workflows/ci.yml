@@ -27,7 +27,7 @@ jobs:
           log-accepted-android-sdk-licenses: false
           packages: platform-tools platforms;android-36 build-tools;36.0.0
       - uses: gradle/actions/setup-gradle@v4
-      - name: Signing helper tests
+      - name: Signing and release tests
         run: python3 -m unittest discover -s scripts/tests -v
       - name: Tests
         run: ./gradlew :app:testDebugUnitTest --stacktrace

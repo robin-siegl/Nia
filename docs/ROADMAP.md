@@ -1,6 +1,8 @@
-# After the nia MVP
+# After nia 1.0
 
 Keep the five-category Home and text-only app list stable. Additions should improve daily use without introducing feeds, usage-ranked suggestions or an editable Home grid.
+
+The 1.0 scope implements guided setup, focused Settings pages, smart search, About/privacy information and automatic public releases. Theme-only sharing remains postponed.
 
 ## 1. Phone validation and polish
 
@@ -30,7 +32,7 @@ Done when profile lock/unlock/removal and cross-device restore cannot leak or mi
 
 ## 5. Distribution and maintainability
 
-Choose a source license, add a changelog and contribution guide, expand CI with emulator/device checks, and consider a public APK update-notification channel. Any network feature should remain optional and explain its purpose.
+A changelog, privacy document and automatic patch/minor/major release workflow are available in 1.0. Choose a source license, add a contribution guide, expand CI with emulator/device checks, and consider a public APK update-notification channel. Any network feature should remain optional and explain its purpose.
 
 Done when releases have a stable signing identity, an upgrade test and clear compatibility notes.
 
