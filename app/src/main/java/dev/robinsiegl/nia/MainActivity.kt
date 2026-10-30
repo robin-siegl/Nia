@@ -8,6 +8,7 @@ import android.app.KeyguardManager
 import android.graphics.Color
 import android.os.Bundle
 import android.os.PowerManager
+import android.os.SystemClock
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -19,12 +20,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import dev.robinsiegl.nia.model.UnlockTracker
+import dev.robinsiegl.nia.model.UnlockRevealRequest
+import dev.robinsiegl.nia.model.Screen
 import dev.robinsiegl.nia.ui.NiaApp
 
 class MainActivity : ComponentActivity() {
     private val model: LauncherViewModel by viewModels()
     private var homeRequest by mutableIntStateOf(0)
-    private var unlockRequest by mutableIntStateOf(0)
+    private var unlockRequest by mutableStateOf<UnlockRevealRequest?>(null)
     private var deviceLocked by mutableStateOf(false)
     private var resumed = false
     private lateinit var keyguard: KeyguardManager
@@ -35,8 +38,8 @@ class MainActivity : ComponentActivity() {
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> { unlocks.screenOff(); deviceLocked = true }
                 Intent.ACTION_USER_PRESENT -> {
-                    unlocks.userPresent(resumed)
-                    if (resumed) checkUnlock() else deviceLocked = false
+                    unlocks.userPresent(resumed, SystemClock.uptimeMillis())
+                    if (resumed) checkUnlock() else deviceLocked = unlocks.awaitingUnlock
                 }
                 Intent.ACTION_SCREEN_ON -> if (resumed) checkUnlock()
             }
@@ -65,10 +68,16 @@ class MainActivity : ComponentActivity() {
     override fun onResume() { super.onResume(); resumed = true; model.refreshDefault(); checkUnlock() }
 
     override fun onPause() {
-        unlocks.leaveForeground(keyguard.isKeyguardLocked, power.isInteractive)
         if (keyguard.isKeyguardLocked || !power.isInteractive) deviceLocked = true
         resumed = false
         super.onPause()
+    }
+
+    override fun onStop() {
+        // During screen-off, onPause can run before keyguard/power state changes.
+        // Decide whether we left for an app only once the window is actually stopped.
+        unlocks.leaveForeground(keyguard.isKeyguardLocked, power.isInteractive)
+        super.onStop()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -80,7 +89,9 @@ class MainActivity : ComponentActivity() {
         val locked = keyguard.isKeyguardLocked
         val interactive = power.isInteractive
         val focused = hasWindowFocus()
-        if (unlocks.foreground(locked, interactive, focused)) unlockRequest++
+        if (unlocks.foreground(locked, interactive, focused, SystemClock.uptimeMillis())) {
+            unlockRequest = if (model.navigation.value.screen == Screen.Home) UnlockRevealRequest() else null
+        }
         // Keep shortcuts hidden between keyguard dismissal and this window receiving focus.
         deviceLocked = locked || !interactive || (unlocks.awaitingUnlock && !focused)
     }

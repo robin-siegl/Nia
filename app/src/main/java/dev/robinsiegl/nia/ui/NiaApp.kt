@@ -53,7 +53,7 @@ fun NiaTheme(palette: NiaPalette, content: @Composable () -> Unit) {
 }
 
 @Composable
-fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: Int = 0, deviceLocked: Boolean = false,
+fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: UnlockRevealRequest? = null, deviceLocked: Boolean = false,
     onSystemBars: (Boolean) -> Unit) {
     val saved by model.saved.collectAsStateWithLifecycle()
     val apps by model.apps.collectAsStateWithLifecycle()
@@ -63,6 +63,8 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: Int = 0, d
     val isDefault by model.isDefault.collectAsStateWithLifecycle()
     val storageError by model.storageError.collectAsStateWithLifecycle()
     val restore by model.restore.collectAsStateWithLifecycle()
+    val restoring by model.restoring.collectAsStateWithLifecycle()
+    val updateCheck by model.updateCheck.collectAsStateWithLifecycle()
     val preferences = saved?.preferences ?: LauncherPreferences()
     val palette = Palette.generate(preferences, isSystemInDarkTheme())
     val snackbar = remember { SnackbarHostState() }
@@ -119,7 +121,8 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: Int = 0, d
                             onSettings = { model.navigate(Screen.Settings) }, onApp = { model.openApp(it.target) },
                             onAppInfo = { model.showAppInfo(it.target) }, onCorner = model::openCorner,
                             contentTopInset = padding.calculateTopPadding(), unlockRequest = unlockRequest,
-                            deviceLocked = deviceLocked, homeRequest = homeRequest)
+                            deviceLocked = deviceLocked, homeRequest = homeRequest,
+                            onAssignCorner = { app, position -> model.assignCornerFromApps(position, app) })
                     } else key(screen) {
                         when (screen) {
                             Screen.Home -> {
@@ -134,7 +137,8 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: Int = 0, d
                             Screen.Apps -> AppListScreen(apps, loading, preferences.searchAutofocus,
                                 onBack = model::back, onSelect = { model.openApp(it.target) },
                                 onSettings = { model.navigate(Screen.Settings) }, onInfo = { model.showAppInfo(it.target) },
-                                alphabetScrubber = preferences.alphabetScrubber)
+                                alphabetScrubber = preferences.alphabetScrubber,
+                                onAssignCorner = { app, position -> model.assignCornerFromApps(position, app) })
                             is Screen.Picker -> AppListScreen(apps, loading, false,
                                 title = screen.category?.label ?: "Clock", onBack = model::back,
                                 onSelect = { model.chooseApp(screen.category, it.target) }, alphabetScrubber = preferences.alphabetScrubber,
@@ -151,18 +155,15 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: Int = 0, d
                                 onAssign = { model.navigate(Screen.Picker(it)) }, onClear = model::clearAssignment,
                                 onExport = { export.launch("nia-settings-${LocalDate.now()}.json") }, onImport = beginImport,
                                 onResetAppearance = model::resetAppearance, onResetAll = model::resetAll, onOpenLink = openLink,
-                                onAssignCorner = { model.navigate(Screen.CornerPicker(it)) })
+                                onAssignCorner = { model.navigate(Screen.CornerPicker(it)) },
+                                updateCheck = updateCheck, onCheckUpdates = model::checkForUpdates)
                         }
                     }
                 }
             }
         }
         restore?.let { preview ->
-            AlertDialog(onDismissRequest = model::cancelRestore, title = { Text("Restore settings?") },
-                text = { Text("Replace your Home layout, appearance, app assignments and app-list preferences with this backup." +
-                    if (preview.missingApps > 0) "\n\n${preview.missingApps} unavailable app assignment(s) will need to be chosen again." else "") },
-                confirmButton = { TextButton(onClick = model::applyRestore) { Text("Restore") } },
-                dismissButton = { TextButton(onClick = model::cancelRestore) { Text("Cancel") } })
+            RestoreDialog(preview, restoring, model::applyRestore, model::cancelRestore)
         }
     }
 }

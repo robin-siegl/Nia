@@ -1,9 +1,13 @@
 package dev.robinsiegl.nia.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
@@ -21,7 +25,7 @@ internal fun CornerSettings(preferences: LauncherPreferences, apps: List<AppEntr
         val shortcut = preferences.shortcut(position)
         SectionLabel("${position.label.uppercase()} CORNER")
         Column(Modifier.testTag("corner-settings-${position.name}")) {
-            ChoiceRow(listOf(ShortcutAction.EMPTY to "Empty", ShortcutAction.SETTINGS to "Settings", ShortcutAction.APP to "App"),
+            ChoiceRow(listOf(ShortcutAction.EMPTY to "Empty", ShortcutAction.APP to "App"),
                 shortcut.action, { action ->
                     if (action == ShortcutAction.APP) onAssign(position)
                     else onChange { it.withShortcut(position, it.shortcut(position).copy(action = action, app = null)) }
@@ -40,17 +44,16 @@ internal fun CornerSettings(preferences: LauncherPreferences, apps: List<AppEntr
     choosingIcon?.let { position ->
         AlertDialog(onDismissRequest = { choosingIcon = null }, title = { Text("${position.label} shortcut icon") },
             text = {
-                Column {
-                    ShortcutIcon.entries.chunked(4).forEach { row ->
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                            row.forEach { icon ->
-                                IconButton(onClick = {
-                                    onChange { it.withShortcut(position, it.shortcut(position).copy(icon = icon)) }; choosingIcon = null
-                                }, modifier = Modifier.size(48.dp).semantics {
-                                    contentDescription = icon.label
-                                    selected = icon == preferences.shortcut(position).icon
-                                }) { ShortcutGlyph(icon, Modifier.size(26.dp)) }
-                            }
+                LazyVerticalGrid(columns = GridCells.Adaptive(56.dp),
+                    modifier = Modifier.fillMaxWidth().heightIn(max = 360.dp).testTag("shortcut-icon-grid")) {
+                    items(ShortcutIcon.entries, key = { it.name }) { icon ->
+                        Box(contentAlignment = Alignment.Center) {
+                            IconButton(onClick = {
+                                onChange { it.withShortcut(position, it.shortcut(position).copy(icon = icon)) }; choosingIcon = null
+                            }, modifier = Modifier.size(48.dp).semantics {
+                                contentDescription = icon.label
+                                selected = icon == preferences.shortcut(position).icon
+                            }) { ShortcutGlyph(icon, Modifier.size(26.dp)) }
                         }
                     }
                 }

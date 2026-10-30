@@ -38,7 +38,7 @@ fun HomeScreen(
     pixelClockLayout: Boolean = true, contentTopInset: Dp = 0.dp,
     leftShortcut: CornerShortcut = CornerShortcut(), rightShortcut: CornerShortcut = CornerShortcut(),
     onCorner: (CornerPosition) -> Unit = {}, cornerLabel: (CornerPosition) -> String = { it.label + " shortcut" },
-    motionMode: MotionMode = MotionMode.SYSTEM, unlockRequest: Int = 0, deviceLocked: Boolean = false,
+    motionMode: MotionMode = MotionMode.SYSTEM, unlockRequest: UnlockRevealRequest? = null, deviceLocked: Boolean = false,
     interactionEnabled: Boolean = true, onScrollable: (Boolean) -> Unit = {}, onRevealReady: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
@@ -46,14 +46,16 @@ fun HomeScreen(
     val view = LocalView.current
     val reduced = motionMode == MotionMode.REDUCED
     val rows = if (layout == HomeLayout.GRID) 2 else 6
-    val reveal = remember { Animatable(if (deviceLocked) 0f else 1f) }
-    var handledUnlock by remember { mutableIntStateOf(unlockRequest) }
+    val reveal = remember { Animatable(if (deviceLocked || unlockRequest?.pending == true) 0f else 1f) }
     LaunchedEffect(deviceLocked, unlockRequest, motionMode) {
         if (deviceLocked) reveal.snapTo(0f)
-        else if (unlockRequest != handledUnlock) {
-            handledUnlock = unlockRequest
+        else if (unlockRequest?.consume() == true) {
             reveal.snapTo(0f)
-            reveal.animateTo(1f, tween(if (reduced) 120 else 200 + rows * 16, easing = LinearEasing))
+            // Draw a stable header before revealing shortcuts. The scaled start delay keeps
+            // their first frames out of the system keyguard fade; scale=0 skips it entirely.
+            withFrameNanos { }
+            reveal.animateTo(1f, tween(if (reduced) 120 else 360 + rows * 24,
+                delayMillis = if (reduced) 0 else 120, easing = LinearEasing))
         } else reveal.snapTo(1f)
     }
     val revealReady by remember { derivedStateOf { reveal.value == 1f } }
@@ -118,13 +120,13 @@ fun HomeScreen(
         }
         listOf(CornerPosition.LEFT to leftShortcut, CornerPosition.RIGHT to rightShortcut).forEach { (position, shortcut) ->
             if (shortcut.action != ShortcutAction.EMPTY) {
-                val label = if (shortcut.action == ShortcutAction.SETTINGS) "Settings" else cornerLabel(position)
+                val label = cornerLabel(position)
                 Box(Modifier.align(if (position == CornerPosition.LEFT) AbsoluteAlignment.BottomLeft else AbsoluteAlignment.BottomRight)
                     .padding(horizontal = 16.dp, vertical = 16.dp).size(48.dp)
                     .revealRow(reveal.asState(), rows, rows, reduced).testTag("home-corner-" + position.name)
                     .shortcutButton(enabled, reduced) { onCorner(position) }
                     .semantics { contentDescription = label }, contentAlignment = Alignment.Center) {
-                    ShortcutGlyph(if (shortcut.action == ShortcutAction.SETTINGS) ShortcutIcon.SETTINGS else shortcut.icon, Modifier.size(24.dp))
+                    ShortcutGlyph(shortcut.icon, Modifier.size(24.dp))
                 }
             }
         }
@@ -132,8 +134,8 @@ fun HomeScreen(
 }
 
 private fun Modifier.revealRow(progress: State<Float>, index: Int, rows: Int, reduced: Boolean): Modifier = graphicsLayer {
-    val fraction = if (reduced) progress.value else ((progress.value * (200 + rows * 16) - index * 16) / 200f).coerceIn(0f, 1f)
+    val fraction = if (reduced) progress.value else ((progress.value * (360 + rows * 24) - index * 24) / 360f).coerceIn(0f, 1f)
     val eased = FastOutSlowInEasing.transform(fraction)
     alpha = eased
-    translationY = if (reduced) 0f else 12.dp.toPx() * (1f - eased)
+    translationY = if (reduced) 0f else 16.dp.toPx() * (1f - eased)
 }

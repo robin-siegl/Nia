@@ -21,9 +21,17 @@ This matches the supplied clock style and settings. nia does not read or automat
 
 ## Unlock motion
 
-nia listens for screen/keyguard state while its activity exists and consumes an unlock only when its window is foreground, interactive and focused. The header remains stationary while shortcut rows fade and rise by up to 12dp, with a subtle stagger. Ordinary app returns do not replay the effect; unlocking into another app discards the pending reveal.
+nia listens for screen/keyguard state while its activity exists and creates a reveal only when its window is foreground, interactive and focused. Version 1.3 retains a pending unlock when `USER_PRESENT` precedes `onResume`; it decides whether nia left for another app at `onStop`, since `onPause` can precede the screen/keyguard state change. Screen-off while another app is active does not arm a reveal. A pending handoff to nia expires after 1.5 seconds if it stays in the background, avoiding replay on a later return.
 
-Reduced motion uses a short fade with no movement or stagger. Compose animations inherit Android's duration scale, including zero-duration animations. The two clocks remain separate system/app views: nia does not own or replace Android's lock-screen exit animation. Warm/cold unlocks, biometric unlock and the visual handoff require validation on the physical Pixel.
+The reveal request survives settings loading and is consumed once, including across Home remounts. Home first draws its stationary header, then uses a 120ms animation-scaled lead-in and 360ms row fades with up to 16dp upward movement and 24ms row staggering. This makes the shortcut reveal more visible after the system fade. The lead-in is a heuristic, not a system callback for the end of the keyguard animation. Ordinary app returns do not replay the effect.
+
+Reduced motion uses a 120ms fade with no lead-in, movement or stagger. Compose animations inherit Android's duration scale, including zero-duration animations. The two clocks remain separate system/app views: nia does not own or replace Android's lock-screen exit animation. A cold process created after the unlock broadcast may not observe that unlock. Warm/cold unlocks, biometric unlock and the visual handoff require validation on the physical Pixel; native UI tests exercise the event ordering and stationary header, not Pixel SystemUI.
+
+## Permissions and reliability
+
+Select nia as the default Home app through Android's Home role. No accessibility service, device administrator, notification access, overlay, root or battery-optimization exemption is needed for the implemented launcher behavior. nia has no always-running service or background polling loop.
+
+The platform [permission definitions](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/core/res/AndroidManifest.xml) restrict remote transition control (`CONTROL_REMOTE_APP_TRANSITION_ANIMATIONS`, signature/privileged/recents) and direct keyguard-state subscription (`SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE`, signature/module/role, intended for Assistant). These cannot be gained by adding an ordinary runtime permission request to nia. Internet permission is separate and used only for the requested manual GitHub update check.
 
 ## Weather status
 
@@ -31,4 +39,4 @@ The reference contains two separate weather presentations: the large outline com
 
 Android's [Smartspace manager](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/core/java/android/app/smartspace/SmartspaceManager.java) is a system API. The platform [permission definitions](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/core/res/AndroidManifest.xml) restrict its management/access, and the [clock weather data flow](https://android.googlesource.com/platform/frameworks/base/+/4c0f7a37669d1dc982045a6b07ac92127cfb5761%5E!/) is inside SystemUI. These are not a supported public component ordinary launchers can embed.
 
-Google's public Weather API publishes weather-condition images, but it does not supply the Pixel lock-screen clock component. Exact Pixel weather integration remains deferred until a supported data and icon source can meet the requested appearance. No Internet/location permission, placeholder condition or generic weather symbol has been added.
+Google's public Weather API publishes weather-condition images, but it does not supply the Pixel lock-screen clock component. Exact Pixel weather integration remains deferred until a supported data and icon source can meet the requested appearance. No weather requests, location permission, placeholder condition or generic weather symbol has been added. Internet permission is solely for manual update checks.

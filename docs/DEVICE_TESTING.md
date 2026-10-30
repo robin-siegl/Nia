@@ -23,7 +23,9 @@ Record the Android version, build number and gesture/button navigation setting i
 - Scroll far down Apps and swipe down: scroll the list instead of dismissing it. Pull down from its top and from an empty/search-results drawer to dismiss. Confirm the alphabet scrubber still works.
 - Enable autofocus: the keyboard must appear after the drawer settles. Close/reopen with and without the keyboard. Test rapid extra taps during transitions; no hidden Home shortcut or unintended app should launch.
 - Lock from Home, unlock by face/fingerprint/PIN, and observe the unchanged header plus shortcut-only reveal. Return from several normal apps without locking; no reveal should replay. Unlock into another app, then return to nia; it must not replay a delayed reveal. Check process recreation and rotation.
-- Configure both corners as Empty, Settings and apps. Pick several outline icons, relaunch/reboot, and verify app names are spoken by TalkBack. Uninstall a corner app and tap its shortcut to recover through app selection.
+- Configure both corners as Empty and App; Settings must not be offered. Pick several of the 27 outline icons (including scrolling the icon chooser), relaunch/reboot, and verify app names are spoken by TalkBack. Uninstall a corner app and tap its shortcut to recover through app selection.
+- Upgrade from 1.2 with a Settings corner: that corner becomes empty and all other settings/assignments remain. A legacy gear icon assigned to an app becomes Star while retaining the app.
+- Test face/fingerprint/PIN unlock with nia both warm and recreated. The 1.3 reveal waits briefly with only the header visible, then fades/rises the shortcuts; check the animation remains visible after the system fade. Lock/unlock from another app, including a quick return Home, and from nia Settings/Apps. Record OS build and a screen recording if the header still jumps or the reveal is skipped. The system clock exit is not controlled by nia.
 - Compare Follow Android and Reduced motion. With Android animation scale set to zero, transitions must finish immediately without leaving input blocked. Toggle system touch haptics and check shortcut feedback follows that setting.
 - Tap a launchable shortcut rapidly twice; open one activity, without leaving navigation stuck. Check Settings stays reachable with both corners empty.
 
@@ -38,7 +40,8 @@ Record the Android version, build number and gesture/button navigation setting i
 - Open About nia and verify the version, privacy text and browser links for the project, issue reporting and notices.
 - Enable/disable autofocus, reopen Apps each time, and test the real keyboard. Back first dismisses the keyboard, then leaves the list.
 - Enable the alphabet scrubber and drag the right edge to the first, middle and final letters. Check the same behavior in assignment pickers, accent normalization and search hiding/restoring the scrubber. Try TalkBack adjustment and keyboard arrows.
-- Long-press an app name to open App info.
+- Long-press an app name: show App info, Assign to left corner and Assign to right corner without launching the app. Verify each action, dismiss the menu, and repeat while searching. Assigning keeps the previous corner icon. App selection screens must not show the action menu.
+- In About, tap Check for updates. Check the latest stable version, APK link and release-page link. Test offline/retry, no release/rate limiting where feasible, same version and a newer development version. A release without an APK should still offer its page. Opening About/Home must not start a request by itself, and downloads must require a tap and stay in the browser/Android installer.
 
 ## Appearance
 
@@ -54,10 +57,11 @@ Record the Android version, build number and gesture/button navigation setting i
 
 - Reboot and force-stop/reopen nia. Check layout, text size, assignments, corners, motion, colors, autofocus and alphabet navigation.
 - Update from 0.1.0 with the same signing key. Existing settings and older exports should load with Default text size and the alphabet scrubber off.
-- Export settings, change them, then import. Review the restore summary and confirm the restored result.
-- Import schema-1/2/3 backups. Existing preferences should remain, corners should default empty and motion should follow Android. Export/re-import schema 4 with two custom corners and Reduced motion.
+- Export settings, change them, then import. Review each changed setting and app assignment with its current/backup value; unchanged entries should be omitted. Scroll to the last entry with large system text. Cancel, verify no changes, reopen and restore the exact previewed result.
+- Import schema-1/2/3 backups. Existing preferences should remain, corners should default empty and motion should follow Android. Import schema 4 with both app and Settings corners, checking migration. Export/re-import schema 5 with two custom corners, new icons and Reduced motion.
 - Cancel import; try malformed and oversized files. Existing settings must remain intact.
 - Import a valid backup referencing missing apps. Other preferences restore; unavailable assignments are listed for reassignment.
+- Uninstall an assigned app while a restore preview is open, then tap Restore. nia must refresh the preview and require a second review; rapid duplicate Restore taps must not apply twice.
 - Check reset appearance keeps assignments. Full reset should require an explicit reset choice and return to setup.
 - Install an update signed with the same release key and verify all preferences survive.
 

@@ -4,6 +4,8 @@ Keep the five-category Home and text-only app list stable. Additions should impr
 
 The 1.0 scope implements guided setup, focused Settings pages, smart search, About/privacy information and automatic public releases. Theme-only sharing remains postponed.
 
+Version 1.3 adds app action menus, a manual About update check, a detailed restore preview and more corner icons, and removes Settings as a corner action. Search aliases, adjustable clock alignment and pauses before opening distracting apps are postponed and are not planned for the next update.
+
 ## 1. Phone validation and polish
 
 Complete the Pixel 10 Pro checklist with the actual OS build. Fix gesture/keyboard edge cases, app launch failures, font scaling and any cutout/system-bar issues found there. Measure cold start, search latency and idle battery impact before setting optimization targets.
@@ -32,7 +34,7 @@ Done when profile lock/unlock/removal and cross-device restore cannot leak or mi
 
 ## 5. Distribution and maintainability
 
-A changelog, privacy document and a production workflow using the committed Gradle version are available. Choose a source license, add a contribution guide, expand CI with emulator/device checks, and consider a public APK update-notification channel. Any network feature should remain optional and explain its purpose.
+A changelog, privacy document, manual GitHub update check and a production workflow using the committed Gradle version are available. Choose a source license, add a contribution guide and expand CI with emulator/device checks. Keep update checks manual; background update notifications are not planned.
 
 Done when releases have a stable signing identity, an upgrade test and clear compatibility notes.
 

@@ -1,8 +1,19 @@
 # nia: MVP requirements
 
-Product specification · 30 October 2026
+Product specification · 31 October 2026
+
+## 1.3.0 everyday improvements
+
+- Holding an app name in Apps opens a small menu for App info or assignment to the left/right corner. Assignment keeps the selected corner icon; normal category/corner pickers remain selection-only.
+- Corner actions are Empty or App. Remove nia Settings as an action; retain access through Apps and a blank-Home long press. Upgrade/import migrates legacy Settings corners to empty and legacy gear icons on app shortcuts to Star. Expand the scrollable matching outline collection to 27 icons.
+- About provides a manual GitHub latest-release check with version, APK and release-page links. Handle no release, offline/error/rate-limit states, already-current/newer-installed versions and releases without an attached APK. No scheduled checking, automatic download or in-app installer. Internet is the only new permission; launcher/search/preferences remain offline.
+- Restore previews every changed setting and app assignment as current/backup values, names unavailable assignments and applies the previewed result. Cancel does not change preferences. Recheck app availability before applying and require reviewing a changed result. Exports use schema 5, imports accept 1–5.
+- Retain unlocks arriving before activity resume, consume reveal events once across delayed Home composition/remounts, and provide a scaled lead-in followed by a longer shortcut fade/rise. The clock/date stay still. Keep system/reduced/disabled animation behavior and avoid stale reveals on ordinary app returns. Pixel SystemUI continuity requires physical-device validation; do not claim control of the system unlock animation.
+- Postpone search aliases, adjustable clock alignment, distracting-app pauses and theme sharing.
 
 ## 1.2.0 quality of life
+
+Historical 1.2 scope; the 1.3 requirements above supersede its Settings corner and backup schema.
 
 - Keep Home mounted beneath a gesture-driven Apps drawer. Tap, swipe and Back share its resting positions and transitions. Downward list gestures dismiss only at the top; list scrolling and search remain usable.
 - Wait for a settled drawer before search autofocus. Enter/Search launches only one unambiguous result. Block additional screen input during transitions and rapid duplicate app launches.
@@ -191,7 +202,7 @@ For the proposed first release, “all apps” means launchable entries in the p
 
 System navigation and the notification shade must remain reachable. Launcher swipe handling must not interfere with the phone's system gesture areas. Use safe insets for camera cutouts, status bars, navigation bars and the keyboard.
 
-Proposed settings access is through the app list. Home long presses do not edit shortcuts. An optional long press on an app-list entry may open its Android App info screen; this is a proposed convenience, not a confirmed feature.
+Settings is available through the app list and by holding blank Home space. Home long presses do not edit shortcuts. Holding an app name in Apps offers Android App info and assignment to either fixed corner.
 
 ## 7. Appearance and accessibility
 

@@ -10,6 +10,8 @@ import dev.robinsiegl.nia.data.BackupException
 import dev.robinsiegl.nia.data.PreferencesStore
 import dev.robinsiegl.nia.model.*
 import dev.robinsiegl.nia.platform.AppRepository
+import dev.robinsiegl.nia.platform.ReleaseRepository
+import dev.robinsiegl.nia.platform.UpdateCheckException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -19,11 +21,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 
-data class RestorePreview(val preferences: LauncherPreferences, val missingApps: Int)
-
 class LauncherViewModel(application: Application) : AndroidViewModel(application) {
     private val store = PreferencesStore(application)
     private val repository = AppRepository(application)
+    private val releases = ReleaseRepository()
     private val _saved = MutableStateFlow<SavedState?>(null)
     val saved = _saved.asStateFlow()
     private val _apps = MutableStateFlow<List<AppEntry>>(emptyList())
@@ -40,6 +41,10 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     val storageError = _storageError.asStateFlow()
     private val _restore = MutableStateFlow<RestorePreview?>(null)
     val restore = _restore.asStateFlow()
+    private val _restoring = MutableStateFlow(false)
+    val restoring = _restoring.asStateFlow()
+    private val _updateCheck = MutableStateFlow<UpdateCheck>(UpdateCheck.Idle)
+    val updateCheck = _updateCheck.asStateFlow()
     private val events = Channel<String>(Channel.BUFFERED)
     val messages = events.receiveAsFlow()
     private var settingsObserver: Job? = null
@@ -114,11 +119,16 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         p.withShortcut(position, p.shortcut(position).copy(action = ShortcutAction.APP, app = target))
     }
 
+    fun assignCornerFromApps(position: CornerPosition, app: AppEntry) = perform("The shortcut could not be saved.") {
+        store.update { state -> state.copy(preferences = state.preferences.withShortcut(position,
+            state.preferences.shortcut(position).copy(action = ShortcutAction.APP, app = app.target))) }
+        events.send("${app.label} assigned to the ${position.label.lowercase()} corner.")
+    }
+
     fun openCorner(position: CornerPosition) {
         val shortcut = _saved.value?.preferences?.shortcut(position) ?: return
         when (shortcut.action) {
             ShortcutAction.EMPTY -> Unit
-            ShortcutAction.SETTINGS -> navigate(Screen.Settings)
             ShortcutAction.APP -> launch {
                 try { repository.launch(requireNotNull(shortcut.app)); home() }
                 catch (_: RuntimeException) {
@@ -169,6 +179,17 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         catch (_: RuntimeException) { events.trySend("App info is currently unavailable.") }
     }
 
+    fun checkForUpdates() {
+        val previous = _updateCheck.value
+        if (previous == UpdateCheck.Checking || !_updateCheck.compareAndSet(previous, UpdateCheck.Checking)) return
+        viewModelScope.launch {
+            _updateCheck.value = try { releases.latest()?.let { UpdateCheck.Result(it) } ?: UpdateCheck.NoRelease }
+            catch (e: CancellationException) { _updateCheck.value = previous; throw e }
+            catch (e: UpdateCheckException) { UpdateCheck.Failed(requireNotNull(e.message)) }
+            catch (_: Exception) { UpdateCheck.Failed("Couldn’t check for updates. Check your connection and try again.") }
+        }
+    }
+
     fun exportSettings(uri: Uri) = perform("The settings file could not be saved.") {
         val p = _saved.value?.preferences ?: return@perform
         withContext(Dispatchers.IO) {
@@ -197,30 +218,32 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
             }
         }
         // Re-query before sanitizing: a just-installed app may not yet be in the UI catalog.
-        val available = withContext(Dispatchers.IO) { repository.listApps().map { it.target }.toSet() }
-        val corners = listOf(decoded.leftShortcut, decoded.rightShortcut)
-        val missing = decoded.assignments.values.count { it !in available } +
-            (if (decoded.clock != null && decoded.clock !in available) 1 else 0) +
-            corners.count { it.app != null && it.app !in available }
-        fun availableShortcut(shortcut: CornerShortcut) =
-            if (shortcut.app != null && shortcut.app !in available) CornerShortcut(icon = shortcut.icon) else shortcut
-        _restore.value = RestorePreview(decoded.copy(
-            assignments = decoded.assignments.filterValues { it in available },
-            clock = decoded.clock?.takeIf { it in available },
-            leftShortcut = availableShortcut(decoded.leftShortcut), rightShortcut = availableShortcut(decoded.rightShortcut),
-        ), missing)
+        val available = withContext(Dispatchers.IO) { repository.listApps() }
+        _restore.value = RestorePreview.create(_saved.value?.preferences ?: LauncherPreferences(), decoded, available)
     }
 
-    fun cancelRestore() { _restore.value = null }
-    fun applyRestore() = perform("Your settings could not be restored. Your previous settings are unchanged.") {
-        val preview = _restore.value ?: return@perform
-        // A restore is an explicit recovery path even if the existing preferences are corrupt.
-        val restored = SavedState(preferences = preview.preferences, setupComplete = true)
-        store.replace(restored)
-        _saved.value = restored
-        observeSettings()
-        _storageError.value = false; _restore.value = null
-        home(); events.send("Settings restored.")
+    fun cancelRestore() { if (!_restoring.value) _restore.value = null }
+    fun applyRestore() {
+        val preview = _restore.value ?: return
+        if (!_restoring.compareAndSet(false, true)) return
+        perform("Your settings could not be restored. Your previous settings are unchanged.") {
+            try {
+                val available = withContext(Dispatchers.IO) { repository.listApps() }
+                val fresh = RestorePreview.create(_saved.value?.preferences ?: LauncherPreferences(), preview.requested, available)
+                if (fresh.preferences != preview.preferences || fresh.current != preview.current) {
+                    _restore.value = fresh
+                    events.send("Settings or available apps changed. Review the updated preview before restoring.")
+                    return@perform
+                }
+                // An explicit restore can also recover corrupt preferences.
+                val restored = SavedState(preferences = preview.preferences, setupComplete = true)
+                store.replace(restored)
+                _saved.value = restored
+                observeSettings()
+                _storageError.value = false; _restore.value = null
+                home(); events.send("Settings restored.")
+            } finally { _restoring.value = false }
+        }
     }
 
     fun resetAppearance() = updatePreferences { current ->

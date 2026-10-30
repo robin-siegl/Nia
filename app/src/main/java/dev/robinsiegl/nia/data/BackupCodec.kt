@@ -2,12 +2,10 @@ package dev.robinsiegl.nia.data
 
 import dev.robinsiegl.nia.model.LauncherPreferences
 import dev.robinsiegl.nia.model.PreferencesValidation
+import dev.robinsiegl.nia.model.SavedState
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.intOrNull
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.*
 import java.time.Instant
 
 @Serializable
@@ -23,7 +21,7 @@ class BackupException(message: String) : IllegalArgumentException(message)
 
 object BackupCodec {
     const val MAX_BYTES = 256 * 1024
-    private const val CURRENT_VERSION = 4
+    private const val CURRENT_VERSION = 5
     val json = Json { encodeDefaults = true; prettyPrint = true; explicitNulls = false }
 
     fun export(preferences: LauncherPreferences, exportedAt: String = Instant.now().toString()): ByteArray {
@@ -47,7 +45,8 @@ object BackupCodec {
             if (root["profile"]?.jsonPrimitive?.content != "personal") {
                 throw BackupException("This version of nia supports personal-profile backups only.")
             }
-            val backup = json.decodeFromString<SettingsBackup>(text)
+            val compatible = if (version <= 4) JsonObject(root + ("settings" to migrateSettings(root.getValue("settings").jsonObject))) else root
+            val backup = json.decodeFromJsonElement<SettingsBackup>(compatible)
             PreferencesValidation.validate(backup.settings)
             return backup.settings
         } catch (e: BackupException) {
@@ -56,4 +55,26 @@ object BackupCodec {
             throw BackupException("This settings file is invalid. Your current settings have not changed.")
         }
     }
+
+    /** Read 1.2 preferences without bringing the removed Settings shortcut back onto Home. */
+    fun decodeState(text: String): SavedState {
+        val root = json.parseToJsonElement(text).jsonObject
+        val compatible = root["preferences"]?.let { JsonObject(root + ("preferences" to migrateSettings(it.jsonObject))) } ?: root
+        return json.decodeFromJsonElement(compatible)
+    }
+
+    private fun migrateSettings(settings: JsonObject): JsonObject = JsonObject(settings.mapValues { (key, value) ->
+        if (key !in setOf("leftShortcut", "rightShortcut")) value
+        else {
+            val shortcut = value.jsonObject
+            val action = shortcut["action"]?.jsonPrimitive?.content
+            val icon = shortcut["icon"]?.jsonPrimitive?.content
+            if (action == "SETTINGS") {
+                require(shortcut["app"] == null || shortcut["app"] == JsonNull)
+                JsonObject(shortcut + ("action" to JsonPrimitive("EMPTY")) +
+                    if (icon == "SETTINGS") mapOf("icon" to JsonPrimitive("STAR")) else emptyMap())
+            } else if (icon == "SETTINGS") JsonObject(shortcut + ("icon" to JsonPrimitive("STAR")))
+            else shortcut
+        }
+    })
 }

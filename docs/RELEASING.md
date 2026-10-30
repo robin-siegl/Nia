@@ -48,8 +48,8 @@ Skip this helper if you have already created nia's key and configured its secret
 The committed `gradle.properties` is the source of the production version. Update both values with the release's changes and commit them to `main`:
 
 ```properties
-nia.versionName=1.2.0
-nia.versionCode=1002000
+nia.versionName=1.3.0
+nia.versionCode=1003000
 ```
 
 The production workflow builds these exact values. It does not choose a version from Git tags, increment it or accept a version override. For example, a future `1.2.1` release uses `nia.versionName=1.2.1` and `nia.versionCode=1002001`.
@@ -63,7 +63,7 @@ The production workflow builds these exact values. It does not choose a version 
 
 With **publish_release** enabled, the APK and checksum are also available under **[Releases](https://github.com/robin-siegl/Nia/releases)** for public download. No artifact extraction or GitHub sign-in is needed for those release assets.
 
-**Current project version:** `1.2.0`. A production build creates `nia-1.2.0.apk` and, when publication is enabled, the tag/release `v1.2.0`. After that version is published, prepare and commit a newer project version before another production build.
+**Current project version:** `1.3.0`. A production build creates `nia-1.3.0.apk` and, when publication is enabled, the tag/release `v1.3.0`. After that version is published, prepare and commit a newer project version before another production build.
 
 The latest stable `vMAJOR.MINOR.PATCH` Git tag is used only to reject duplicate or older versions. Tags are compared numerically; prerelease and unrelated tags are ignored. Leading zeroes, prerelease suffixes, existing versions and builds from a branch other than `main` are rejected. These checks also apply to artifact-only production builds. If a run fails before creating its tag, the same project version can be retried.
 
@@ -99,5 +99,5 @@ Debug installs are separate apps and use development signing. They are suitable 
 - **Wrong password or alias:** Use the values from the same keystore you encoded. The alias does not need to match the app name.
 - **No public download:** Keep **publish_release** enabled when running the workflow, then open **Releases** after it succeeds.
 - **Release version already exists or is too old:** Update `nia.versionName` and its matching `nia.versionCode` in `gradle.properties`, commit the change to `main`, then run the workflow again. The workflow never invents or increments a version.
-- **Android version code does not match:** Use `major * 1000000 + minor * 1000 + patch` for the committed `nia.versionName`; for `1.2.0`, set `nia.versionCode=1002000`.
+- **Android version code does not match:** Use `major * 1000000 + minor * 1000 + patch` for the committed `nia.versionName`; for `1.3.0`, set `nia.versionCode=1003000`.
 - **Tag exists but publishing failed:** Download the verified APK/checksum artifact from that run and finish creating the GitHub Release for its existing tag. Keep the tag at its original commit; do not move it or rebuild a different APK under that version.
