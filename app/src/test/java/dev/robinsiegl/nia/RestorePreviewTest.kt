@@ -27,7 +27,7 @@ class RestorePreviewTest {
         assertEquals(20, preview.changes.size)
         assertEquals(requested, preview.preferences)
         assertTrue(preview.changes.all { it.before != it.after })
-        assertEquals(setOf("Home", "Appearance", "Apps", "App assignments", "Corner shortcuts"), preview.changes.map { it.section }.toSet())
+        assertEquals(setOf("Home screen", "Appearance", "App list", "Everyday apps", "Corner shortcuts"), preview.changes.map { it.section }.toSet())
         assertTrue(preview.changes.first { it.label == "Music" }.after.contains("First"))
         assertTrue(preview.changes.first { it.label == "Clock" }.before.contains("System clock"))
     }
@@ -36,7 +36,7 @@ class RestorePreviewTest {
             leftShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.STAR, first.target))
         val preview = RestorePreview.create(original, LauncherPreferences(), apps)
         assertEquals(listOf("Music", "Clock", "Left shortcut"), preview.changes.map { it.label })
-        assertEquals(listOf("Choose an app", "System clock", "Empty"), preview.changes.map { it.after })
+        assertEquals(listOf("Not assigned", "System clock", "Empty"), preview.changes.map { it.after })
     }
     @Test fun `unavailable apps are listed per assignment and sanitized exactly as previewed`() {
         val current = LauncherPreferences(assignments = mapOf(HomeCategory.MUSIC to first.target))
@@ -48,7 +48,7 @@ class RestorePreviewTest {
         assertTrue(preview.preferences.assignments.isEmpty())
         assertNull(preview.preferences.clock)
         assertEquals(CornerShortcut(icon = ShortcutIcon.CLOUD), preview.preferences.rightShortcut)
-        assertEquals("Choose an app", preview.changes.first { it.label == "Music" }.after)
+        assertEquals("Not assigned", preview.changes.first { it.label == "Music" }.after)
     }
     @Test fun `duplicate app labels retain the full activity identity in the preview`() {
         val renamed = second.copy(label = first.label)

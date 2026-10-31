@@ -1,9 +1,7 @@
 package dev.robinsiegl.nia.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -12,42 +10,51 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import dev.robinsiegl.nia.BuildConfig
 import dev.robinsiegl.nia.model.*
 
 @Composable
 fun SettingsScreen(
     isDefault: Boolean, storageError: Boolean, onBack: () -> Unit,
     onSection: (SettingsSection) -> Unit, onSetDefault: () -> Unit, onChangeDefault: () -> Unit,
+    preferences: LauncherPreferences = LauncherPreferences(),
 ) {
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).padding(bottom = 24.dp)) {
-        ScreenHeader("Settings", onBack)
+    SettingsLayout("Settings", onBack) {
         if (storageError) {
-            Text("Saved settings could not be read. Restore a backup or reset nia to recover.", fontSize = 14.sp)
+            SettingsDescription("Your saved settings couldn’t be read. Restore a backup or reset nia to continue.")
             TextButton(onClick = { onSection(SettingsSection.BACKUP) }) { Text("Restore or reset settings") }
         }
-        SettingsSection.entries.forEach { section ->
-            Row(Modifier.fillMaxWidth().clickable(role = Role.Button) { onSection(section) }.padding(vertical = 16.dp),
-                verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f).padding(end = 12.dp)) {
-                    Text(section.title, fontSize = 20.sp)
-                    Text(section.description, fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f))
-                }
-                Text("›", fontSize = 28.sp)
-            }
+        SectionLabel("Personalize")
+        listOf(SettingsSection.HOME, SettingsSection.APPEARANCE, SettingsSection.ASSIGNMENTS,
+            SettingsSection.SHORTCUTS, SettingsSection.APP_LIST).forEach { section ->
+            SettingsAction(section.title, settingsSummary(section, preferences), { onSection(section) })
         }
-        SectionLabel("DEFAULT LAUNCHER")
-        Text(if (isDefault) "nia is your default Home app." else "nia is not your default Home app.", fontSize = 14.sp)
-        if (!isDefault) OutlinedButton(onClick = onSetDefault, modifier = Modifier.fillMaxWidth().padding(top = 12.dp)) {
-            Text("Set nia as default launcher")
+        SectionLabel("More")
+        SettingsAction("Default launcher", if (isDefault) "nia" else "nia is not the default", onChangeDefault)
+        if (!isDefault) OutlinedButton(onClick = onSetDefault,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp).heightIn(min = 48.dp)) {
+            Text("Set nia as default")
         }
-        TextButton(onClick = onChangeDefault, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
-            Text("Change default launcher")
-        }
+        SettingsAction(SettingsSection.BACKUP.title, SettingsSection.BACKUP.description, { onSection(SettingsSection.BACKUP) })
+        SettingsAction(SettingsSection.ABOUT.title, "Version ${BuildConfig.VERSION_NAME} · Updates and privacy", { onSection(SettingsSection.ABOUT) })
     }
+}
+
+private fun settingsSummary(section: SettingsSection, p: LauncherPreferences): String = when (section) {
+    SettingsSection.HOME -> "${if (p.layout == HomeLayout.GRID) "Icon grid" else "Text list"} · ${if (p.pixelClockLayout) "Pixel-style clock" else "Classic clock"}"
+    SettingsSection.APPEARANCE -> "${if (p.colorStyle == ColorStyle.MONOCHROME) "Black & white" else "Color"} · ${when (p.themeMode) {
+        ThemeMode.SYSTEM -> "Follow system"; ThemeMode.LIGHT -> "Light"; ThemeMode.DARK -> "Dark"
+    }}"
+    SettingsSection.ASSIGNMENTS -> "${HomeCategory.entries.count { p.assignments[it] != null }} of ${HomeCategory.entries.size} shortcuts assigned"
+    SettingsSection.SHORTCUTS -> when {
+        p.leftShortcut.action == ShortcutAction.APP && p.rightShortcut.action == ShortcutAction.APP -> "Both corners"
+        p.leftShortcut.action == ShortcutAction.APP -> "Left corner"
+        p.rightShortcut.action == ShortcutAction.APP -> "Right corner"
+        else -> "No shortcuts"
+    }
+    SettingsSection.APP_LIST -> if (p.searchAutofocus) "Keyboard opens with Apps" else "Tap search to open the keyboard"
+    else -> section.description
 }
 
 @Composable
@@ -60,22 +67,21 @@ fun SettingsDetailScreen(
     onAssignCorner: (CornerPosition) -> Unit = {},
     updateCheck: UpdateCheck = UpdateCheck.Idle, onCheckUpdates: () -> Unit = {},
 ) {
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
-        ScreenHeader(section.title, onBack)
+    SettingsLayout(section.title, onBack) {
         when (section) {
             SettingsSection.HOME -> HomeSettings(preferences, onChange)
             SettingsSection.SHORTCUTS -> CornerSettings(preferences, apps, onChange, onAssignCorner)
             SettingsSection.APPEARANCE -> AppearanceSettings(preferences, onChange)
             SettingsSection.ASSIGNMENTS -> AssignmentsSettings(preferences, apps, onAssign, onClear)
             SettingsSection.APP_LIST -> {
-                SettingSwitch("Focus search automatically", "Show the keyboard once Apps has opened.", preferences.searchAutofocus) {
+                SettingSwitch("Keyboard on open", "Open the keyboard when Apps is ready to search.", preferences.searchAutofocus) {
                     value -> onChange { it.copy(searchAutofocus = value) }
                 }
-                SettingSwitch("Alphabet scrubber", "Drag along the right edge to jump to a letter.", preferences.alphabetScrubber) {
+                SettingSwitch("A–Z navigation", "Drag along the right edge to jump to a letter.", preferences.alphabetScrubber) {
                     value -> onChange { it.copy(alphabetScrubber = value) }
                 }
-                Text("Search by name, initials, or words in any order. Matching apps stay alphabetical.",
-                    fontSize = 14.sp, modifier = Modifier.padding(top = 20.dp))
+                SettingsDescription("Search by name, initials or words in any order. Results stay alphabetical.",
+                    Modifier.padding(top = 24.dp))
             }
             SettingsSection.BACKUP -> BackupSettings(storageError, onExport, onImport, onResetAppearance, onResetAll)
             SettingsSection.ABOUT -> AboutContent(onOpenLink, updateCheck, onCheckUpdates)
@@ -85,91 +91,101 @@ fun SettingsDetailScreen(
 
 @Composable
 internal fun HomeSettings(preferences: LauncherPreferences, onChange: ((LauncherPreferences) -> LauncherPreferences) -> Unit) {
+    SectionLabel("Layout")
     ChoiceRow(listOf(HomeLayout.GRID to "Icon grid", HomeLayout.LIST to "Text list"), preferences.layout,
         { value -> onChange { it.copy(layout = value) } })
     Spacer(Modifier.height(16.dp))
-    SettingSwitch("Pixel clock layout", "Keep the clock and date aligned when you unlock.", preferences.pixelClockLayout) {
+    SettingSwitch("Pixel-style clock", "Sized and positioned for the Pixel 10 Pro lock screen.", preferences.pixelClockLayout) {
         value -> onChange { it.copy(pixelClockLayout = value) }
     }
     if (!preferences.pixelClockLayout || preferences.layout == HomeLayout.LIST) {
-        Text(if (preferences.pixelClockLayout) "App text size" else "Home text size", fontSize = 16.sp,
-            modifier = Modifier.padding(top = 20.dp, bottom = 10.dp))
+        SectionLabel(if (preferences.pixelClockLayout) "App text size" else "Home text size")
         ChoiceRow(listOf(HomeTextSize.SMALL to "Small", HomeTextSize.DEFAULT to "Default", HomeTextSize.LARGE to "Large"),
             preferences.homeTextSize, { value -> onChange { it.copy(homeTextSize = value) } })
-        Text(if (preferences.pixelClockLayout) "Applies to app names. The clock and date keep their lock-screen sizing."
-            else "Applies to the clock, date and Home list.", fontSize = 12.sp, modifier = Modifier.padding(top = 10.dp))
+        SettingsDescription(if (preferences.pixelClockLayout) "Applies to app names. The clock and date keep their size."
+            else "Applies to the clock, date and app names.", Modifier.padding(top = 12.dp))
     }
-    HomePreview(preferences, Modifier.padding(top = 20.dp))
+    SectionLabel("Preview")
+    HomePreview(preferences)
 }
 
 @Composable
 internal fun AppearanceSettings(preferences: LauncherPreferences, onChange: ((LauncherPreferences) -> LauncherPreferences) -> Unit) {
+    SectionLabel("Colors")
     ChoiceRow(listOf(ColorStyle.MONOCHROME to "Black & white", ColorStyle.COLOR to "Color"), preferences.colorStyle,
         { value -> onChange { it.copy(colorStyle = value) } })
-    Spacer(Modifier.height(16.dp))
+    SectionLabel("Theme")
     ChoiceRow(listOf(ThemeMode.SYSTEM to "System", ThemeMode.LIGHT to "Light", ThemeMode.DARK to "Dark"),
         preferences.themeMode, { value -> onChange { it.copy(themeMode = value) } })
-    Text("System follows your phone’s light or dark appearance.", fontSize = 12.sp,
-        modifier = Modifier.padding(top = 10.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f))
-    SectionLabel("MOTION")
-    ChoiceRow(listOf(MotionMode.SYSTEM to "Follow Android", MotionMode.REDUCED to "Reduced"), preferences.motionMode,
+    SettingsDescription("System follows your phone’s light or dark theme.", Modifier.padding(top = 12.dp))
+    if (preferences.colorStyle == ColorStyle.COLOR) {
+        SectionLabel("Theme color")
+        ColorSettings(preferences, onChange)
+    }
+    SectionLabel("Animations")
+    ChoiceRow(listOf(MotionMode.SYSTEM to "Standard", MotionMode.REDUCED to "Reduced"), preferences.motionMode,
         { value -> onChange { it.copy(motionMode = value) } })
-    Text("Android’s animation speed is always respected. Reduced uses short fades without movement or stagger.",
-        fontSize = 12.sp, modifier = Modifier.padding(top = 10.dp))
-    if (preferences.colorStyle == ColorStyle.COLOR) ColorSettings(preferences, onChange)
+    SettingsDescription("Reduced uses short fades with less movement. Both options follow Android’s animation settings.",
+        Modifier.padding(top = 12.dp))
 }
 
 @Composable
 internal fun AssignmentsSettings(
     preferences: LauncherPreferences, apps: List<AppEntry>, onAssign: (HomeCategory?) -> Unit, onClear: (HomeCategory?) -> Unit,
 ) {
+    SettingsDescription("Choose which app each shortcut opens. The date opens Calendar; the time opens Clock.",
+        Modifier.padding(top = 8.dp, bottom = 12.dp))
     HomeCategory.entries.forEach { category ->
         AssignmentRow(category.label, preferences.assignments[category], apps, { onAssign(category) }, { onClear(category) })
     }
     AssignmentRow("Clock", preferences.clock, apps, { onAssign(null) }, { onClear(null) }, "System clock")
 }
 
+private enum class ResetOption { APPEARANCE, ALL }
+
 @Composable
-private fun ColumnScope.BackupSettings(storageError: Boolean, onExport: () -> Unit, onImport: () -> Unit,
+private fun BackupSettings(storageError: Boolean, onExport: () -> Unit, onImport: () -> Unit,
     onResetAppearance: () -> Unit, onResetAll: () -> Unit) {
-    var confirmReset by rememberSaveable { mutableStateOf(false) }
-    Text("A settings backup includes your app assignments, layout, colors and app-list preferences.", fontSize = 14.sp)
-    TextButton(onClick = onExport, enabled = !storageError, modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) { Text("Export settings") }
-    TextButton(onClick = onImport, modifier = Modifier.fillMaxWidth()) { Text("Import settings") }
-    SectionLabel("RESET")
-    TextButton(onClick = onResetAppearance, enabled = !storageError, modifier = Modifier.fillMaxWidth()) {
-        Text("Reset appearance and behavior")
+    var reset by rememberSaveable { mutableStateOf<ResetOption?>(null) }
+    SectionLabel("Backup")
+    SettingsDescription("Save your layout, colors, app choices and other preferences in a settings file.")
+    SettingsAction("Save backup", "Choose where to save the file.", onExport, enabled = !storageError)
+    SettingsAction("Restore backup", "Review changes before applying them.", onImport)
+    SectionLabel("Reset")
+    SettingsAction("Reset appearance & behavior", "Restore defaults and keep all app assignments and corner shortcuts.",
+        { reset = ResetOption.APPEARANCE }, enabled = !storageError, showChevron = false)
+    SettingsAction("Reset all settings", "Clear preferences and app assignments, then start setup again.",
+        { reset = ResetOption.ALL }, showChevron = false)
+    reset?.let { kind ->
+        val all = kind == ResetOption.ALL
+        AlertDialog(onDismissRequest = { reset = null },
+            title = { Text(if (all) "Reset all settings?" else "Reset appearance & behavior?") },
+            text = { Text(if (all) "Your preferences and app assignments will be cleared. You can save a backup before resetting."
+                else "Your layout, colors, text size, search and animation settings will return to their defaults. App assignments and corner shortcuts will stay as they are.") },
+            confirmButton = { TextButton(onClick = { reset = null; if (all) onResetAll() else onResetAppearance() }) { Text("Reset") } },
+            dismissButton = { TextButton(onClick = { reset = null }) { Text("Cancel") } })
     }
-    Text("Keeps your app assignments.", fontSize = 12.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
-    TextButton(onClick = { confirmReset = true }, modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) { Text("Reset all settings") }
-    if (confirmReset) AlertDialog(onDismissRequest = { confirmReset = false }, title = { Text("Reset nia?") },
-        text = { Text("This clears your preferences and app assignments. You can export a backup first.") },
-        confirmButton = { TextButton(onClick = { confirmReset = false; onResetAll() }) { Text("Reset") } },
-        dismissButton = { TextButton(onClick = { confirmReset = false }) { Text("Cancel") } })
 }
 
 @Composable
 private fun AssignmentRow(label: String, target: AppTarget?, apps: List<AppEntry>, onSelect: () -> Unit,
-    onClear: () -> Unit, defaultLabel: String = "Choose an app") {
-    val assigned = target?.let { selected -> apps.find { it.target == selected }?.label ?: "Unavailable · choose another" } ?: defaultLabel
+    onClear: () -> Unit, defaultLabel: String = "Not assigned") {
+    val assigned = target?.let { selected -> apps.find { it.target == selected }?.label ?: "App unavailable" } ?: defaultLabel
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(1f).clickable(role = Role.Button, onClick = onSelect).padding(vertical = 14.dp)) {
-            Text(label, fontSize = 17.sp)
-            Text(assigned, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f))
-        }
+        SettingsAction(label, assigned, onSelect, modifier = Modifier.weight(1f))
         if (target != null) TextButton(onClick = onClear,
-            modifier = Modifier.semantics { contentDescription = "Clear $label assignment" }) { Text("Clear", fontSize = 12.sp) }
+            modifier = Modifier.semantics { contentDescription = "Clear $label assignment" }) { Text("Clear") }
     }
 }
 
 @Composable
 internal fun SettingSwitch(label: String, description: String, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth().heightIn(min = 64.dp), verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(1f).padding(end = 12.dp)) {
-            Text(label, fontSize = 16.sp)
-            Text(description, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f))
+    Row(Modifier.fillMaxWidth().heightIn(min = 72.dp).toggleable(value = checked, role = Role.Switch, onValueChange = onChange)
+        .padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f).padding(end = 16.dp)) {
+            Text(label, style = MaterialTheme.typography.bodyLarge)
+            SettingsDescription(description, Modifier.padding(top = 4.dp))
         }
-        Switch(checked, onCheckedChange = onChange, modifier = Modifier.semantics { contentDescription = label })
+        Switch(checked, onCheckedChange = null)
     }
 }

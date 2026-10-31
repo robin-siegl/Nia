@@ -1,13 +1,13 @@
 package dev.robinsiegl.nia.model
 
 enum class SettingsSection(val title: String, val description: String) {
-    HOME("Home", "Layout, clock and text size"),
-    SHORTCUTS("Corner shortcuts", "Optional left and right shortcuts"),
-    APPEARANCE("Appearance", "Themes, colors and OLED black"),
-    ASSIGNMENTS("App assignments", "Your everyday apps and Clock"),
-    APP_LIST("App list", "Search and alphabet navigation"),
-    BACKUP("Backup & reset", "Export, restore and reset settings"),
-    ABOUT("About nia", "Version, privacy and project information"),
+    HOME("Home screen", "Layout, clock and text size"),
+    SHORTCUTS("Corner shortcuts", "Optional shortcuts at the bottom of Home"),
+    APPEARANCE("Appearance", "Colors, theme and animations"),
+    ASSIGNMENTS("Everyday apps", "Apps for your Home shortcuts and clock"),
+    APP_LIST("App list", "Search and A–Z navigation"),
+    BACKUP("Backup & reset", "Save, restore or reset your settings"),
+    ABOUT("About nia", "Updates, privacy and project information"),
 }
 
 sealed interface Screen {

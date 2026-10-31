@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.2
+
+- Refined Settings labels, explanations and restore terminology. The overview shows current layout, theme, assigned-app count and corner/search choices.
+- Kept Back and the page title visible while scrolling, limited content width on wider screens and improved spacing and text hierarchy.
+- Made entire switch rows tappable and exposed single-choice selection states to accessibility services. The corner icon picker highlights its current choice.
+- Grouped custom color controls together, simplified About and backup actions, and explained what each reset preserves. Both reset actions now ask for confirmation.
+- Preserved saved preferences, backup schema, Home layout and unlock behavior. Production builds use the committed 1.3.2 / 1003002 version.
+
 ## 1.3.1
 
 - Keep unlock reveals queued until nia's window is resumed, focused and unlocked; mark them handled after the reveal finishes. Focus interruptions restart unfinished work when Home becomes visible instead of silently consuming it behind another window.

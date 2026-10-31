@@ -47,8 +47,8 @@ internal fun ColorSettings(preferences: LauncherPreferences, onChange: ((Launche
     }
     val seed = currentSeed()
     val valid = PreferencesValidation.isColor(input)
-    Text("Pick one color. nia finds the matching background and text.", fontSize = 14.sp,
-        modifier = Modifier.padding(top = 24.dp, bottom = 16.dp))
+    SettingsDescription("Choose a color. nia creates matching light and dark themes.",
+        Modifier.padding(bottom = 16.dp))
     val presets = listOf("Violet" to "#7C3AED", "Rose" to "#D54778", "Blue" to "#2563EB",
         "Mint" to "#008B75", "Amber" to "#BD7900", "Coral" to "#D8553D")
     BoxWithConstraints(Modifier.fillMaxWidth()) {
@@ -85,7 +85,7 @@ internal fun ColorSettings(preferences: LauncherPreferences, onChange: ((Launche
             }
         }, label = { Text("Hex color") }, singleLine = true,
             isError = input.isNotEmpty() && !valid, modifier = Modifier.weight(1f),
-            supportingText = { if (!valid) Text("Use #RRGGBB") })
+            supportingText = { if (!valid) Text("Enter six hex digits, for example #7C3AED.") })
         TextButton(onClick = commit, enabled = valid, modifier = Modifier.padding(start = 8.dp)) { Text("Apply") }
     }
     Row(Modifier.fillMaxWidth().padding(vertical = 16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -99,7 +99,7 @@ internal fun ColorSettings(preferences: LauncherPreferences, onChange: ((Launche
             }
         }
     }
-    SettingSwitch("Pure black in dark mode", "Keeps your colored text on an OLED-black background.", preferences.pureBlackColorBackground) {
+    SettingSwitch("Pure black background", "Use #000000 in dark mode and keep colored text and icons.", preferences.pureBlackColorBackground) {
         value -> onChange { it.copy(pureBlackColorBackground = value) }
     }
 }

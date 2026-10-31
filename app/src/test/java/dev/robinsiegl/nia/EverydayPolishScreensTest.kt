@@ -166,7 +166,7 @@ class EverydayPolishScreensTest {
         var p by mutableStateOf(LauncherPreferences(leftShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.STAR, notes.target)))
         render { Column { CornerSettings(p, listOf(notes), { p = it(p) }, {}) } }
         rule.onNodeWithText("Settings", substring = false).assertDoesNotExist()
-        rule.onNodeWithText("Icon: Star").performClick()
+        rule.onNodeWithText("Icon").performClick()
         capture("shortcut-icons")
         rule.onNodeWithTag("shortcut-icon-grid").performScrollToNode(hasContentDescription("Cloud"))
         rule.onNodeWithContentDescription("Cloud").performClick()
