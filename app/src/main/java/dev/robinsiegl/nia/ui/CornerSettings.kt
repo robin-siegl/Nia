@@ -1,29 +1,35 @@
 package dev.robinsiegl.nia.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import dev.robinsiegl.nia.model.*
 
 @Composable
 internal fun CornerSettings(preferences: LauncherPreferences, apps: List<AppEntry>,
     onChange: ((LauncherPreferences) -> LauncherPreferences) -> Unit, onAssign: (CornerPosition) -> Unit) {
-    var choosingIcon by remember { mutableStateOf<CornerPosition?>(null) }
-    Text("Two optional shortcuts at the bottom of Home. Settings stays available in Apps and by holding empty Home space.", fontSize = 14.sp)
+    var choosingIcon by rememberSaveable { mutableStateOf<CornerPosition?>(null) }
+    SettingsDescription("Leave a corner empty, or choose an app and an outline icon.", Modifier.padding(top = 8.dp))
     CornerPosition.entries.forEach { position ->
         val shortcut = preferences.shortcut(position)
-        SectionLabel("${position.label.uppercase()} CORNER")
+        SectionLabel("${position.label} corner")
         Column(Modifier.testTag("corner-settings-${position.name}")) {
             ChoiceRow(listOf(ShortcutAction.EMPTY to "Empty", ShortcutAction.APP to "App"),
                 shortcut.action, { action ->
@@ -31,29 +37,32 @@ internal fun CornerSettings(preferences: LauncherPreferences, apps: List<AppEntr
                     else onChange { it.withShortcut(position, it.shortcut(position).copy(action = action, app = null)) }
                 })
             if (shortcut.action == ShortcutAction.APP) {
-                val label = apps.find { it.target == shortcut.app }?.label ?: "Unavailable · choose another"
-                TextButton(onClick = { onAssign(position) }, modifier = Modifier.fillMaxWidth()) { Text("App: $label") }
-                TextButton(onClick = { choosingIcon = position }, modifier = Modifier.fillMaxWidth()) {
-                    ShortcutGlyph(shortcut.icon, Modifier.size(24.dp))
-                    Spacer(Modifier.width(12.dp))
-                    Text("Icon: ${shortcut.icon.label}")
-                }
+                val label = apps.find { it.target == shortcut.app }?.label ?: "App unavailable"
+                SettingsAction("App", label, { onAssign(position) })
+                SettingsAction("Icon", shortcut.icon.label, { choosingIcon = position },
+                    leading = { ShortcutGlyph(shortcut.icon, Modifier.size(24.dp)) })
             }
         }
     }
+    SettingsDescription("Open Settings from Apps, or touch and hold empty space on Home.", Modifier.padding(top = 24.dp))
     choosingIcon?.let { position ->
         AlertDialog(onDismissRequest = { choosingIcon = null }, title = { Text("${position.label} shortcut icon") },
             text = {
                 LazyVerticalGrid(columns = GridCells.Adaptive(56.dp),
-                    modifier = Modifier.fillMaxWidth().heightIn(max = 360.dp).testTag("shortcut-icon-grid")) {
+                    modifier = Modifier.fillMaxWidth().heightIn(max = 360.dp).selectableGroup().testTag("shortcut-icon-grid")) {
                     items(ShortcutIcon.entries, key = { it.name }) { icon ->
                         Box(contentAlignment = Alignment.Center) {
-                            IconButton(onClick = {
+                            val active = icon == preferences.shortcut(position).icon
+                            val shape = RoundedCornerShape(12.dp)
+                            Box(modifier = Modifier.size(48.dp).clip(shape)
+                                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = if (active) 0.12f else 0f))
+                                .border(if (active) 1.dp else 0.dp,
+                                    MaterialTheme.colorScheme.onSurface.copy(alpha = if (active) 0.8f else 0f), shape)
+                                .selectable(selected = active, role = Role.RadioButton, onClick = {
                                 onChange { it.withShortcut(position, it.shortcut(position).copy(icon = icon)) }; choosingIcon = null
-                            }, modifier = Modifier.size(48.dp).semantics {
+                            }).semantics {
                                 contentDescription = icon.label
-                                selected = icon == preferences.shortcut(position).icon
-                            }) { ShortcutGlyph(icon, Modifier.size(26.dp)) }
+                            }, contentAlignment = Alignment.Center) { ShortcutGlyph(icon, Modifier.size(26.dp)) }
                         }
                     }
                 }

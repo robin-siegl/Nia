@@ -41,20 +41,20 @@ data class RestorePreview(
                 }
                 fun toggle(value: Boolean) = if (value) "On" else "Off"
                 fun enumLabel(value: Enum<*>) = value.name.lowercase().replace('_', ' ').replaceFirstChar { it.uppercase() }
-                change("Home", "Layout", current.layout, restored.layout) { if (it == HomeLayout.GRID) "Icon grid" else "Text list" }
-                change("Home", "Home text size", current.homeTextSize, restored.homeTextSize, ::enumLabel)
-                change("Home", "Pixel clock layout", current.pixelClockLayout, restored.pixelClockLayout, ::toggle)
+                change("Home screen", "Layout", current.layout, restored.layout) { if (it == HomeLayout.GRID) "Icon grid" else "Text list" }
+                change("Home screen", "Home text size", current.homeTextSize, restored.homeTextSize, ::enumLabel)
+                change("Home screen", "Pixel-style clock", current.pixelClockLayout, restored.pixelClockLayout, ::toggle)
                 change("Appearance", "Colors", current.colorStyle, restored.colorStyle) { if (it == ColorStyle.COLOR) "Color" else "Black & white" }
                 change("Appearance", "Theme", current.themeMode, restored.themeMode, ::enumLabel)
                 change("Appearance", "Theme color", current.seedColor, restored.seedColor) { it.uppercase() }
-                change("Appearance", "Pure black color background", current.pureBlackColorBackground, restored.pureBlackColorBackground, ::toggle)
-                change("Appearance", "Motion", current.motionMode, restored.motionMode) { if (it == MotionMode.SYSTEM) "Follow Android" else "Reduced" }
-                change("Apps", "Focus search automatically", current.searchAutofocus, restored.searchAutofocus, ::toggle)
-                change("Apps", "Alphabet scrubber", current.alphabetScrubber, restored.alphabetScrubber, ::toggle)
+                change("Appearance", "Pure black background", current.pureBlackColorBackground, restored.pureBlackColorBackground, ::toggle)
+                change("Appearance", "Animations", current.motionMode, restored.motionMode) { if (it == MotionMode.SYSTEM) "Standard" else "Reduced" }
+                change("App list", "Keyboard on open", current.searchAutofocus, restored.searchAutofocus, ::toggle)
+                change("App list", "A–Z navigation", current.alphabetScrubber, restored.alphabetScrubber, ::toggle)
                 HomeCategory.entries.forEach { category ->
-                    change("App assignments", category.label, current.assignments[category], restored.assignments[category]) { appName(it, "Choose an app") }
+                    change("Everyday apps", category.label, current.assignments[category], restored.assignments[category]) { appName(it, "Not assigned") }
                 }
-                change("App assignments", "Clock", current.clock, restored.clock) { appName(it, "System clock") }
+                change("Everyday apps", "Clock", current.clock, restored.clock) { appName(it, "System clock") }
                 CornerPosition.entries.forEach { position ->
                     val before = current.shortcut(position)
                     val after = restored.shortcut(position)

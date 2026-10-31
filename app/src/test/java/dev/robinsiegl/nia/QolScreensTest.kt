@@ -154,7 +154,7 @@ class QolScreensTest {
         }
         rule.onNodeWithText("Reduced").performClick()
         assertEquals(MotionMode.REDUCED, p.motionMode)
-        rule.onNodeWithText("Follow Android").performClick()
+        rule.onNodeWithText("Standard").performClick()
         assertEquals(MotionMode.SYSTEM, p.motionMode)
     }
 
@@ -211,7 +211,7 @@ class QolScreensTest {
         render {
             Column(Modifier.fillMaxSize()) { CornerSettings(p, apps, { p = it(p) }, { picker = it }) }
         }
-        rule.onNodeWithText("Icon: Notes").performClick()
+        rule.onNodeWithText("Icon").performClick()
         rule.onNodeWithContentDescription("Camera").performClick()
         assertEquals(ShortcutIcon.CAMERA, p.leftShortcut.icon)
         rule.onNodeWithText("Settings", substring = false).assertDoesNotExist()

@@ -227,10 +227,10 @@ class ScreensTest {
         render {
             detail(SettingsSection.HOME, p, onChange = { change -> p = change(p) })
         }
-        val before = rule.onNodeWithText("09:41").fetchSemanticsNode().boundsInRoot.height
-        rule.onNodeWithText("Large").performClick()
+        val before = rule.onNodeWithText("09:41").performScrollTo().fetchSemanticsNode().boundsInRoot.height
+        rule.onNodeWithText("Large").performScrollTo().performClick()
         assertEquals(HomeTextSize.LARGE, p.homeTextSize)
-        assertTrue(rule.onNodeWithText("09:41").fetchSemanticsNode().boundsInRoot.height > before)
+        assertTrue(rule.onNodeWithText("09:41").performScrollTo().fetchSemanticsNode().boundsInRoot.height > before)
         screenshot("settings-home-size")
     }
 
@@ -279,7 +279,7 @@ class ScreensTest {
         render { detail(SettingsSection.HOME, p, onChange = { p = it(p) }) }
         rule.onNodeWithText("App text size").assertIsDisplayed()
         rule.onNodeWithTag("pixel-clock-header").assertExists()
-        rule.onNodeWithContentDescription("Pixel clock layout").performClick()
+        rule.onNodeWithText("Pixel-style clock").performClick()
         assertFalse(p.pixelClockLayout)
         rule.onNodeWithText("Home text size").assertIsDisplayed()
         rule.onNodeWithText("09:41").assertExists()
@@ -344,13 +344,13 @@ class ScreensTest {
         screenshot("settings-overview")
         rule.onNodeWithText("Appearance").performClick()
         rule.onNodeWithText("System").assertIsDisplayed()
-        rule.onNodeWithText("App assignments").assertDoesNotExist()
-        rule.onNodeWithText("Back").performClick()
-        rule.onNodeWithText("App assignments").performClick()
+        rule.onNodeWithText("Everyday apps").assertDoesNotExist()
+        rule.onNodeWithContentDescription("Back").performClick()
+        rule.onNodeWithText("Everyday apps").performClick()
         rule.onNodeWithText("Clock").assertIsDisplayed()
         rule.onNodeWithText("System").assertDoesNotExist()
-        rule.onNodeWithText("Back").performClick()
-        rule.onNodeWithText("Change default launcher").performScrollTo().performClick()
+        rule.onNodeWithContentDescription("Back").performClick()
+        rule.onNodeWithText("Default launcher").performScrollTo().performClick()
         assertTrue(changedLauncher)
     }
 
@@ -358,11 +358,11 @@ class ScreensTest {
         var opened = ""
         render { detail(SettingsSection.ABOUT, onOpenLink = { opened = it }) }
         rule.onNodeWithText("Version ${BuildConfig.VERSION_NAME}").assertIsDisplayed()
-        rule.onNodeWithText("No accounts, advertising or analytics. nia works offline.").assertIsDisplayed()
+        rule.onNodeWithText("No accounts, ads or analytics.").assertIsDisplayed()
         screenshot("about-nia")
         rule.onNodeWithText("View on GitHub").performScrollTo().performClick()
         assertEquals(ProjectLinks.REPOSITORY, opened)
-        rule.onNodeWithText("Privacy details").performScrollTo().performClick()
+        rule.onNodeWithText("Privacy policy").performScrollTo().performClick()
         assertEquals(ProjectLinks.PRIVACY, opened)
         rule.onNodeWithText("Third-party notices").performScrollTo().performClick()
         assertEquals(ProjectLinks.NOTICES, opened)
@@ -375,7 +375,7 @@ class ScreensTest {
         rule.onNodeWithText("Cancel").performClick()
         assertEquals(0, resets)
         rule.onNodeWithText("Reset all settings").performClick()
-        rule.onNodeWithText("Reset").performClick()
+        rule.onNode(hasText("Reset") and hasClickAction()).performClick()
         assertEquals(1, resets)
     }
 

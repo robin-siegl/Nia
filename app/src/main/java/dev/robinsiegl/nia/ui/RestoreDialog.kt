@@ -14,23 +14,21 @@ import dev.robinsiegl.nia.model.RestorePreview
 
 @Composable
 internal fun RestoreDialog(preview: RestorePreview, restoring: Boolean, onRestore: () -> Unit, onCancel: () -> Unit) {
-    AlertDialog(onDismissRequest = { if (!restoring) onCancel() }, title = { Text("Review restore") },
+    AlertDialog(onDismissRequest = { if (!restoring) onCancel() }, title = { Text("Restore backup?") },
         text = {
             Column(Modifier.heightIn(max = 400.dp).verticalScroll(rememberScrollState()).testTag("restore-changes")) {
                 val count = preview.changes.size
                 Text(if (count == 0) "No settings will change." else "$count ${if (count == 1) "change" else "changes"} from this backup.")
                 if (preview.unavailable.isNotEmpty()) {
-                    Text("UNAVAILABLE APPS", fontSize = 12.sp, fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(top = 20.dp, bottom = 8.dp))
-                    Text("These assignments will be cleared. Choose their apps again after restoring.", fontSize = 14.sp)
+                    SectionLabel("Unavailable apps")
+                    Text("These apps aren’t available on this device. Their assignments will be cleared so you can choose replacements.", fontSize = 14.sp)
                     preview.unavailable.forEach { missing ->
                         Text("${missing.label}: ${missing.target.key}", fontSize = 12.sp,
                             modifier = Modifier.padding(top = 8.dp))
                     }
                 }
                 preview.changes.groupBy { it.section }.forEach { (section, changes) ->
-                    Text(section.uppercase(), fontSize = 12.sp, fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(top = 20.dp, bottom = 8.dp))
+                    SectionLabel(section)
                     changes.forEach { change ->
                         Column(Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
                             Text(change.label, fontWeight = FontWeight.Medium, fontSize = 15.sp)

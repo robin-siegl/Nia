@@ -153,7 +153,7 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: UnlockReve
                                 interactionEnabled = !selectingApp)
                             Screen.Settings -> SettingsScreen(isDefault, storageError, onBack = model::back,
                                 onSection = { model.navigate(Screen.SettingsDetail(it)) },
-                                onSetDefault = setDefault, onChangeDefault = changeDefault)
+                                onSetDefault = setDefault, onChangeDefault = changeDefault, preferences = preferences)
                             is Screen.SettingsDetail -> SettingsDetailScreen(screen.section, preferences, apps, storageError,
                                 onBack = model::back, onChange = model::updatePreferences,
                                 onAssign = { model.navigate(Screen.Picker(it)) }, onClear = model::clearAssignment,

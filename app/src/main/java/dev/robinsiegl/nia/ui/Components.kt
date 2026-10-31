@@ -1,6 +1,8 @@
 package dev.robinsiegl.nia.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -21,6 +23,12 @@ import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import dev.robinsiegl.nia.model.HomeCategory
 
 private val categoryVectors = HomeCategory.entries.associateWith { category ->
@@ -94,23 +102,27 @@ fun ScreenHeader(title: String, onBack: () -> Unit, trailing: (@Composable () ->
 
 @Composable
 fun <T> ChoiceRow(options: List<Pair<T, String>>, selected: T, onSelect: (T) -> Unit, modifier: Modifier = Modifier) {
-    Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(modifier.fillMaxWidth().height(IntrinsicSize.Min).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         options.forEach { (value, label) ->
             val active = selected == value
-            OutlinedButton(
-                onClick = { onSelect(value) }, modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-                shape = RoundedCornerShape(6.dp), contentPadding = PaddingValues(8.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = if (active) MaterialTheme.colorScheme.primary else Color.Transparent,
-                    contentColor = if (active) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-                ), border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = if (active) 1f else 0.25f)),
-            ) { Text(label, fontSize = 13.sp) }
+            Surface(modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 48.dp)
+                .selectable(selected = active, role = Role.RadioButton, onClick = { onSelect(value) }),
+                shape = RoundedCornerShape(8.dp),
+                color = if (active) MaterialTheme.colorScheme.primary else Color.Transparent,
+                contentColor = if (active) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = if (active) 1f else 0.3f)),
+            ) {
+                Box(Modifier.padding(horizontal = 8.dp, vertical = 12.dp), contentAlignment = Alignment.Center) {
+                    Text(label, style = MaterialTheme.typography.labelLarge, textAlign = TextAlign.Center)
+                }
+            }
         }
     }
 }
 
 @Composable
 fun SectionLabel(text: String) {
-    Text(text, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
-        modifier = Modifier.padding(top = 30.dp, bottom = 12.dp))
+    Text(text, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Medium,
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
+        modifier = Modifier.padding(top = 24.dp, bottom = 12.dp).semantics { heading() })
 }
