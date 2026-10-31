@@ -56,7 +56,7 @@ The primary phone is reported to run Android 17. Record what is actually install
 - Recheck with touch haptics disabled, Reduced motion and animation scale zero. Feedback must not repeat as the finger jitters near the threshold, and no launch may depend on haptics.
 - Scroll down Apps, then swipe down. Scroll the list rather than closing it until it reaches the top. Repeat with search results and an empty list.
 - Interrupt a drag/settle with the notification shade, Android Home or screen lock. On return, the next tap and swipe work without waiting for a clock tick or settings change.
-- Configure Empty/App in both corners and try icons throughout the chooser. Settings is not offered. Relaunch/reboot, then uninstall an assigned app and verify recovery.
+- Configure Empty/App in Quick corners and try icons throughout the chooser. Settings is not offered. Relaunch/reboot, then uninstall an assigned app and verify recovery.
 - Upgrade a legacy Settings corner: it becomes empty. A legacy gear icon on an app becomes Star while retaining the app.
 - Lock from nia Home, then unlock with face, fingerprint and PIN. The header stays stationary while shortcuts reveal. Lock from another app, unlock there and return Home; no delayed reveal should replay.
 - **Compare tap-to-wake and the power button using the same lock and unlock methods.** Repeat after screen timeout and with ambient display on/off. Record whether a missed animation leaves shortcuts already visible and responsive or hidden with blocked input.
@@ -65,6 +65,14 @@ The primary phone is reported to run Android 17. Record what is actually install
 - Test Standard, Reduced and Android animation scale zero. Change the scale during drawer/reveal motion. Completion or cancellation must restore input.
 - With Battery Saver on and off, test Music, Clock/date, a corner, Apps and swipe-up immediately after settling. Toggle Battery Saver from Quick Settings during a transition and repeat on return. Record phone results separately from simulated scale tests.
 - Double-tap launch targets quickly. Open one activity without leaving navigation stuck. Toggle Android touch haptics and check press feedback follows that preference.
+
+## Icon picker
+
+- Open it from a Home app and from either Quick corner. Search names, category words and synonyms such as controller, GPS, Wi-Fi and cafe. Browse categories; typing a search must cover the full catalog.
+- Preview a different icon, then Cancel or Close: the original selection stays saved. Confirm a choice and reopen it, checking the same icon/name/target after restart and backup restore.
+- Recreate the activity during icon selection. Preserve the pending icon and query without applying them early. Use Android Back with the keyboard open, then dismiss the picker.
+- Check light/dark and colored themes, exact OLED black, system bars, maximum text/display size and keyboard insets. Keep search, confirmation and Close reachable. Category browsing remains available at large text sizes when there is room.
+- Test TalkBack labels/selected state and keyboard focus. Icons and license assets are bundled; airplane mode must not affect browsing or selection.
 
 ## Backups, recovery and upgrades
 

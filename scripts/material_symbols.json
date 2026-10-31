@@ -1,0 +1,1567 @@
+{
+  "revision": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+  "style": "materialsymbolsoutlined",
+  "weight": 300,
+  "opticalSize": 24,
+  "categories": {
+    "COMMUNICATION": "Communication",
+    "MEDIA": "Media",
+    "PRODUCTIVITY": "Productivity",
+    "TRAVEL": "Travel",
+    "MONEY": "Money",
+    "HEALTH": "Health",
+    "HOME": "Home & life",
+    "TECH": "Tech",
+    "FUN": "Fun"
+  },
+  "icons": [
+    {
+      "id": "STAR",
+      "label": "Star",
+      "category": "HOME",
+      "symbol": "star",
+      "keywords": "favorite favourite saved bookmark"
+    },
+    {
+      "id": "CAMERA",
+      "label": "Camera",
+      "category": "MEDIA",
+      "symbol": "photo_camera",
+      "keywords": "photo picture capture photography"
+    },
+    {
+      "id": "BROWSER",
+      "label": "Browser",
+      "category": "TECH",
+      "symbol": "language",
+      "keywords": "internet web globe online chrome firefox"
+    },
+    {
+      "id": "NOTES",
+      "label": "Notes",
+      "category": "PRODUCTIVITY",
+      "symbol": "description",
+      "keywords": "document memo writing text"
+    },
+    {
+      "id": "WALLET",
+      "label": "Wallet",
+      "category": "MONEY",
+      "symbol": "account_balance_wallet",
+      "keywords": "payment cards money banking"
+    },
+    {
+      "id": "HEART",
+      "label": "Heart",
+      "category": "HOME",
+      "symbol": "favorite",
+      "keywords": "love favorite favourite"
+    },
+    {
+      "id": "PHONE",
+      "label": "Phone",
+      "category": "COMMUNICATION",
+      "symbol": "call",
+      "keywords": "calls dialer telephone contact"
+    },
+    {
+      "id": "MESSAGES",
+      "label": "Messages",
+      "category": "COMMUNICATION",
+      "symbol": "chat_bubble",
+      "keywords": "chat sms texting whatsapp signal telegram"
+    },
+    {
+      "id": "MUSIC",
+      "label": "Music",
+      "category": "MEDIA",
+      "symbol": "music_note",
+      "keywords": "songs audio sound player"
+    },
+    {
+      "id": "CALENDAR",
+      "label": "Calendar",
+      "category": "PRODUCTIVITY",
+      "symbol": "calendar_month",
+      "keywords": "date agenda events appointments"
+    },
+    {
+      "id": "MAPS",
+      "label": "Maps",
+      "category": "TRAVEL",
+      "symbol": "map",
+      "keywords": "navigation directions gps google maps waze"
+    },
+    {
+      "id": "SEARCH",
+      "label": "Search",
+      "category": "PRODUCTIVITY",
+      "symbol": "search",
+      "keywords": "find lookup magnify"
+    },
+    {
+      "id": "MAIL",
+      "label": "Mail",
+      "category": "COMMUNICATION",
+      "symbol": "mail",
+      "keywords": "email inbox letters gmail outlook"
+    },
+    {
+      "id": "PHOTOS",
+      "label": "Photos",
+      "category": "MEDIA",
+      "symbol": "photo_library",
+      "keywords": "gallery images pictures albums"
+    },
+    {
+      "id": "FILES",
+      "label": "Files",
+      "category": "PRODUCTIVITY",
+      "symbol": "folder",
+      "keywords": "documents storage file manager"
+    },
+    {
+      "id": "BOOK",
+      "label": "Book",
+      "category": "MEDIA",
+      "symbol": "menu_book",
+      "keywords": "reading ebook library books"
+    },
+    {
+      "id": "HEADPHONES",
+      "label": "Headphones",
+      "category": "MEDIA",
+      "symbol": "headphones",
+      "keywords": "music audio sound listening headset"
+    },
+    {
+      "id": "PODCAST",
+      "label": "Podcast",
+      "category": "MEDIA",
+      "symbol": "podcasts",
+      "keywords": "audio episodes shows listening"
+    },
+    {
+      "id": "VIDEO",
+      "label": "Video",
+      "category": "MEDIA",
+      "symbol": "smart_display",
+      "keywords": "watch play streaming youtube"
+    },
+    {
+      "id": "SHOPPING",
+      "label": "Shopping",
+      "category": "MONEY",
+      "symbol": "shopping_bag",
+      "keywords": "shop store purchases bags"
+    },
+    {
+      "id": "TRAIN",
+      "label": "Train",
+      "category": "TRAVEL",
+      "symbol": "train",
+      "keywords": "rail railway transit station"
+    },
+    {
+      "id": "BIKE",
+      "label": "Bike",
+      "category": "TRAVEL",
+      "symbol": "directions_bike",
+      "keywords": "bicycle cycling ride"
+    },
+    {
+      "id": "FITNESS",
+      "label": "Fitness",
+      "category": "HEALTH",
+      "symbol": "fitness_center",
+      "keywords": "gym exercise workout weights training"
+    },
+    {
+      "id": "COFFEE",
+      "label": "Coffee",
+      "category": "HOME",
+      "symbol": "local_cafe",
+      "keywords": "cafe drink tea cup"
+    },
+    {
+      "id": "CALCULATOR",
+      "label": "Calculator",
+      "category": "PRODUCTIVITY",
+      "symbol": "calculate",
+      "keywords": "math maths numbers arithmetic"
+    },
+    {
+      "id": "CLOCK",
+      "label": "Clock",
+      "category": "PRODUCTIVITY",
+      "symbol": "schedule",
+      "keywords": "time watch hours"
+    },
+    {
+      "id": "CLOUD",
+      "label": "Cloud",
+      "category": "TECH",
+      "symbol": "cloud",
+      "keywords": "sync backup online storage weather"
+    },
+    {
+      "id": "CONTACTS",
+      "label": "Contacts",
+      "category": "COMMUNICATION",
+      "symbol": "contacts",
+      "keywords": "people address book phone numbers"
+    },
+    {
+      "id": "FORUM",
+      "label": "Forum",
+      "category": "COMMUNICATION",
+      "symbol": "forum",
+      "keywords": "chat conversations discussion community reddit"
+    },
+    {
+      "id": "SMS",
+      "label": "Text message",
+      "category": "COMMUNICATION",
+      "symbol": "sms",
+      "keywords": "chat messages texting sms"
+    },
+    {
+      "id": "AT_SIGN",
+      "label": "At sign",
+      "category": "COMMUNICATION",
+      "symbol": "alternate_email",
+      "keywords": "email username mention contact"
+    },
+    {
+      "id": "VIDEO_CALL",
+      "label": "Video call",
+      "category": "COMMUNICATION",
+      "symbol": "video_call",
+      "keywords": "meeting chat conference zoom teams"
+    },
+    {
+      "id": "SEND",
+      "label": "Send",
+      "category": "COMMUNICATION",
+      "symbol": "send",
+      "keywords": "message paper plane share"
+    },
+    {
+      "id": "PEOPLE",
+      "label": "People",
+      "category": "COMMUNICATION",
+      "symbol": "group",
+      "keywords": "friends social team community"
+    },
+    {
+      "id": "PERSON",
+      "label": "Person",
+      "category": "COMMUNICATION",
+      "symbol": "person",
+      "keywords": "profile account user contact"
+    },
+    {
+      "id": "PUBLIC",
+      "label": "Community",
+      "category": "COMMUNICATION",
+      "symbol": "groups",
+      "keywords": "people social network friends"
+    },
+    {
+      "id": "ANNOUNCEMENT",
+      "label": "Announcement",
+      "category": "COMMUNICATION",
+      "symbol": "campaign",
+      "keywords": "megaphone news broadcast"
+    },
+    {
+      "id": "LINK",
+      "label": "Link",
+      "category": "COMMUNICATION",
+      "symbol": "link",
+      "keywords": "url web share connection"
+    },
+    {
+      "id": "CALLBACK",
+      "label": "Call back",
+      "category": "COMMUNICATION",
+      "symbol": "phone_callback",
+      "keywords": "incoming telephone call"
+    },
+    {
+      "id": "PLAY",
+      "label": "Play",
+      "category": "MEDIA",
+      "symbol": "play_circle",
+      "keywords": "video music audio player start"
+    },
+    {
+      "id": "RADIO",
+      "label": "Radio",
+      "category": "MEDIA",
+      "symbol": "radio",
+      "keywords": "fm broadcast music stations"
+    },
+    {
+      "id": "VOLUME",
+      "label": "Volume",
+      "category": "MEDIA",
+      "symbol": "volume_up",
+      "keywords": "sound audio speaker loud"
+    },
+    {
+      "id": "EQUALIZER",
+      "label": "Equalizer",
+      "category": "MEDIA",
+      "symbol": "graphic_eq",
+      "keywords": "sound music audio mixing waveform"
+    },
+    {
+      "id": "PLAYLIST",
+      "label": "Playlist",
+      "category": "MEDIA",
+      "symbol": "queue_music",
+      "keywords": "songs music queue audio list"
+    },
+    {
+      "id": "MUSIC_LIBRARY",
+      "label": "Music library",
+      "category": "MEDIA",
+      "symbol": "library_music",
+      "keywords": "albums songs audio collection"
+    },
+    {
+      "id": "MICROPHONE",
+      "label": "Microphone",
+      "category": "MEDIA",
+      "symbol": "mic",
+      "keywords": "voice recording audio speech recorder"
+    },
+    {
+      "id": "MOVIE",
+      "label": "Movie",
+      "category": "MEDIA",
+      "symbol": "movie",
+      "keywords": "film cinema video movies"
+    },
+    {
+      "id": "TV",
+      "label": "TV",
+      "category": "MEDIA",
+      "symbol": "live_tv",
+      "keywords": "television streaming watch broadcast"
+    },
+    {
+      "id": "SUBSCRIPTIONS",
+      "label": "Subscriptions",
+      "category": "MEDIA",
+      "symbol": "subscriptions",
+      "keywords": "channels following videos feed"
+    },
+    {
+      "id": "VIDEO_CAMERA",
+      "label": "Video camera",
+      "category": "MEDIA",
+      "symbol": "videocam",
+      "keywords": "record video movie filming"
+    },
+    {
+      "id": "IMAGE",
+      "label": "Image",
+      "category": "MEDIA",
+      "symbol": "image",
+      "keywords": "picture photo landscape wallpaper"
+    },
+    {
+      "id": "AUDIO",
+      "label": "Audio",
+      "category": "MEDIA",
+      "symbol": "audio_file",
+      "keywords": "sound recording music file"
+    },
+    {
+      "id": "SPEAKER",
+      "label": "Speaker",
+      "category": "MEDIA",
+      "symbol": "speaker",
+      "keywords": "music sound stereo audio"
+    },
+    {
+      "id": "NEWSPAPER",
+      "label": "Newspaper",
+      "category": "MEDIA",
+      "symbol": "newspaper",
+      "keywords": "news articles reading headlines"
+    },
+    {
+      "id": "RSS",
+      "label": "RSS",
+      "category": "MEDIA",
+      "symbol": "rss_feed",
+      "keywords": "feeds news subscriptions reader"
+    },
+    {
+      "id": "CHECK_CIRCLE",
+      "label": "Check",
+      "category": "PRODUCTIVITY",
+      "symbol": "check_circle",
+      "keywords": "done task complete success todo"
+    },
+    {
+      "id": "CHECKLIST",
+      "label": "Checklist",
+      "category": "PRODUCTIVITY",
+      "symbol": "checklist",
+      "keywords": "tasks todo shopping list plan"
+    },
+    {
+      "id": "TASKS",
+      "label": "Tasks",
+      "category": "PRODUCTIVITY",
+      "symbol": "task_alt",
+      "keywords": "done reminders check todo complete"
+    },
+    {
+      "id": "EVENT_NOTES",
+      "label": "Event notes",
+      "category": "PRODUCTIVITY",
+      "symbol": "event_note",
+      "keywords": "calendar agenda schedule notes"
+    },
+    {
+      "id": "ALARM",
+      "label": "Alarm",
+      "category": "PRODUCTIVITY",
+      "symbol": "alarm",
+      "keywords": "clock wake reminder time"
+    },
+    {
+      "id": "TIMER",
+      "label": "Timer",
+      "category": "PRODUCTIVITY",
+      "symbol": "timer",
+      "keywords": "stopwatch countdown cooking time"
+    },
+    {
+      "id": "HOURGLASS",
+      "label": "Hourglass",
+      "category": "PRODUCTIVITY",
+      "symbol": "hourglass_empty",
+      "keywords": "time waiting focus countdown"
+    },
+    {
+      "id": "BOOKMARK",
+      "label": "Bookmark",
+      "category": "PRODUCTIVITY",
+      "symbol": "bookmark",
+      "keywords": "saved favorite favourite reading"
+    },
+    {
+      "id": "EDIT_NOTES",
+      "label": "Edit notes",
+      "category": "PRODUCTIVITY",
+      "symbol": "edit_note",
+      "keywords": "writing pen memo document"
+    },
+    {
+      "id": "DRAW",
+      "label": "Draw",
+      "category": "PRODUCTIVITY",
+      "symbol": "draw",
+      "keywords": "pen handwriting sketch drawing"
+    },
+    {
+      "id": "DOCUMENT_EDIT",
+      "label": "Document",
+      "category": "PRODUCTIVITY",
+      "symbol": "edit_document",
+      "keywords": "write text edit word document"
+    },
+    {
+      "id": "INVENTORY",
+      "label": "Inventory",
+      "category": "PRODUCTIVITY",
+      "symbol": "inventory_2",
+      "keywords": "box archive packages storage"
+    },
+    {
+      "id": "TABLE",
+      "label": "Table",
+      "category": "PRODUCTIVITY",
+      "symbol": "table_chart",
+      "keywords": "spreadsheet rows cells sheets excel"
+    },
+    {
+      "id": "ARTICLE",
+      "label": "Article",
+      "category": "PRODUCTIVITY",
+      "symbol": "article",
+      "keywords": "reading newspaper document text"
+    },
+    {
+      "id": "TRANSLATE",
+      "label": "Translate",
+      "category": "PRODUCTIVITY",
+      "symbol": "translate",
+      "keywords": "language dictionary words translation"
+    },
+    {
+      "id": "SCAN",
+      "label": "Scan document",
+      "category": "PRODUCTIVITY",
+      "symbol": "document_scanner",
+      "keywords": "scanner pdf paper camera"
+    },
+    {
+      "id": "PRINTER",
+      "label": "Printer",
+      "category": "PRODUCTIVITY",
+      "symbol": "print",
+      "keywords": "paper document printing"
+    },
+    {
+      "id": "ATTACHMENT",
+      "label": "Attachment",
+      "category": "PRODUCTIVITY",
+      "symbol": "attach_file",
+      "keywords": "paperclip document files"
+    },
+    {
+      "id": "FOLDER_OPEN",
+      "label": "Open folder",
+      "category": "PRODUCTIVITY",
+      "symbol": "folder_open",
+      "keywords": "files documents browse"
+    },
+    {
+      "id": "ARCHIVE",
+      "label": "Archive",
+      "category": "PRODUCTIVITY",
+      "symbol": "archive",
+      "keywords": "box storage saved documents"
+    },
+    {
+      "id": "NAVIGATION",
+      "label": "Navigation",
+      "category": "TRAVEL",
+      "symbol": "navigation",
+      "keywords": "directions gps arrow route maps"
+    },
+    {
+      "id": "COMPASS",
+      "label": "Compass",
+      "category": "TRAVEL",
+      "symbol": "explore",
+      "keywords": "explore direction navigation north"
+    },
+    {
+      "id": "LOCATION",
+      "label": "Location",
+      "category": "TRAVEL",
+      "symbol": "location_on",
+      "keywords": "pin place gps map position"
+    },
+    {
+      "id": "CAR",
+      "label": "Car",
+      "category": "TRAVEL",
+      "symbol": "directions_car",
+      "keywords": "driving vehicle auto road"
+    },
+    {
+      "id": "BUS",
+      "label": "Bus",
+      "category": "TRAVEL",
+      "symbol": "directions_bus",
+      "keywords": "transit transport public bus stop"
+    },
+    {
+      "id": "SUBWAY",
+      "label": "Subway",
+      "category": "TRAVEL",
+      "symbol": "subway",
+      "keywords": "metro underground train public transport"
+    },
+    {
+      "id": "FLIGHT",
+      "label": "Flight",
+      "category": "TRAVEL",
+      "symbol": "flight",
+      "keywords": "plane airplane airport travel"
+    },
+    {
+      "id": "BOAT",
+      "label": "Boat",
+      "category": "TRAVEL",
+      "symbol": "directions_boat",
+      "keywords": "ferry ship sea sailing water"
+    },
+    {
+      "id": "TAXI",
+      "label": "Taxi",
+      "category": "TRAVEL",
+      "symbol": "local_taxi",
+      "keywords": "cab uber driving transport"
+    },
+    {
+      "id": "MOTORBIKE",
+      "label": "Motorbike",
+      "category": "TRAVEL",
+      "symbol": "two_wheeler",
+      "keywords": "motorcycle scooter riding"
+    },
+    {
+      "id": "WALK",
+      "label": "Walk",
+      "category": "TRAVEL",
+      "symbol": "directions_walk",
+      "keywords": "walking pedestrian steps directions"
+    },
+    {
+      "id": "ROUTE",
+      "label": "Route",
+      "category": "TRAVEL",
+      "symbol": "route",
+      "keywords": "trip journey directions path maps"
+    },
+    {
+      "id": "TRAVEL_SEARCH",
+      "label": "Explore travel",
+      "category": "TRAVEL",
+      "symbol": "travel_explore",
+      "keywords": "world holiday journey destinations"
+    },
+    {
+      "id": "FUEL",
+      "label": "Fuel",
+      "category": "TRAVEL",
+      "symbol": "local_gas_station",
+      "keywords": "gas petrol station car refuel"
+    },
+    {
+      "id": "EV_CHARGING",
+      "label": "EV charging",
+      "category": "TRAVEL",
+      "symbol": "ev_station",
+      "keywords": "electric car battery charger"
+    },
+    {
+      "id": "HIKING",
+      "label": "Hiking",
+      "category": "TRAVEL",
+      "symbol": "hiking",
+      "keywords": "walk outdoors trail trek mountains"
+    },
+    {
+      "id": "LUGGAGE",
+      "label": "Luggage",
+      "category": "TRAVEL",
+      "symbol": "luggage",
+      "keywords": "bag suitcase holiday travel"
+    },
+    {
+      "id": "HOTEL",
+      "label": "Hotel",
+      "category": "TRAVEL",
+      "symbol": "hotel",
+      "keywords": "sleep stay accommodation trip"
+    },
+    {
+      "id": "PARKING",
+      "label": "Parking",
+      "category": "TRAVEL",
+      "symbol": "local_parking",
+      "keywords": "car park driving space"
+    },
+    {
+      "id": "TICKET",
+      "label": "Ticket",
+      "category": "TRAVEL",
+      "symbol": "confirmation_number",
+      "keywords": "booking travel event pass"
+    },
+    {
+      "id": "PAYMENTS",
+      "label": "Payments",
+      "category": "MONEY",
+      "symbol": "payments",
+      "keywords": "cash money bank transfer"
+    },
+    {
+      "id": "CREDIT_CARD",
+      "label": "Credit card",
+      "category": "MONEY",
+      "symbol": "credit_card",
+      "keywords": "debit payment wallet banking"
+    },
+    {
+      "id": "BANK",
+      "label": "Bank",
+      "category": "MONEY",
+      "symbol": "account_balance",
+      "keywords": "finance banking money institution"
+    },
+    {
+      "id": "SAVINGS",
+      "label": "Savings",
+      "category": "MONEY",
+      "symbol": "savings",
+      "keywords": "piggy bank money budget"
+    },
+    {
+      "id": "RECEIPT",
+      "label": "Receipt",
+      "category": "MONEY",
+      "symbol": "receipt_long",
+      "keywords": "bill invoice purchase tax"
+    },
+    {
+      "id": "EXCHANGE",
+      "label": "Currency exchange",
+      "category": "MONEY",
+      "symbol": "currency_exchange",
+      "keywords": "money conversion rates finance"
+    },
+    {
+      "id": "PRICE_CHECK",
+      "label": "Price check",
+      "category": "MONEY",
+      "symbol": "price_check",
+      "keywords": "cost money budget compare"
+    },
+    {
+      "id": "CART",
+      "label": "Shopping cart",
+      "category": "MONEY",
+      "symbol": "shopping_cart",
+      "keywords": "shop groceries store basket"
+    },
+    {
+      "id": "TAG",
+      "label": "Price tag",
+      "category": "MONEY",
+      "symbol": "sell",
+      "keywords": "sale discount label shop"
+    },
+    {
+      "id": "LOYALTY",
+      "label": "Loyalty",
+      "category": "MONEY",
+      "symbol": "loyalty",
+      "keywords": "rewards card coupons discount"
+    },
+    {
+      "id": "INVOICE",
+      "label": "Invoice",
+      "category": "MONEY",
+      "symbol": "request_quote",
+      "keywords": "bill quote payment finance"
+    },
+    {
+      "id": "EURO",
+      "label": "Euro",
+      "category": "MONEY",
+      "symbol": "euro",
+      "keywords": "currency money eur finance"
+    },
+    {
+      "id": "TREND",
+      "label": "Trend",
+      "category": "MONEY",
+      "symbol": "trending_up",
+      "keywords": "finance chart stocks growth investing"
+    },
+    {
+      "id": "CHART",
+      "label": "Chart",
+      "category": "MONEY",
+      "symbol": "bar_chart",
+      "keywords": "statistics data finance graph"
+    },
+    {
+      "id": "HEALTH",
+      "label": "Health",
+      "category": "HEALTH",
+      "symbol": "health_and_safety",
+      "keywords": "wellness medical care shield"
+    },
+    {
+      "id": "MEDICAL",
+      "label": "Medical",
+      "category": "HEALTH",
+      "symbol": "medical_services",
+      "keywords": "doctor first aid hospital medicine"
+    },
+    {
+      "id": "MEDICATION",
+      "label": "Medication",
+      "category": "HEALTH",
+      "symbol": "medication",
+      "keywords": "pills medicine pharmacy reminder"
+    },
+    {
+      "id": "HEART_RATE",
+      "label": "Heart rate",
+      "category": "HEALTH",
+      "symbol": "monitor_heart",
+      "keywords": "pulse health fitness cardio"
+    },
+    {
+      "id": "MEDITATION",
+      "label": "Meditation",
+      "category": "HEALTH",
+      "symbol": "self_improvement",
+      "keywords": "mindfulness yoga focus calm wellness"
+    },
+    {
+      "id": "RUNNING",
+      "label": "Running",
+      "category": "HEALTH",
+      "symbol": "directions_run",
+      "keywords": "run jogging exercise workout"
+    },
+    {
+      "id": "FOOTBALL",
+      "label": "Football",
+      "category": "HEALTH",
+      "symbol": "sports_soccer",
+      "keywords": "soccer sport ball team"
+    },
+    {
+      "id": "BASKETBALL",
+      "label": "Basketball",
+      "category": "HEALTH",
+      "symbol": "sports_basketball",
+      "keywords": "sport ball court team"
+    },
+    {
+      "id": "TENNIS",
+      "label": "Tennis",
+      "category": "HEALTH",
+      "symbol": "sports_tennis",
+      "keywords": "sport racket match court"
+    },
+    {
+      "id": "SWIMMING",
+      "label": "Swimming",
+      "category": "HEALTH",
+      "symbol": "pool",
+      "keywords": "swim water sport exercise"
+    },
+    {
+      "id": "WATER",
+      "label": "Water",
+      "category": "HEALTH",
+      "symbol": "water_drop",
+      "keywords": "drink hydration liquid health"
+    },
+    {
+      "id": "SPA",
+      "label": "Spa",
+      "category": "HEALTH",
+      "symbol": "spa",
+      "keywords": "relax wellness flower beauty"
+    },
+    {
+      "id": "SLEEP",
+      "label": "Sleep",
+      "category": "HEALTH",
+      "symbol": "bedtime",
+      "keywords": "night rest moon bedtime"
+    },
+    {
+      "id": "ACCESSIBILITY",
+      "label": "Accessibility",
+      "category": "HEALTH",
+      "symbol": "accessibility_new",
+      "keywords": "person access wellbeing assistance"
+    },
+    {
+      "id": "STEP_COUNTER",
+      "label": "Steps",
+      "category": "HEALTH",
+      "symbol": "footprint",
+      "keywords": "walking fitness activity pedometer"
+    },
+    {
+      "id": "HOME",
+      "label": "Home",
+      "category": "HOME",
+      "symbol": "home",
+      "keywords": "house smart home family"
+    },
+    {
+      "id": "LIGHT",
+      "label": "Light",
+      "category": "HOME",
+      "symbol": "lightbulb",
+      "keywords": "lamp lighting idea smart home"
+    },
+    {
+      "id": "KITCHEN",
+      "label": "Kitchen",
+      "category": "HOME",
+      "symbol": "kitchen",
+      "keywords": "fridge food cooking appliances"
+    },
+    {
+      "id": "LAUNDRY",
+      "label": "Laundry",
+      "category": "HOME",
+      "symbol": "local_laundry_service",
+      "keywords": "washing clothes washing machine dryer"
+    },
+    {
+      "id": "CLEANING",
+      "label": "Cleaning",
+      "category": "HOME",
+      "symbol": "cleaning_services",
+      "keywords": "clean broom chores home"
+    },
+    {
+      "id": "PETS",
+      "label": "Pets",
+      "category": "HOME",
+      "symbol": "pets",
+      "keywords": "dog cat animal paw"
+    },
+    {
+      "id": "GARDEN",
+      "label": "Garden",
+      "category": "HOME",
+      "symbol": "yard",
+      "keywords": "plants flowers gardening nature"
+    },
+    {
+      "id": "CHAIR",
+      "label": "Chair",
+      "category": "HOME",
+      "symbol": "chair",
+      "keywords": "furniture lounge living room"
+    },
+    {
+      "id": "BED",
+      "label": "Bed",
+      "category": "HOME",
+      "symbol": "bed",
+      "keywords": "bedroom sleep rest furniture"
+    },
+    {
+      "id": "KEY",
+      "label": "Key",
+      "category": "HOME",
+      "symbol": "key",
+      "keywords": "door access unlock home"
+    },
+    {
+      "id": "LOCK",
+      "label": "Lock",
+      "category": "TECH",
+      "symbol": "lock",
+      "keywords": "privacy secure password protection"
+    },
+    {
+      "id": "SHIELD",
+      "label": "Shield",
+      "category": "TECH",
+      "symbol": "shield",
+      "keywords": "security privacy protection antivirus"
+    },
+    {
+      "id": "SECURITY",
+      "label": "Security",
+      "category": "TECH",
+      "symbol": "security",
+      "keywords": "privacy shield safety protection"
+    },
+    {
+      "id": "FAMILY",
+      "label": "Family",
+      "category": "HOME",
+      "symbol": "family_restroom",
+      "keywords": "parents children family people"
+    },
+    {
+      "id": "BABY",
+      "label": "Baby",
+      "category": "HOME",
+      "symbol": "child_care",
+      "keywords": "child parenting kids family"
+    },
+    {
+      "id": "TOOLS",
+      "label": "Tools",
+      "category": "HOME",
+      "symbol": "construction",
+      "keywords": "repair maintenance build diy"
+    },
+    {
+      "id": "HANDYMAN",
+      "label": "Handyman",
+      "category": "HOME",
+      "symbol": "handyman",
+      "keywords": "tools repair maintenance home"
+    },
+    {
+      "id": "POWER",
+      "label": "Power",
+      "category": "TECH",
+      "symbol": "power",
+      "keywords": "plug electricity charger energy"
+    },
+    {
+      "id": "BATTERY",
+      "label": "Battery",
+      "category": "TECH",
+      "symbol": "battery_full",
+      "keywords": "power charge energy device"
+    },
+    {
+      "id": "SUN",
+      "label": "Sun",
+      "category": "HOME",
+      "symbol": "sunny",
+      "keywords": "day weather light brightness"
+    },
+    {
+      "id": "UMBRELLA",
+      "label": "Umbrella",
+      "category": "HOME",
+      "symbol": "umbrella",
+      "keywords": "rain weather shelter"
+    },
+    {
+      "id": "FOOD",
+      "label": "Food",
+      "category": "HOME",
+      "symbol": "restaurant",
+      "keywords": "meal eat dining cooking restaurant"
+    },
+    {
+      "id": "DRINK",
+      "label": "Drink",
+      "category": "HOME",
+      "symbol": "local_bar",
+      "keywords": "beverage cocktail glass party"
+    },
+    {
+      "id": "PLANTS",
+      "label": "Plants",
+      "category": "HOME",
+      "symbol": "potted_plant",
+      "keywords": "nature garden indoor flower"
+    },
+    {
+      "id": "TERMINAL",
+      "label": "Terminal",
+      "category": "TECH",
+      "symbol": "terminal",
+      "keywords": "command line shell console developer"
+    },
+    {
+      "id": "CODE",
+      "label": "Code",
+      "category": "TECH",
+      "symbol": "code",
+      "keywords": "programming development coding software"
+    },
+    {
+      "id": "BUG",
+      "label": "Bug",
+      "category": "TECH",
+      "symbol": "bug_report",
+      "keywords": "debug errors issues developer coding"
+    },
+    {
+      "id": "DEVELOPER",
+      "label": "Developer",
+      "category": "TECH",
+      "symbol": "developer_mode",
+      "keywords": "android programming debugging device"
+    },
+    {
+      "id": "COMPUTER",
+      "label": "Computer",
+      "category": "TECH",
+      "symbol": "computer",
+      "keywords": "desktop pc laptop screen"
+    },
+    {
+      "id": "PHONE_DEVICE",
+      "label": "Smartphone",
+      "category": "TECH",
+      "symbol": "smartphone",
+      "keywords": "mobile android pixel device phone"
+    },
+    {
+      "id": "TABLET",
+      "label": "Tablet",
+      "category": "TECH",
+      "symbol": "tablet_android",
+      "keywords": "device android screen"
+    },
+    {
+      "id": "LAPTOP",
+      "label": "Laptop",
+      "category": "TECH",
+      "symbol": "laptop_chromebook",
+      "keywords": "notebook computer portable pc"
+    },
+    {
+      "id": "DESKTOP",
+      "label": "Desktop",
+      "category": "TECH",
+      "symbol": "desktop_windows",
+      "keywords": "pc monitor workstation computer"
+    },
+    {
+      "id": "WATCH",
+      "label": "Watch",
+      "category": "TECH",
+      "symbol": "watch",
+      "keywords": "wearable smartwatch time wrist"
+    },
+    {
+      "id": "KEYBOARD",
+      "label": "Keyboard",
+      "category": "TECH",
+      "symbol": "keyboard",
+      "keywords": "typing input computer keys"
+    },
+    {
+      "id": "MOUSE",
+      "label": "Mouse",
+      "category": "TECH",
+      "symbol": "mouse",
+      "keywords": "pointer computer input"
+    },
+    {
+      "id": "ROUTER",
+      "label": "Router",
+      "category": "TECH",
+      "symbol": "router",
+      "keywords": "internet network wifi modem"
+    },
+    {
+      "id": "WIFI",
+      "label": "Wi-Fi",
+      "category": "TECH",
+      "symbol": "wifi",
+      "keywords": "wireless wi fi wlan internet network"
+    },
+    {
+      "id": "BLUETOOTH",
+      "label": "Bluetooth",
+      "category": "TECH",
+      "symbol": "bluetooth",
+      "keywords": "wireless connection audio pairing"
+    },
+    {
+      "id": "USB",
+      "label": "USB",
+      "category": "TECH",
+      "symbol": "usb",
+      "keywords": "connection cable port device"
+    },
+    {
+      "id": "CABLE",
+      "label": "Cable",
+      "category": "TECH",
+      "symbol": "cable",
+      "keywords": "charger connection wire usb"
+    },
+    {
+      "id": "MEMORY",
+      "label": "Memory",
+      "category": "TECH",
+      "symbol": "memory",
+      "keywords": "chip processor ram hardware"
+    },
+    {
+      "id": "STORAGE",
+      "label": "Storage",
+      "category": "TECH",
+      "symbol": "storage",
+      "keywords": "disk drives database server files"
+    },
+    {
+      "id": "VPN",
+      "label": "VPN",
+      "category": "TECH",
+      "symbol": "vpn_key",
+      "keywords": "network privacy secure connection"
+    },
+    {
+      "id": "PASSWORD",
+      "label": "Password",
+      "category": "TECH",
+      "symbol": "password",
+      "keywords": "login privacy secure credentials"
+    },
+    {
+      "id": "FINGERPRINT",
+      "label": "Fingerprint",
+      "category": "TECH",
+      "symbol": "fingerprint",
+      "keywords": "unlock biometric identity security"
+    },
+    {
+      "id": "QR_CODE",
+      "label": "QR code",
+      "category": "TECH",
+      "symbol": "qr_code_scanner",
+      "keywords": "scan barcode camera reader"
+    },
+    {
+      "id": "NFC",
+      "label": "NFC",
+      "category": "TECH",
+      "symbol": "nfc",
+      "keywords": "wireless contactless card payment"
+    },
+    {
+      "id": "DOWNLOAD",
+      "label": "Download",
+      "category": "TECH",
+      "symbol": "download",
+      "keywords": "save offline files transfer"
+    },
+    {
+      "id": "UPLOAD",
+      "label": "Upload",
+      "category": "TECH",
+      "symbol": "upload",
+      "keywords": "share backup cloud files transfer"
+    },
+    {
+      "id": "SYNC",
+      "label": "Sync",
+      "category": "TECH",
+      "symbol": "sync",
+      "keywords": "refresh backup transfer update"
+    },
+    {
+      "id": "GAMING",
+      "label": "Gaming",
+      "category": "FUN",
+      "symbol": "sports_esports",
+      "keywords": "games controller gamepad play"
+    },
+    {
+      "id": "DICE",
+      "label": "Dice",
+      "category": "FUN",
+      "symbol": "casino",
+      "keywords": "games tabletop chance roll"
+    },
+    {
+      "id": "PUZZLE",
+      "label": "Puzzle",
+      "category": "FUN",
+      "symbol": "extension",
+      "keywords": "games jigsaw brain thinking"
+    },
+    {
+      "id": "TOYS",
+      "label": "Toys",
+      "category": "FUN",
+      "symbol": "toys",
+      "keywords": "kids play games fun"
+    },
+    {
+      "id": "CELEBRATE",
+      "label": "Celebrate",
+      "category": "FUN",
+      "symbol": "celebration",
+      "keywords": "party event confetti birthday"
+    },
+    {
+      "id": "CAKE",
+      "label": "Cake",
+      "category": "FUN",
+      "symbol": "cake",
+      "keywords": "birthday party food baking"
+    },
+    {
+      "id": "PALETTE",
+      "label": "Palette",
+      "category": "FUN",
+      "symbol": "palette",
+      "keywords": "art colors painting drawing design"
+    },
+    {
+      "id": "BRUSH",
+      "label": "Brush",
+      "category": "FUN",
+      "symbol": "brush",
+      "keywords": "art painting drawing creative"
+    },
+    {
+      "id": "THEATER",
+      "label": "Theater",
+      "category": "FUN",
+      "symbol": "theater_comedy",
+      "keywords": "comedy drama stage entertainment"
+    },
+    {
+      "id": "PIANO",
+      "label": "Piano",
+      "category": "FUN",
+      "symbol": "piano",
+      "keywords": "music keyboard instrument playing"
+    },
+    {
+      "id": "DIVERSITY",
+      "label": "Friends",
+      "category": "FUN",
+      "symbol": "diversity_3",
+      "keywords": "people community together friends"
+    },
+    {
+      "id": "CAMPAIGN_FLAG",
+      "label": "Flag",
+      "category": "FUN",
+      "symbol": "flag",
+      "keywords": "goals game achievement milestone"
+    },
+    {
+      "id": "TROPHY",
+      "label": "Trophy",
+      "category": "FUN",
+      "symbol": "trophy",
+      "keywords": "winner award sport achievement"
+    },
+    {
+      "id": "ROCKET",
+      "label": "Rocket",
+      "category": "FUN",
+      "symbol": "rocket_launch",
+      "keywords": "space launch science exploration"
+    },
+    {
+      "id": "SCIENCE",
+      "label": "Science",
+      "category": "FUN",
+      "symbol": "science",
+      "keywords": "experiment lab chemistry research"
+    },
+    {
+      "id": "GEAR",
+      "label": "Gear",
+      "category": "TECH",
+      "symbol": "settings",
+      "keywords": "settings preferences configuration tools system"
+    },
+    {
+      "id": "APP_GRID",
+      "label": "App grid",
+      "category": "TECH",
+      "symbol": "grid_view",
+      "keywords": "apps applications grid launcher tiles"
+    }
+  ],
+  "interfaceSymbols": [
+    "apps",
+    "settings",
+    "close",
+    "check"
+  ],
+  "licenseSha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+  "resourceSha256": {
+    "accessibility_new": "343cce8b8ac3f2e83cd38b2da31a086f1787f741adc0042afe24d17abc9650fc",
+    "account_balance": "2413cab0a34ae435479c071688e5144c0d3a1b522c47967d4847eb94dac8bae3",
+    "account_balance_wallet": "db902b865dad54d722c93bdcd9f421a72ee90e340faa825fef9ece1918f8321e",
+    "alarm": "148b4dc506c72968937c359c2c9cc2dda616f0afab0843540a93ec107f6dbc47",
+    "alternate_email": "814373a0fa32b27ad7c0e1a6b528923f4c700b28e5add1cecbe60a3e81c3803d",
+    "apps": "cd347c037b77cef0fe6173f7de74c00159f6409ea46e2a4f6621c907690799c9",
+    "archive": "8c6e004d8c15d8f58db2ab0f51294bb1173a36cdc0f740da3a56fc33be2b0aae",
+    "article": "5f5dec313c2c67ea7e1f086cfed05dcfe353d7c054937fd39bc5cf4bfc8d42de",
+    "attach_file": "f350ac2f9651386ca40943164e196e206f5aa47851a2e8cbf7cff5a222552484",
+    "audio_file": "766fc48a425a5cd5fa1e35712ac21cba117606971e8dcbc05e4f8f4eed64d571",
+    "bar_chart": "6a94980007c24b7ca3691132380bd0dfd78be33e100451c9b53c9e6c1a8605fc",
+    "battery_full": "d98f8f3bd25212223815db70370fdbf64a8697004b0b48dfa651f72faaa51e19",
+    "bed": "dc3504be8854a503e61cd055abc7e4c04ebb76b4392a25713f27a93609c067dd",
+    "bedtime": "68d726d580318c82c566e11de8ea722c898f96df698bd2a13efc3cc40ee254b2",
+    "bluetooth": "091634221003adc0f78ac89bc7f6a2a33afbb9d86c0c6dcfcb33bafd05d690df",
+    "bookmark": "241260aac5393e0062f078af21a37727d5f40abcc183800605bf1f540162a884",
+    "brush": "554547a56d9beb5d6148bd3569e24ff81238089fbf49344b6cb701780b7e7a95",
+    "bug_report": "8d567b84b74c5834d1c0bbe52fe652bf55762903cd5af8dcd65e0f0cd8824652",
+    "cable": "36bbde9072fe9080c16f587675f21296cb639f1a4f19c18cdb6eefa837afe57b",
+    "cake": "771106d982bc74205b436ea6a945572c20deb73e61471ae2d615b0c6f6053382",
+    "calculate": "7adb6932e339750eced725cff1e5d368cd1a813520d5295f22f4e5dc37e93925",
+    "calendar_month": "5a4b2468910ec238871a1fc7874bcf3cd7faad4780348b9bba113b6c46c4e26f",
+    "call": "807cf93547d37ee87224a862d73ea3f9d4197e485e388bc9e2eebeecdbd28379",
+    "campaign": "f3bf008775819e6c15f173f9cdf9524815ac36b308686b432b87dff948c24a5c",
+    "casino": "4f47617457478719e9a5bce32e0265ca730603ee782dec4d0694bcd48314235e",
+    "celebration": "f82bc3135c8f76bb58f05eb6c07ee94ed173e756890fa1169df697f725f0ab7b",
+    "chair": "952d3714dbaad2c364a695b0d0d54bb8fc78de1ae5c9844668fec1e39d27e3a8",
+    "chat_bubble": "f487b4f3b9ff85164085ddc2301ed07ebbfe6e566a9b1ba66d88bd77d1233632",
+    "check": "5e9b7d1290db02ad95f6528e3bbfe7cb23b6717f410fac9f3dfca910a5fd7b45",
+    "check_circle": "16466d46844cdf05b5e217f0887282bec07f879e2d56b411a28f817d10974f71",
+    "checklist": "1e6b03c2aa375b68700392492e3864815f71b9afca03264572801636feb0d35e",
+    "child_care": "c1591837c2e328ce3a88f772dfbf647b80a3c7fd65a19bb080e7a2f758f3a24d",
+    "cleaning_services": "10b864f0d39ab3f1c7550368e208e1fbd4d9eb9f750c7f098675a344cfc59600",
+    "close": "4c6e54b696256a7cd4f923ef53dd2828fa65deb19aab441c81d1ac03b1b32e6d",
+    "cloud": "728bf6ace103a63d93629cd2c822c83c600a5891daa6857e296b8651f57f17b4",
+    "code": "f679763a2676296febcc76a1dc07316bc71967da654d901ea64cb5fff2e9c724",
+    "computer": "531984c9e72dff93e2f5a8444061aaad416779b6e1ad13f9642c0623ab77bfb6",
+    "confirmation_number": "9a70faab0cf01b80408abf91e89e85c9d0b4d977d3b8b211ecbb96f1d28cc658",
+    "construction": "9fd190191224f527e782b9013382d7d760d5cdd253a09546a02dd8bbf60274cc",
+    "contacts": "eb64b2c2697b81e205852e6e5eb1a6d70f5a73b5e2bc69255b30e37af89aadeb",
+    "credit_card": "c74d5100276e3e9492d2ee5bde7794a9fe1f8c2c3f47561817f8c51f2f4ed651",
+    "currency_exchange": "b841121e1f150a63750e88c2366c0ca1fdb6475a3d71d1208351b9ac22e2a237",
+    "description": "a27b7fb0b4a5c0ba5f3c923cdf3174eebb495371b516fccb28827bd9c817e493",
+    "desktop_windows": "aeca681301d6670948e1ed2d025501f37ff0a4b3186e18165b760f4ff4cae1aa",
+    "developer_mode": "783c2422f2d2784a4562f17eb8141ac9769373c7e23a7b65997d83e421f3891c",
+    "directions_bike": "877a4fa4b912d703279cfeb584c7368f47d271abb5440d6eb69865de087e2b4e",
+    "directions_boat": "63bc2161b377b9a053bf407469facc3f3119e895945cfb104cc6532f44905453",
+    "directions_bus": "7f2489a5bcc909a169ef471db46be904f83d2b9c4850d66c37e9955681441391",
+    "directions_car": "c706a3b95ea5fcab918b9f5e523db179cca6fe0f2812b6c9ce97fb66babcceb3",
+    "directions_run": "5c7949ec0c3040c7551ad19087e6f2162b24c941a409d308df26484ccb985afe",
+    "directions_walk": "8d4e4ad625c9c2459d7308496ff9319997ff9ce2ea36693630745f4fcecd0bde",
+    "diversity_3": "1ad69ccce021a88d30512f5c8da662ff4cfacaa493616cff67df788b7fc45d11",
+    "document_scanner": "07845ea256db1302569419e7961f9d613645dde7fcebaecfefa1861cd05d8a73",
+    "download": "a0d66a1a8829dbd781931f955d0a9126f9ac81dd6395fe8b40eef77c94ed5580",
+    "draw": "792512c9a91dd7c0405f1630b69b713fdd12de784e959eaae6d30c3be23f7dc6",
+    "edit_document": "61c3a24c186285d2d4c6bac5bb659f2a69e33404f54b777778f215094a05c643",
+    "edit_note": "b084e36dc5871f410d15fce24a2df6a558cf5f36628f24c16039aaaaec634be7",
+    "euro": "4847e74331cdff829c2e1e91f79d1144dec369fc5c20fb2c7aeb9b367ea6d3b9",
+    "ev_station": "24df2877a6fa18f77783d64403a87dcaaa446fde0652c74bf154fd872be02061",
+    "event_note": "dd8cf12018e96ce0d93fad043cef74f696ca85a4f0a0b1e57e5f46c8c96c487e",
+    "explore": "791b841cdc32f230dd631983167a4e5e2e71bd6d16a34acdc60af20828ee1132",
+    "extension": "54ce28ee2ba4be74e0398271ea9d66effee8862709af9c572f8f9f8d475385dc",
+    "family_restroom": "f43a85c1126db7bb7c0fbde797c7aef1a51004f5a7a796dc35889c75bb51cb61",
+    "favorite": "a501cd7c3bf586d3fe96463063ed4856d8eb5c0e7d3c13274116843caf5c6595",
+    "fingerprint": "4c9728739e7d54ce94e3979c022c331c53b271d0351a61a715b0deb44a379456",
+    "fitness_center": "007f305eea00598fa96ee1054484cd2cd4b0e49d84ae9d0b7ac4e2cdb80f39f7",
+    "flag": "417a06410a6fe5aac2a2386d111a779af9f04f92a99e65a705cce0227a8c6e9d",
+    "flight": "27c02c61f0f7c198908ba2d64b8b46a1f1506669e990838302f5bfad121aed13",
+    "folder": "7ac0a21199437837fb5db07bc39842df01d50c7eb250dda61aaca045aa61a634",
+    "folder_open": "c4f1507ea575d8a078245bbd0e9193c038a3ffaec88c6e8fb5c3f78094d0617d",
+    "footprint": "0e165ca17ff32dcb3619d31e110048ebf3d3322d6c257136757b058fb300994a",
+    "forum": "5a10a3e7e9ce856733f797f8905d65f0aa96811a2f167ae20755f00d6415f73e",
+    "graphic_eq": "20c667c9dacc4e22427db8ac052651afb2424de47ccd4b6599f804ec97da21de",
+    "grid_view": "f5dee54a80564f273476974c8fc9fde6b3400263c03e56043245b837e06fd9b0",
+    "group": "8cabe1e38ae1c5f3c536ce0078316b1f8c41c6b6aef4e5ba244781aed667b6d6",
+    "groups": "8156465288feb45cc1370a557eece57bac0ba39fe39d29f1bd7e3f8431b926f8",
+    "handyman": "1c2d4babc19311f5ea8dc70a5f09e7602298899557a0186f5167b30983809f12",
+    "headphones": "92d344ee54e5244a57bb99b428fda28c878d84ccb339f380f800d8f1bb35d665",
+    "health_and_safety": "4e5c5c4a42e59f953216a19975369337f19f601c51a5ffe7522c1b06d86294c5",
+    "hiking": "5db276c026d7afc8916366e6abab4a4155ad57571699c2ef455239ce493ddfc5",
+    "home": "5a8f475fa78fac4dd6a236ac7619ce9ad6c74e7de4df26c2ef4181b3f3964ed3",
+    "hotel": "8dd2a17ce03eee0746c4e18510a86bbe217b8dbe1d48936c70a091d6fd61a4f5",
+    "hourglass_empty": "7ac1717191700e53d8b8fe43d494991b64437a1834d3a7704b336c20a9425613",
+    "image": "4c6668b76b556bcd56c2c2bd6cd09ea37167dabde310b9d0aee70c7e5f9b0cd5",
+    "inventory_2": "b48e76786064d8376c36b1d24bcdeca328f815f7fa97f7650af0a828cba54641",
+    "key": "3ac2c0eafc4e2697556c107633f95a9de85a5d3bfdf2d907107162fe1d7f25be",
+    "keyboard": "12c84af7d5b255c192888bfd58ecab9c3889c49cdb27fa053c6c76b2ce6d246f",
+    "kitchen": "b91b2caa9687159dc02bd24e2208aa6e5e69b1d4bb089bbcf4c5ffa1e479f4f7",
+    "language": "c896dbb3ac4c0f62af0e140dbe4eecda2c131809fa49df0a26f9eb1aa7d63032",
+    "laptop_chromebook": "b3a76ea47c8643e3aafe5cd4708001c71f2edf1abe6bba3603e612864fd252ee",
+    "library_music": "af59234877e83e345ba69f58328d7fe95e3609c4a8fe37d4135d52fa3c4143ec",
+    "lightbulb": "598dd63f9a5ee47e198a77f2e05301d1f238981389b6515704d1d0902a25cbf6",
+    "link": "96665d3e8c89a04a57b3d492022918e238a362a2e26100d8b14c8102003fe9ba",
+    "live_tv": "b517110940ed2f108e2aa9e627dd0fe0c2b79ffb937117b59c642394dce94906",
+    "local_bar": "d187135db6a8f2adbed7623064ca54812d0e8ba8709c16c57bf0c47afd549ea4",
+    "local_cafe": "0301d5e9f6bcb0eb30b8a700124ff3ea47a1ae00657d8c61ab58e1cd1e1bc84c",
+    "local_gas_station": "0f952b4e08cb2a10ce900b70a7f229ee170b1209f59e87c9d2b786541834efaf",
+    "local_laundry_service": "733a597a36c9b78435a0ea6d722f8e9b9c5c21d14a16fd34d7b7f6978887e28c",
+    "local_parking": "29e63e706c68ba31c7278ea53aae2b5132c69106ed38320222c438ac0f4da6c2",
+    "local_taxi": "f8c5a4b4cc64f89ae20a1bee0a28fddf2422563f2a058a4b2b4d097301325583",
+    "location_on": "82e6c50b42872e1b82443fb63df88358f8e0b90b81f4ca7594f64aa072d8fe05",
+    "lock": "7fd9adb5f09f4d94989cbfc39d446fbe9217723c1c6523a06f5f080bf7355ff0",
+    "loyalty": "5224f543fbfc53bed293fa38e5bfbfaf00e14c49a519553fea296cdd24d96444",
+    "luggage": "14ad7d82c4a692d0fadeac89fd480f0ede1338d291d41db2150b4b1370afe6cd",
+    "mail": "5df43cb868bc20d42d46b4a70c6f4df319b1f72f1d3c2a0b1abac9e56e5e5238",
+    "map": "efa11f25b3ce15e39cb3d6464b74db2534f5caf8e35be5a5415191ffec73b937",
+    "medical_services": "24791dbab7fbe430139156a8ada4ac4b7206c1cd4d2c8337d11445af5245ebab",
+    "medication": "4cc285157374956bb81f7738c28b081bd5cf862835c0cdec392960b1faac7f47",
+    "memory": "b8ad32ee4b14367404f673e04b1b8ee5b463c48ee077c8b9cbe5158f56102faa",
+    "menu_book": "3179cdf34005977a50ae3fec433318f975a4087d015bf953d9f55acafc485e32",
+    "mic": "f5e6f42b57402b31ac5d015b5a05c8ba47d26ae07dbf756e757f1899be53e6cd",
+    "monitor_heart": "19468a0c4f6526d7da677874781b2a2f97c4b070003feb3accc5003899f80a73",
+    "mouse": "719cfd903998ba40c19f97de28c92bf8dc38be70f2071234322f0b89c14d6df8",
+    "movie": "236c9f75c5266209b5f8a59329d5fbc5d999b092201688e3881d5c8668de0959",
+    "music_note": "45256388e01f04bb3c49e42238260a2f35c5908fcdbbebea4464d20300a82611",
+    "navigation": "7b9c074c191737073f3a0fb887d485d8bcba302c8044b0b96b4f4ead674a5a04",
+    "newspaper": "e1dfb160f33b1c2a7b10ebc98655e4a87313722fb42887f7526e4fb32c584b2b",
+    "nfc": "4cbeddb36e1052763641d80b052a80c6a89022ac433793dedc2e47ab8ffd66c9",
+    "palette": "b6262f5e6f793fb110c393e20e9315d8b17c12afd0172a2b3be6743780f0733e",
+    "password": "cc26f26a056085bb99ee71dfea0cbfa44828b7bc0866c665fa8a7a0e5ff2a299",
+    "payments": "8fba9fd2bb93a4930984cb79c935710100b19ec17c4e6be22a2a6990dcda80de",
+    "person": "398100ece1a7116df9ec5dcc0300615efff0a0ade08c9de0aa35c5fb9c0279b5",
+    "pets": "e764bb02e5b03ff2e44aa2cb937d260bb1e380725e1c753675d7e3b764ffe8ed",
+    "phone_callback": "51c6f8b2436b537ebd479dee22d723576bdabbf86516f004837e48db267d2d7c",
+    "photo_camera": "a1f78c34ceac29bc5a303cf2baeabe73303814c85aae8a81653cf1f20fb3b22e",
+    "photo_library": "a7fb9e1c8a675e7f18bc43cab8305fbc9e42f69eb942bce8e89a8008a7b5df58",
+    "piano": "f68a3e970b3ea3fb26c6f13d461ced509b388a9b01f83f85c59d7d706e2a1997",
+    "play_circle": "54012f876eede5750c020d65c8aa9db435b8615935547657c77f081c3d7d5677",
+    "podcasts": "7f97d99d6e2a4e1d64df972142936a70e6015a62745995a8ffeb281f81681c41",
+    "pool": "a04887a8f7bde6a776b983068ea4ad4ef3580274bd7af93e2565e5ddd70d12c0",
+    "potted_plant": "f50c585d96b60c8a3f3f6f6c2042a32671fcc693382fedb87be3ef4b81a3f8ec",
+    "power": "c62aa9059ee9d2c0e7caf73053b2dbbe49c38ae0b087ce74871307692a514ddd",
+    "price_check": "5f81604324b14a9e00f5e5e9752abc0eab593726f64d344cf73c955acaaf9bec",
+    "print": "4c3f1ba89e34fce42c6e332ad6fe6a61a3a37cd6e243e042c7e59bcf58bd1225",
+    "qr_code_scanner": "67127015964ef4c0a400ea1fd407923ae8deb4f039a029b2e495ba10d17f22d7",
+    "queue_music": "30f1e59175445211732fa3b51c4bda3bc4ed2d210558f89140016219adc796a1",
+    "radio": "429b3a6ff2f426db6ad7c5f37cdb42ef5cdfd53c8a443f3571a4647a3034235d",
+    "receipt_long": "ee7fd1ed15f85e025f0e5a5fe03d55bef3327591ffbf8c46ba5e0531ce8a19ec",
+    "request_quote": "34f6a206f8bc1abbf1499aa02d6db2bd8863db4aad3a16f0c5833581c859fb58",
+    "restaurant": "a800cb7ee983a779a649a3619b99a3b94dd1e0d437bd5775c65971e92d87f9bd",
+    "rocket_launch": "84ab655155031b7a59baf6d494666c5bacb564f999afd35150549aa7fbfd80d9",
+    "route": "34f64391c91ef5fe07ce5a0a42480e6d7e96b216f1ad3a02cb302244c4662bbb",
+    "router": "697fea8a0b3f3efb2af50997103a5c8105660cf2b42897c4af98682765ec5d4d",
+    "rss_feed": "c8360f7a63ab3cb8229d3e60f3f7ef4b8f3b876901e7c67edc67a5b1964c5cc3",
+    "savings": "b463c7fd0752aabf6d351dbfdebf102cee354c361d0ddc4142c3362c2a6323bb",
+    "schedule": "ec69b4c0ddac38913bc4f1798684e23071d0fffab13185c01c3fb99f3c7916ab",
+    "science": "79fda96639c95b011992eb3d867dd1ac73aa07d65a6debb1ae1f6949ac93608a",
+    "search": "939671719b9ec483edae2aedf06b4be6011d0437634e62f06706bcdba6e2d250",
+    "security": "46055f0fcba60767b42cd0dcda0b32696cd871e2d8fb9597fa07cded7f0188f8",
+    "self_improvement": "7e3dc7f927f8a4e4c251c3917e6fabaadcccdfaaa47e3d702bfc437aca37c925",
+    "sell": "161d54dfc8894a458139bc998970b06da78c6ac6fd81994b9f79977a000caa75",
+    "send": "2eaf4f8e575b59934bf240c61d2825a9a4707f4b9bffdc0100afb6d9a4b50f86",
+    "settings": "693629e2a889f73c8ac43415427568f050ca61dea8e1ab31b8b0a1753b9c3809",
+    "shield": "9a2684cbadae0b7059ab4b6ff784605ae4a4bfc8b3ae751bf36710fff7dbb315",
+    "shopping_bag": "ce33499848da7650460f28996e3310f909b0d4172dd31db3157c34666cca57bd",
+    "shopping_cart": "286a0b0212a9b1988d511801d0e68fc6663077ae7b81fd7c7ae58fa9adae1648",
+    "smart_display": "437a73940ea03819f093ca60f00ef30f66dce8e0d31688d68c673d37720108a9",
+    "smartphone": "0f8ce687987fd48e8337a6b36c2b6eda2d6837d9e9beed55acafe9b5eeea5d25",
+    "sms": "fc43dbc9abb85f838ba33a5613217d70babcfccb22cb2da97df9abea6e68c3ee",
+    "spa": "8c6bb90fa9e635bc6645e8f90ae47cbeab24fae27c2b7435c232804418717d6a",
+    "speaker": "a3cbae3e00f14cd6bb5b96e4131fe4e2ba6fc55760c9670235c3e6fd63737433",
+    "sports_basketball": "2bec41b66bf86e3b67c105d6aef1827c4701b5a4b68ea28ca62f6ae056496cf2",
+    "sports_esports": "6f186e66b84cbadb7b428383e178e08e5030e54edc1e3292dd00c80705a13e0c",
+    "sports_soccer": "53e44c3f7cba492ab340f471fc7b5ece87e072ae826adaa8ece2f13730b5f0b4",
+    "sports_tennis": "62f62bbb5707c557114f6277021b5ac19e82cd357ce898c0cca9d261f2409fa6",
+    "star": "30e4de0ebf321f57720e9a9e6737be2ca282dfe8e205316d1a98d62d2578bea7",
+    "storage": "984413fc85556f5e82179927212e24922ce17c309ae9d1651d96ba734eef5a17",
+    "subscriptions": "b5180657f950a3ad0c0cf45faed75ae6996c1d1d5b9cab7d925986daa179b91e",
+    "subway": "381acf93aaa3fa46672061ea334009e2a7443b6773238455301f4a9705fb44bb",
+    "sunny": "74c32c0c8eca045b3784182ca43a62b270e5dad7c89e69207e9f3f99ff260cfe",
+    "sync": "0a7e98a615257d531780fe696349af60c04415737e93df5669fe0ba9c8c22f25",
+    "table_chart": "69fd979b693b38308b7a215826fbb6cc114f7eeff68000075fe37298ffe6873e",
+    "tablet_android": "dee028dc66e84da3d74a81b6cc281347f0f4382fbeaa3c12f1805e94ba352471",
+    "task_alt": "6759632c3e63f1c576437202985794300c1872ec09cefb5b706afced011a116f",
+    "terminal": "839d692eccb52b33c3f8ac69b4d9de432d37c03eed4474ec248c4285d954a1b1",
+    "theater_comedy": "ebbba9eafcfc62cdae516a45362c303b66c38806b73424a91aa2903055633389",
+    "timer": "a750039e7cbe62a325b9eb110f645f4e591a7c0c8b03a328b369d247eb09a77d",
+    "toys": "2b724fc36a33eb3d1a766e21283671e7628d5c1a88612c88920f303b4ebcc7c3",
+    "train": "e4ced987638ecdb2b1c5720e400665738397f705b6e8d97c009635c29f82ac7b",
+    "translate": "6a3ddc02f7e5231c4c795e97ac13956a57bdb9bcc18b6f90a91e7d2f47e77e0d",
+    "travel_explore": "d6a24e9ab5e435c01be87b787428818ebb1c7351b963cef956541e5d206acc44",
+    "trending_up": "cb20e1fb717264edf7c9af4719733c613021270b5f79aa302d71513ab412c7e3",
+    "trophy": "f607b6b7db89677fa8b2b5bb9fc1d90d5dd0203494df147c0d103cdf0903b747",
+    "two_wheeler": "ea910b60442dd64c2336ed13a7e2100c1e9acef920c171be767f9dddfce2a730",
+    "umbrella": "3ec2d282af8cb2002b0fb8509cb05ca9630de04d6d2ffa672d2f0c37a9622fbc",
+    "upload": "d551178ce7fe8b636a172b60259a019365d64e7333d4a5eb963271da74e53022",
+    "usb": "3fdca288b9e32eaba1093de7ab8d8fb31e7bf4bdc2a3289a9d54489b96487f0b",
+    "video_call": "3af5db5f2faa9c251abe4715fa1df0275ec7dd92723ee53edb366c218f67ed72",
+    "videocam": "156fcc61a798817169b8fae612a425aef2823318ea60448587ac874b4628ae12",
+    "volume_up": "89582a0ab504e810bf46092c11c3d0b15b112e2e4b4aa7eaf16df94cabe7c75f",
+    "vpn_key": "b8997a26a6427eb26db11373476ac870baa6ad1ae5f3acefb914a2987ec2989b",
+    "watch": "fefc556c550184611e7621761faca8766eb17f42c67594308e6dd79e98f7aae1",
+    "water_drop": "e48b60dde73b2d7c9ba63446ad7aa79fd0b96ade0dbd85dbbc30e1517763ccb1",
+    "wifi": "a17167f73c50f8f2e33d94f01564d61bf63d6551e6508603fef3678fb68c504e",
+    "yard": "b11c418c266e68628c582c38761def9c59e6f314ab52aa825c4f8df51697baf5"
+  }
+}

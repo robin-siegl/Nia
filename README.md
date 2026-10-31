@@ -18,10 +18,13 @@ Choose the apps that belong on your Home. Add up to **eight apps plus Apps**, pi
 
 Start with an empty Home and add just what you need during setup, or later in **Settings → Home apps**. Every app entry can be edited or removed. Upgrading from an earlier nia keeps your existing shortcuts.
 
-The time opens Clock, and the date opens your separately assigned Calendar. Two optional bottom corners give you quick access to other apps, with a choice of matching outline icons. Leave both empty for a simpler Home.
+The time opens Clock, and the date opens your separately assigned Calendar. **Quick corners** put an optional app shortcut in each bottom corner. Leave either one empty for a simpler Home.
+
+Choose from **192 Material Symbols** with searchable names, keywords and categories. Home apps and Quick corners share the same picker: preview a choice, then confirm it.
 
 <p>
   <img src="docs/screenshots/home-shortcut-editor.png" width="220" alt="Edit a Home app's name, target and outline icon" />
+  <img src="docs/screenshots/shortcut-icons.png" width="220" alt="Search and browse Material Symbols in the shared icon picker" />
 </p>
 
 ## All your apps, a swipe away
@@ -80,4 +83,4 @@ nia is built with Kotlin and Jetpack Compose. Start with [Contributing](CONTRIBU
 
 The [design guide](docs/DESIGN.md) describes nia's visual and interaction principles. The [architecture guide](docs/ARCHITECTURE.md) explains its state, data and Android integration. Coding-agent instructions and development skills start in [AGENTS.md](AGENTS.md).
 
-A source license has not yet been specified. Dependencies and bundled fonts retain their own licenses; see [third-party notices](THIRD_PARTY_NOTICES.md).
+A source license has not yet been specified. Dependencies, bundled fonts and Material Symbols retain their own licenses; see [third-party notices](THIRD_PARTY_NOTICES.md).

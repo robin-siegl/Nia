@@ -164,15 +164,16 @@ class EverydayPolishScreensTest {
 
     @Test fun `corner icon picker scrolls through the extended collection without a Settings action`() {
         var p by mutableStateOf(LauncherPreferences(leftShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.STAR, notes.target)))
-        render { Column { CornerSettings(p, listOf(notes), { p = it(p) }, {}) } }
+        render { Column { QuickCornerSettings(p, listOf(notes), { p = it(p) }, {}) } }
         rule.onNodeWithText("Settings", substring = false).assertDoesNotExist()
         rule.onNodeWithText("Icon").performClick()
         capture("shortcut-icons")
         rule.onNodeWithTag("shortcut-icon-grid").performScrollToNode(hasContentDescription("Cloud"))
         rule.onNodeWithContentDescription("Cloud").performClick()
+        rule.onNodeWithText("Use icon").performClick()
         assertEquals(ShortcutIcon.CLOUD, p.leftShortcut.icon)
         assertEquals(notes.target, p.leftShortcut.app)
-        assertEquals(27, ShortcutIcon.entries.size)
+        assertEquals(192, ShortcutIcon.entries.size)
     }
 
     @Test fun `pending unlock animates on delayed Home composition and never replays after remount`() {

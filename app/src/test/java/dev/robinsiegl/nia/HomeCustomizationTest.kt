@@ -118,10 +118,13 @@ class HomeCustomizationTest {
         assertEquals("Google Maps", draft.shortcut.name)
         assertEquals(ShortcutIcon.MAPS, draft.shortcut.icon)
         rule.onNodeWithText("Icon").performClick()
+        rule.onNodeWithTag("icon-search").performTextInput("star")
         rule.onNodeWithContentDescription("Star").performClick()
+        rule.onNodeWithText("Use icon").performClick()
         rule.onNodeWithText("Save").performClick()
         assertEquals(draft.shortcut, saved)
         assertEquals(notes.target, saved!!.app)
+        assertEquals(ShortcutIcon.STAR, saved!!.icon)
     }
     @Test fun `new shortcuts require both a name and an app and can be canceled without changing preferences`() {
         var backs = 0; var saves = 0

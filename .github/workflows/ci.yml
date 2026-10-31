@@ -29,6 +29,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: Signing and release tests
         run: python3 -m unittest discover -s scripts/tests -v
+      - name: Verify bundled Material Symbols
+        run: python3 scripts/sync_material_symbols.py --check
       - name: Tests
         run: ./gradlew :app:testDebugUnitTest --stacktrace
       - name: Test reports and rendered screens

@@ -209,10 +209,12 @@ class QolScreensTest {
         var p by mutableStateOf(LauncherPreferences(leftShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.NOTES, apps.first().target)))
         var picker: CornerPosition? = null
         render {
-            Column(Modifier.fillMaxSize()) { CornerSettings(p, apps, { p = it(p) }, { picker = it }) }
+            Column(Modifier.fillMaxSize()) { QuickCornerSettings(p, apps, { p = it(p) }, { picker = it }) }
         }
         rule.onNodeWithText("Icon").performClick()
+        rule.onNodeWithTag("icon-search").performTextInput("camera")
         rule.onNodeWithContentDescription("Camera").performClick()
+        rule.onNodeWithText("Use icon").performClick()
         assertEquals(ShortcutIcon.CAMERA, p.leftShortcut.icon)
         rule.onNodeWithText("Settings", substring = false).assertDoesNotExist()
         rule.onAllNodesWithText("App").onLast().performClick()

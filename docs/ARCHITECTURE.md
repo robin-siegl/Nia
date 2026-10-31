@@ -88,6 +88,10 @@ Reset appearance/behavior restores default preferences while retaining Home entr
 
 The ViewModel owns `HomeShortcutDraft` through app/icon picking and activity recreation. Drafts and navigation are transient and do not survive process death; saved entries and setup progress do. Cancel discards the draft; Save validates and commits the whole entry transactionally. Reassigning preserves a chosen name/icon. Reordering changes the same list for both layouts. Custom names apply only to Home, not alphabetical search.
 
+`ShortcutIcon` has stable serialized IDs; labels, categories and search keywords are presentation metadata. `IconCatalog` provides pure, alphabetical filtering. Home and Quick corners use the same `ShortcutIconPicker`, which owns a saveable pending selection/query/category and only calls its persistence callback on confirmation. The picker owns its dialog window, safe/IME insets and system-bar contrast; it keeps no Activity reference.
+
+The catalog and Android resource mapping are generated from `scripts/material_symbols.json`. `scripts/sync_material_symbols.py --download` deliberately imports a pinned Google Material Symbols subset; `--check` validates it offline, including its Apache 2.0 license. Gradle and the running launcher never download icons. Vector paths are unchanged; Compose applies the palette instead of Android theme tint. Keep the 27 original IDs and legacy Settings-to-Star migration. The new generic gear uses `GEAR`, so it cannot collide with the removed `SETTINGS` icon/action. Quick corners is a display-name change: `leftShortcut`/`rightShortcut` and the schema-6 structure stay unchanged.
+
 Restore previews compare additions/removals, names, icons, app targets, order and independent Clock/Calendar targets. An unavailable app clears its target while retaining the Home entry's identity, presentation and position. Applying still revalidates the reviewed result.
 
 ### Shared Home gesture coordination

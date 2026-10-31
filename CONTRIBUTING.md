@@ -49,6 +49,17 @@ Robolectric tests render the native Compose UI at API 35. They cover state and i
 
 Use [Device testing](docs/DEVICE_TESTING.md) for launcher selection, gestures, unlocks, accessibility and signed upgrades. Record the actual device and OS build, and distinguish observed results from simulations. Screenshots are written to `app/build/reports/screenshots/` and included in CI's test-report artifact.
 
+## Changing shortcut icons
+
+Use the shared picker and catalog for Home apps and Quick corners. Edit [material_symbols.json](scripts/material_symbols.json), keeping existing IDs stable, then run:
+
+```sh
+python3 scripts/sync_material_symbols.py --download
+python3 scripts/sync_material_symbols.py --check
+```
+
+The import uses the pinned Google source revision and generates the Kotlin catalog/resource mapping and bundled XML vectors. Commit those outputs together with the manifest and license. `--check` works offline and runs in CI; normal builds never download icons. Do not hand-edit generated files or reuse the legacy `SETTINGS` ID. See [third-party notices](THIRD_PARTY_NOTICES.md#shortcut-and-interface-icons).
+
 ## Versions and changelog
 
 Bump both `nia.versionName` and `nia.versionCode` in `gradle.properties` once for each completed change set, including documentation and skill changes. Choose the version according to the [version policy](docs/RELEASING.md#version-policy), and add a concise entry to [CHANGELOG.md](CHANGELOG.md).

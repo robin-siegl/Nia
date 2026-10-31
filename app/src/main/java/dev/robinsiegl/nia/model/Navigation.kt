@@ -2,7 +2,7 @@ package dev.robinsiegl.nia.model
 
 enum class SettingsSection(val title: String, val description: String) {
     HOME("Home screen", "Layout, clock and text size"),
-    SHORTCUTS("Corner shortcuts", "Optional shortcuts at the bottom of Home"),
+    SHORTCUTS("Quick corners", "Optional shortcuts at the bottom of Home"),
     APPEARANCE("Appearance", "Colors, theme and animations"),
     ASSIGNMENTS("Home apps", "Add, edit and arrange your shortcuts"),
     APP_LIST("App list", "Search and A–Z navigation"),

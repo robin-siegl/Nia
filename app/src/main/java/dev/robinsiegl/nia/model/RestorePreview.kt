@@ -77,8 +77,8 @@ data class RestorePreview(
                 CornerPosition.entries.forEach { position ->
                     val before = current.shortcut(position)
                     val after = restored.shortcut(position)
-                    change("Corner shortcuts", "${position.label} shortcut", before.app, after.app) { appName(it, "Empty") }
-                    change("Corner shortcuts", "${position.label} icon", before.icon, after.icon) { it.label }
+                    change("Quick corners", "${position.label} shortcut", before.app, after.app) { appName(it, "Empty") }
+                    change("Quick corners", "${position.label} icon", before.icon, after.icon) { it.label }
                 }
             }
             return RestorePreview(current, requested, restored, changes, unavailable)

@@ -14,13 +14,6 @@ enum class HomeCategory(val label: String) {
 @Serializable enum class SetupStep { LAYOUT, APPS, APPEARANCE, DEFAULT }
 @Serializable enum class MotionMode { SYSTEM, REDUCED }
 @Serializable enum class ShortcutAction { EMPTY, APP }
-@Serializable enum class ShortcutIcon(val label: String) {
-    STAR("Star"), CAMERA("Camera"), BROWSER("Browser"), NOTES("Notes"), WALLET("Wallet"), HEART("Heart"),
-    PHONE("Phone"), MESSAGES("Messages"), MUSIC("Music"), CALENDAR("Calendar"), MAPS("Maps"),
-    SEARCH("Search"), MAIL("Mail"), PHOTOS("Photos"), FILES("Files"), BOOK("Book"), HEADPHONES("Headphones"),
-    PODCAST("Podcast"), VIDEO("Video"), SHOPPING("Shopping"), TRAIN("Train"), BIKE("Bike"), FITNESS("Fitness"),
-    COFFEE("Coffee"), CALCULATOR("Calculator"), CLOCK("Clock"), CLOUD("Cloud")
-}
 enum class CornerPosition(val label: String) { LEFT("Left"), RIGHT("Right") }
 
 @Serializable
