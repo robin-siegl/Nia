@@ -1,33 +1,33 @@
-# nia privacy
+# Privacy
 
-nia's launcher, search, preferences and backups work offline. It has no accounts, advertising, analytics or crash-reporting service. Internet permission is used only when you manually check GitHub for an update in About nia.
+nia's Home, app list, search, settings and backups work offline. There are no accounts, ads, analytics or crash-reporting services. The only in-app network request is the GitHub update check you start in **Settings → About nia**.
 
 ## Installed apps
 
-nia reads launchable app names and launch targets from Android to display the app list, search it and open the apps you choose. This processing happens on your device. nia does not upload your app list or record app-usage history.
+nia reads launchable app names and their launch targets from Android to list, search and open your apps. This happens on your device. nia does not upload the app list or keep an app-usage history.
 
 ## Settings and setup
 
-Your app assignments, layout, appearance, app-list options and unfinished setup step are stored in nia's private app storage. nia does not read messages, contacts, calendar events, location or notification contents.
+Your chosen apps, layout, colors, app-list preferences and unfinished setup step are kept in nia's private app storage. nia does not read messages, contacts, calendar events, location or notification contents.
 
 ## Backups
 
-Exporting creates a JSON file at the location you select through Android's document picker. It includes appearance, layout, app-list preferences and assigned app identifiers. It does not include installed-app inventories, search history or setup progress. If you choose a cloud document provider, that provider handles the file under its own policies.
+**Save backup** creates a JSON file wherever you choose through Android's document picker. It contains nia's preferences and assigned app identifiers. It does not contain other apps' data, a complete app inventory, search history or setup progress. If you save to a cloud document provider, that provider handles the file under its own policies.
 
-Importing reads only the file you select. Android's automatic app-data backup and transfer are disabled; use nia's explicit settings export/import when moving settings.
+**Restore backup** reads only the file you select. nia previews each setting and assignment that will change, including unavailable apps. Cancel leaves your settings unchanged. If settings or available apps change before you restore, nia asks you to review the updated result.
 
-Before restoring, nia shows the current and backup values for every setting/app assignment that will change. Unavailable assignments are identified and cleared in the preview. Cancel leaves preferences unchanged. App availability is checked again when applying; a changed result requires reviewing the new preview.
+Android's automatic app-data backup and transfer are disabled. Use nia's explicit backup actions to move settings between installations.
 
 ## Manual update checks
 
-Settings → About nia → Check for updates makes an HTTPS request to `api.github.com/repos/robin-siegl/Nia/releases/latest`. GitHub receives the normal connection metadata, including your IP address and the generic `nia-Android` client header. nia does not send your installed apps, app assignments, preferences, device identifier or search history. No account or access token is used.
+**Check for updates** sends an unauthenticated HTTPS request to `api.github.com/repos/robin-siegl/Nia/releases/latest`. GitHub receives normal connection information, including your IP address and the generic `nia-Android` client header. nia does not send your app list, assignments, settings, device identifier or search history.
 
-There are no automatic checks, background update jobs or automatic APK downloads. Results remain in memory for the current nia process. The download/release buttons open GitHub in another app, usually your browser; Android handles any installation you choose. nia does not request permission to install packages.
+Checks never run automatically. Results stay in memory for the current process. Download and release links open in another app, usually your browser; Android handles installation if you choose it. nia does not request package-installation permission or download APKs itself.
 
 ## External links
 
-About nia offers links to GitHub, issue reporting and license notices. Opening a link uses another app, usually your browser. Any information you submit to GitHub is handled by GitHub.
+About nia links to GitHub, issue reporting, privacy information and third-party notices. These links open externally. Information you choose to submit to GitHub is handled by GitHub.
 
-## Removing data
+## Remove your data
 
-Use Settings → Backup & reset → Reset all settings, clear nia's app storage in Android Settings, or uninstall nia to remove its locally stored settings. Exported files are separate and must be removed from the location where you saved them.
+Use **Settings → Backup & reset → Reset all settings**, clear nia's app storage in Android Settings, or uninstall nia to remove locally saved settings. Backup files are separate; delete them from the location where you saved them.

@@ -1,43 +1,23 @@
-# After nia 1.0
+# Roadmap
 
-Keep the five-category Home and text-only app list stable. Additions should improve daily use without introducing feeds, usage-ranked suggestions or an editable Home grid.
+Keep nia's fixed Home and text-only app list predictable. Future work should improve daily use without adding feeds, usage-ranked suggestions or an editable Home grid. These are priorities and possibilities, not promised release dates.
 
-The 1.0 scope implements guided setup, focused Settings pages, smart search, About/privacy information and automatic public releases. Theme-only sharing remains postponed.
+## First: reliability on the phone
 
-Version 1.3 adds app action menus, a manual About update check, a detailed restore preview and more corner icons, and removes Settings as a corner action. Search aliases, adjustable clock alignment and pauses before opening distracting apps are postponed and are not planned for the next update.
+Complete the [Pixel device checklist](DEVICE_TESTING.md) with the actual OS build. Focus on tap-to-wake versus power-button unlocks, gesture cancellation, keyboard behavior, Battery Saver, large text and in-place signed upgrades. Fix observed failures before adding more Home features.
 
-## 1. Phone validation and polish
+Measure cold start, search latency, animation rendering and idle battery use on real hardware. Use those results to set performance targets; simulation alone cannot establish Pixel/SystemUI behavior or battery impact.
 
-Complete the Pixel 10 Pro checklist with the actual OS build. Fix gesture/keyboard edge cases, app launch failures, font scaling and any cutout/system-bar issues found there. Measure cold start, search latency and idle battery impact before setting optimization targets.
+## Next: broader validation
 
-Done when the primary phone passes the checklist and an in-place signed update preserves preferences.
+Test more Android versions and manufacturers, then landscape, foldables and tablets as devices become available. Check external keyboards, TalkBack and other accessibility tools. Record actual results rather than inferring broad compatibility from one phone.
 
-## 2. Theme refinement
+## Later possibilities
 
-The visual color wheel, brightness slider, curated presets and live paired previews are available in 0.2.0. Home text sizes and optional alphabet scrubbing are also implemented.
+- **Theme-only sharing:** Export and import colors independently of app assignments. This remains postponed.
+- **Exact Pixel weather:** Investigate only when supported data access and correctly licensed icons can meet the requested appearance. Generic substitute icons and invented weather are outside the plan.
+- **Work profiles and Private Space:** Treat these as complete platform features with explicit identity, availability, locked visibility, search and restore rules. They are not currently supported.
 
-For a later release, allow importing/exporting just a theme independently from app assignments. Theme sharing is explicitly postponed. Consider adjustable pastel strength and respecting Android's enhanced contrast preference.
+## Project maintenance
 
-Done when any supported picker color produces readable matched light/dark pairs and System changes remain reliable.
-
-## 3. Broader compatibility
-
-Test additional Pixel/Android versions and one Samsung device. Improve landscape, foldable and tablet layouts as actual device needs emerge. Keep the app list accessible with external keyboards and switch-access tools.
-
-Done when the documented device matrix has results rather than inferred compatibility.
-
-## 4. Optional profile support
-
-Implement work profiles with explicit profile identity, availability and paused-state handling. Separately implement Android's complete Private Space contract: a hideable container, lock/unlock, and exclusion of locked apps from search. Extend backup rules before allowing profile assignments.
-
-Done when profile lock/unlock/removal and cross-device restore cannot leak or misbind app identities.
-
-## 5. Distribution and maintainability
-
-A changelog, privacy document, manual GitHub update check and a production workflow using the committed Gradle version are available. Choose a source license, add a contribution guide and expand CI with emulator/device checks. Keep update checks manual; background update notifications are not planned.
-
-Done when releases have a stable signing identity, an upgrade test and clear compatibility notes.
-
-## Deliberate scope boundaries
-
-The two optional corner shortcuts are an explicit addition in 1.2.0. The five main categories retain their order. Arbitrary extra Home entries, rearrangement, widgets and social feeds remain outside the fixed minimal Home concept. Contacts, unread counts, embedded music playback and calendar-event previews would add data-access requirements and should each be justified independently.
+Choose a source license, keep build/signing documentation current and consider emulator/device CI when it can cover meaningful gaps. Update checks remain manual. Keep the [design](DESIGN.md) and [architecture](ARCHITECTURE.md) guides aligned with implemented behavior.

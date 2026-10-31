@@ -1,0 +1,4 @@
+interface:
+  display_name: "nia Android development"
+  short_description: "Build and review nia Android and Compose changes"
+  default_prompt: "Use $nia-android-development to implement and verify an Android change in nia."
