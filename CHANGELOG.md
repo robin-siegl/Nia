@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.3
+
+- Rewrote the README around nia’s everyday experience, screenshots and installation.
+- Added current design, architecture and contributor guides, replacing the old MVP requirements and separate lock-screen notes.
+- Added repository Android/launcher skills and AGENTS.md instructions, including a required version/code bump and changelog update for every completed change set.
+- Refined release, privacy, device-testing and roadmap documentation while preserving attribution and license notices.
+
 ## 1.3.2
 
 - Refined Settings labels, explanations and restore terminology. The overview shows current layout, theme, assigned-app count and corner/search choices.
@@ -10,10 +17,10 @@
 
 ## 1.3.1
 
-- Keep unlock reveals queued until nia's window is resumed, focused and unlocked; mark them handled after the reveal finishes. Focus interruptions restart unfinished work when Home becomes visible instead of silently consuming it behind another window.
-- Retain the unlock session across activity recreation, preserve observed locks through a late stop callback and keep pending unlocks when Home resumes before a slow window-focus handoff.
-- Check current screen/keyguard state before acting on deferred screen-off broadcasts. Explicit app departures cancel pending reveals so normal app returns do not replay them.
-- Keep the stationary header, existing motion timings, reduced/disabled animation support and Home input recovery. Add lifecycle/focus regressions; Pixel SystemUI's exit animation still requires physical-device validation.
+- Keep a queued unlock reveal until Home is resumed, focused and unlocked, and mark it complete after the animation finishes.
+- Preserve unfinished reveals through focus interruptions and activity recreation, including a slow handoff from the lock screen.
+- Check current lock/screen state before acting on delayed broadcasts, and cancel queued reveals when leaving for another app.
+- Preserve the stationary header, animation preferences and Home input recovery. The visual Pixel/SystemUI handoff still needs physical-device validation.
 
 ## 1.3.0
 

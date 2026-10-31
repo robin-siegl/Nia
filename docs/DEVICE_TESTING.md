@@ -1,75 +1,86 @@
-# Pixel 10 Pro acceptance
+# Device testing
 
-Record the Android version, build number and gesture/button navigation setting in the test results. Android 17 is the reported intended baseline, not a claim that this repository has already been tested on that physical phone.
+Use this checklist for the Pixel 10 Pro first, and record other devices separately. Automated tests are useful evidence for state and input behavior; they do not establish physical-device compatibility or SystemUI timing.
 
-## Home and navigation
+## Record the test environment
 
-- Install the APK, open nia, complete or skip setup, then choose nia in Android's default Home dialog.
-- Test all four setup stages, Back, Skip setup, restore and All apps. Select apps mid-setup, reopen nia, and confirm its current stage and assignments remain. The final preview should match the selected layout/theme.
-- Open every Settings page and return using Back. Scroll long pages and verify the title and Back button stay visible, including with the largest system font. Check the overview summaries match your current settings. Tap the text and switch areas of each toggle; both should change the setting exactly once. App selection must return to its originating page. Change the default launcher from the overview both while nia is default and while another launcher is default.
-- From several other apps, use the Home gesture. nia should return to its clean Home, without an old search or keyboard.
-- Open Apps using both swipe-up and the visible Apps entry. Confirm swiping does not interfere with Android Home/Back gestures or the notification shade.
-- Test normal Recents switching and returning to Home. Record any OS-controlled transition differences.
-- Switch between icon grid and text list. Confirm five fixed categories and no rearrangement/add controls.
-- Confirm Apps is the sixth grid icon or a text row matching the other entries. Open Settings through Apps and by holding blank Home space. Holding an app shortcut must not open Settings.
-- Select Small / Default / Large Home text. Verify the preview, clock, date and list entries; check that configured bottom corners stay reachable while a long Home list scrolls.
-- Try large system text/display scaling. Keep Apps, settings and every category reachable.
-- Compare the Pixel-style clock with the reference lock screen after unlocking. Check both grid and list, time/date tap actions, the spaced time, date weight and screen anchors. Toggle Pixel-style clock off to verify the old scalable header; rotate to landscape and back.
-- With Pixel-style clock enabled, changing app text sizes should not move the clock/date. Check a signed upgrade keeps the selected layout and assignments, and older backups enable the aligned header with the old layout still selectable.
+| Field | Record |
+| --- | --- |
+| Device | Model and any relevant display settings |
+| Android | Version and build number |
+| nia | Version, build type and tested commit |
+| Navigation | Gesture or button navigation |
+| Unlock | Face, fingerprint or PIN; tap-to-wake or power button |
+| Conditions | Battery Saver, animation scale, font/display size and ambient display |
+| Result | Pass/fail for the tested cases, with steps and captures for failures |
 
-## Motion and corners
+The primary phone is reported to run Android 17. Record what is actually installed instead of treating that target as a completed test result.
 
-- Slowly pull Apps up, pause midway, reverse the gesture and release. It should track the finger, cancel without a stray launch, and settle according to distance/velocity. Tap Apps and Back for the equivalent transitions; test Android Home while a transition runs.
-- Scroll far down Apps and swipe down: scroll the list instead of dismissing it. Pull down from its top and from an empty/search-results drawer to dismiss. Confirm the alphabet scrubber still works.
-- Enable autofocus: the keyboard must appear after the drawer settles. Close/reopen with and without the keyboard. Test rapid extra taps during transitions; no hidden Home shortcut or unintended app should launch.
-- Lock from Home, unlock by face/fingerprint/PIN, and observe the unchanged header plus shortcut-only reveal. Return from several normal apps without locking; no reveal should replay. Unlock into another app, then return to nia; it must not replay a delayed reveal. Check process recreation and rotation.
-- Configure both corners as Empty and App; Settings must not be offered. Pick several of the 27 outline icons (including scrolling the icon chooser), relaunch/reboot, and verify app names are spoken by TalkBack. Uninstall a corner app and tap its shortcut to recover through app selection.
-- Upgrade from 1.2 with a Settings corner: that corner becomes empty and all other settings/assignments remain. A legacy gear icon assigned to an app becomes Star while retaining the app.
-- Test face/fingerprint/PIN unlock with nia both warm and recreated. The 1.3 reveal waits briefly with only the header visible, then fades/rises the shortcuts; check the animation remains visible after the system fade. Lock/unlock from another app, including a quick return Home, and from nia Settings/Apps. Record OS build and a screen recording if the header still jumps or the reveal is skipped. The system clock exit is not controlled by nia.
-- With 1.3.1, open/close Quick Settings during an unfinished reveal, delay the focus handoff, and rotate/change system appearance while unlocking. The queued reveal should finish once Home is focused, even across activity recreation. Repeat after it has fully finished: focus changes and ordinary app returns must not replay it. Verify buttons/swipe still respond after normal, Reduced and zero-duration reveals.
-- Compare Standard and Reduced animations. With Android animation scale set to zero, transitions must finish immediately without leaving input blocked. Toggle system touch haptics and check shortcut feedback follows that setting.
-- With Battery Saver already enabled, lock/unlock Home and test Music, Clock/date, a corner, Apps and swipe-up as soon as the reveal settles, without waiting for the clock's next minute. Repeat with Battery Saver off, Reduced motion and Android's animator scale at zero. Toggle Battery Saver using Quick Settings during a transition and test input again after returning. Record the phone/OS result separately from simulated animation-scale tests.
-- Cancel an Apps swipe midway (for example, interrupt it with the notification shade or lock the phone). Returning to nia must settle the drawer and accept the next tap/swipe, without waiting for another clock or settings update.
-- Tap a launchable shortcut rapidly twice; open one activity, without leaving navigation stuck. Check Settings stays reachable with both corners empty.
+## Installation, setup and Home
 
-## Apps
+- Install and open nia. Complete setup, choose nia in Android's Home dialog, and verify the Home gesture returns to it.
+- Test all four setup stages, Back, Skip setup, Restore and All apps. Select an app mid-setup, close/reopen nia, and check the stage and assignments remain.
+- Change the default launcher from nia Settings, both when nia is default and when it is not. The system chooser must remain available.
+- Open every Settings page and return with Back. Scroll long pages: title and Back stay visible. Check overview summaries and tap both the label and control of each switch; each tap changes the setting once.
+- Return Home from other apps and Recents. Old searches, keyboards and subpages must not remain in front of Home.
+- Switch icon grid/text list. Keep Phone, Messages, Music, Calendar and Maps in order, with Apps as the sixth icon or matching text row.
+- Open Apps by swipe and its visible entry. Open Settings through Apps and by holding empty Home space. Holding a Home app shortcut must not open Settings.
 
-- Assign all five categories. Try an SMS app/WhatsApp, your music app, dialer, calendar and navigation app.
-- Tap the time and date. Confirm Clock opens and date uses the same Calendar assignment.
-- Install/uninstall an app while nia runs. Confirm the list refreshes and stale assignments recover through the app selector.
-- Search with mixed case, accents, no results and a blank query. Clear should restore alphabetical order.
-- Search app initials, camel-case initials and multiple word prefixes in different orders. Matches must stay alphabetical.
-- Search for exactly one app and press keyboard Search/Enter; it should open. With several matches or none, it must not launch an arbitrary app. Test a physical keyboard if available.
-- Open About nia and verify the version, privacy text and browser links for the project, issue reporting and notices.
-- Enable/disable autofocus, reopen Apps each time, and test the real keyboard. Back first dismisses the keyboard, then leaves the list.
-- Enable the alphabet scrubber and drag the right edge to the first, middle and final letters. Check the same behavior in assignment pickers, accent normalization and search hiding/restoring the scrubber. Try TalkBack adjustment and keyboard arrows.
-- Long-press an app name: show App info, Assign to left corner and Assign to right corner without launching the app. Verify each action, dismiss the menu, and repeat while searching. Assigning keeps the previous corner icon. App selection screens must not show the action menu.
-- In About, tap Check for updates. Check the latest stable version, APK link and release-page link. Test offline/retry, no release/rate limiting where feasible, same version and a newer development version. A release without an APK should still offer its page. Opening About/Home must not start a request by itself, and downloads must require a tap and stay in the browser/Android installer.
+## Apps, assignments and search
 
-## Appearance
+- Assign all five categories to real apps, including an alternative messenger and navigation app. Confirm every category opens its chosen app.
+- Tap time and date. Clock opens; date uses the Calendar assignment. Clear/reassign targets and check the unassigned behavior.
+- Install, remove, disable or update an app while nia runs. The list refreshes, distinct launch entries remain identifiable, and unavailable assignments offer recovery.
+- Search mixed case, accents, initials, camel-case initials and word prefixes in different orders. Results remain alphabetical. Clear restores the list; an empty result stays usable.
+- Press Enter/Search with one result, several results and no results. Launch only the sole match. Test a physical keyboard if available.
+- Toggle Keyboard on open. Focus and the real keyboard should appear only after Apps settles. Back first hides the keyboard, then closes Apps.
+- Enable A–Z navigation. Jump to the first, middle and last letters, including in assignment pickers. Search hides it; clearing search restores it. Try TalkBack adjustment and keyboard arrows.
+- Hold an app name for App info and left/right corner assignment. Check the actions while searching, dismiss the menu and repeat. Assignment retains the corner icon; pickers do not show this menu.
 
-- Check black/white Light, Dark and System behavior. Monochrome dark canvas must be exactly black.
-- Select violet and other seed colors. Check both generated previews and readable text throughout Home, Apps and settings.
-- Tap and drag the color wheel, adjust brightness, and type a custom hex value. Both previews should update immediately, and wheel/slider selections should persist after release. Invalid hex must not save. Test scrolling around the wheel and TalkBack hue/saturation actions.
-- Change system appearance while nia is foregrounded and while another app is open. System mode should follow it; explicit Light/Dark should hold their choice.
-- Enable colored OLED mode. Confirm pure black with the generated light foreground in dark mode.
-- Confirm status/navigation controls remain legible and the camera cutout/keyboard do not overlap content.
-- Change time zone and 12/24-hour preference; verify date and time update correctly, including at midnight.
+## Appearance and accessibility
 
-## Persistence and recovery
+- Test Black & white and Color in Light, Dark and System modes. Monochrome dark canvas is exactly `#000000`; colored dark mode can also use pure black.
+- Pick presets, tap/drag the color wheel, adjust brightness and enter hex values. Both theme previews update; wheel/slider choices persist after release. Invalid hex cannot be applied.
+- Change Android's theme while nia is open and while another app is foregrounded. System follows it; explicit Light/Dark stays selected.
+- Test large font and display scaling on Home, Apps, Settings and dialogs. Keep all actions reachable and text readable, including the last restore change and reset controls.
+- Check status/navigation contrast, camera cutouts, landscape and keyboard insets. Try TalkBack labels, switch/choice states and focus order. Hidden Home controls must not be accessible beneath Apps.
+- Toggle Pixel-style clock, compare the intended portrait reference, and rotate to landscape and back. In Pixel mode, app text size must not move the clock/date. Classic mode keeps scalable header text.
+- Change time zone and 12/24-hour preference, and check time/date updates at midnight.
 
-- Reboot and force-stop/reopen nia. Check layout, text size, assignments, corners, motion, colors, autofocus and alphabet navigation.
-- Update from 0.1.0 with the same signing key. Existing settings and older exports should load with Default text size and the alphabet scrubber off.
-- Export settings, change them, then import. Review each changed setting and app assignment with its current/backup value; unchanged entries should be omitted. Scroll to the last entry with large system text. Cancel, verify no changes, reopen and restore the exact previewed result.
-- Import schema-1/2/3 backups. Existing preferences should remain, corners should default empty and motion should follow Android. Import schema 4 with both app and Settings corners, checking migration. Export/re-import schema 5 with two custom corners, new icons and Reduced motion.
-- Cancel import; try malformed and oversized files. Existing settings must remain intact.
-- Import a valid backup referencing missing apps. Other preferences restore; unavailable assignments are listed for reassignment.
-- Uninstall an assigned app while a restore preview is open, then tap Restore. nia must refresh the preview and require a second review; rapid duplicate Restore taps must not apply twice.
-- Check both reset confirmations can be canceled. Reset appearance & behavior keeps app assignments and corner shortcuts; Reset all settings returns to setup.
-- Install an update signed with the same release key and verify all preferences survive.
+## Drawer, corners and unlocks
 
-## Boundaries
+- Drag Apps slowly, stop midway, reverse direction and release. Follow the finger, settle cleanly and avoid stray launches. Compare tap, swipe and Back paths.
+- Scroll down Apps, then swipe down. Scroll the list rather than closing it until it reaches the top. Repeat with search results and an empty list.
+- Interrupt a drag/settle with the notification shade, Android Home or screen lock. On return, the next tap and swipe work without waiting for a clock tick or settings change.
+- Configure Empty/App in both corners and try icons throughout the chooser. Settings is not offered. Relaunch/reboot, then uninstall an assigned app and verify recovery.
+- Upgrade a legacy Settings corner: it becomes empty. A legacy gear icon on an app becomes Star while retaining the app.
+- Lock from nia Home, then unlock with face, fingerprint and PIN. The header stays stationary while shortcuts reveal. Lock from another app, unlock there and return Home; no delayed reveal should replay.
+- **Compare tap-to-wake and the power button using the same lock and unlock methods.** Repeat after screen timeout and with ambient display on/off. Record whether a missed animation leaves shortcuts already visible and responsive or hidden with blocked input.
+- Interrupt an unfinished reveal with Quick Settings or a focus change. Rotate/change system appearance during unlocking. The reveal should finish when Home is active, including after activity recreation; a completed reveal must not replay on later focus changes.
+- Repeat warm/cold starts. Record a screen capture and OS build if the header jumps or the animation disappears. Android controls the system lock-screen exit; nia does not own that transition.
+- Test Standard, Reduced and Android animation scale zero. Change the scale during drawer/reveal motion. Completion or cancellation must restore input.
+- With Battery Saver on and off, test Music, Clock/date, a corner, Apps and swipe-up immediately after settling. Toggle Battery Saver from Quick Settings during a transition and repeat on return. Record phone results separately from simulated scale tests.
+- Double-tap launch targets quickly. Open one activity without leaving navigation stuck. Toggle Android touch haptics and check press feedback follows that preference.
 
-Personal profile only. Work profiles and Private Space are not part of this MVP acceptance. Broad manufacturer/tablet compatibility is not claimed from a Pixel-only pass.
+## Backups, recovery and upgrades
 
-- In Backup & reset, cancel both reset confirmations and verify settings remain unchanged. Reset appearance & behavior must keep everyday app assignments, the Clock assignment and both corner apps/icons; Reset all settings returns to setup. Test Save backup and Restore backup, including recovery when saved settings cannot be read.
+- Reboot and force-stop/reopen nia. Verify layout, text size, app choices, corners, animations, colors and app-list preferences persist.
+- Save a backup, change settings, then restore it. Preview each changed current/backup value and omit unchanged entries. Cancel first and confirm nothing changes; reopen and apply.
+- Import supported schema 1–5 backups. Check defaults for older fields, Settings-corner migration and current exports with custom corners and Reduced animations.
+- Cancel file selection. Try malformed, oversized, unsupported-version and unsupported-profile files. Keep existing settings intact.
+- Restore a backup containing unavailable apps. List the affected assignments and clear only those targets while restoring valid settings.
+- Remove an app while its restore preview is open. Restore must refresh the preview and require another review. Rapid duplicate Restore taps must not apply twice.
+- Cancel both reset confirmations. Reset appearance & behavior keeps everyday apps, Clock and both corner apps/icons; Reset all settings returns to setup.
+- With unreadable saved settings, keep Restore backup and full reset available while saving a backup and partial reset remain disabled.
+- Install over an earlier production release using the same signing key. Confirm settings survive. A debug install is a separate app, not this upgrade test.
+
+## About and update checks
+
+- Verify the installed version, privacy text and project/issue/notices links.
+- Tap Check for updates. Check the latest stable version, APK link and release page; opening About alone must not make a request.
+- Test offline/retry, rate limiting or no release where feasible, equal/newer-installed versions, and a release without an APK. A missing APK still offers the release page.
+- Confirm downloads require a tap and open externally, with installation handled by Android.
+
+## Supported scope
+
+Test the personal profile. Work profiles and Private Space are not currently supported. A Pixel-only pass does not establish broad manufacturer, tablet or foldable compatibility. Keep untested cases marked as untested.

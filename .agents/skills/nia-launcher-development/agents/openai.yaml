@@ -1,0 +1,4 @@
+interface:
+  display_name: "nia launcher development"
+  short_description: "Build reliable Android launcher behavior in nia"
+  default_prompt: "Use $nia-launcher-development to investigate and improve nia launcher behavior."
