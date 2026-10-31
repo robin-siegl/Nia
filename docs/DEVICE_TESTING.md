@@ -24,6 +24,7 @@ The primary phone is reported to run Android 17. Record what is actually install
 - Open every Settings page and return with Back. Scroll long pages: title and Back stay visible. Check overview summaries and tap both the label and control of each switch; each tap changes the setting once.
 - Return Home from other apps and Recents. Old searches, keyboards and subpages must not remain in front of Home.
 - Switch icon grid/text list. Keep Phone, Messages, Music, Calendar and Maps in order, with Apps as the sixth icon or matching text row.
+- With Android auto-rotate enabled, turn the phone sideways and upside down on Home, Apps, setup, Settings, app pickers and dialogs. nia stays upright in portrait. Return Home from a landscape app and repeat after locking/unlocking; other apps keep their own orientation behavior.
 - Open Apps by swipe and its visible entry. Open Settings through Apps and by holding empty Home space. Holding a Home app shortcut must not open Settings.
 
 ## Apps, assignments and search
@@ -43,8 +44,8 @@ The primary phone is reported to run Android 17. Record what is actually install
 - Pick presets, tap/drag the color wheel, adjust brightness and enter hex values. Both theme previews update; wheel/slider choices persist after release. Invalid hex cannot be applied.
 - Change Android's theme while nia is open and while another app is foregrounded. System follows it; explicit Light/Dark stays selected.
 - Test large font and display scaling on Home, Apps, Settings and dialogs. Keep all actions reachable and text readable, including the last restore change and reset controls.
-- Check status/navigation contrast, camera cutouts, landscape and keyboard insets. Try TalkBack labels, switch/choice states and focus order. Hidden Home controls must not be accessible beneath Apps.
-- Toggle Pixel-style clock, compare the intended portrait reference, and rotate to landscape and back. In Pixel mode, app text size must not move the clock/date. Classic mode keeps scalable header text.
+- Check status/navigation contrast, camera cutouts, system-controlled window resizing and keyboard insets. Try TalkBack labels, switch/choice states and focus order. Hidden Home controls must not be accessible beneath Apps.
+- Toggle Pixel-style clock and compare the intended portrait reference. Turning the phone sideways must not change nia's orientation. In Pixel mode, app text size must not move the clock/date. Classic mode keeps scalable header text.
 - Change time zone and 12/24-hour preference, and check time/date updates at midnight.
 
 ## Drawer, corners and unlocks

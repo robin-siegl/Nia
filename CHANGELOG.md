@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0 (unreleased)
+
+- Specify a shared resisted Apps pull, clock transition, progress cue and threshold haptics for both grid and list. Large-text lists scroll before handing off; grids stay fixed. The interaction remains planned, including cancellation, accessibility and unlock continuity.
+
+- Request portrait orientation for nia's activity, covering Home, Apps, Settings, setup and app pickers (issue #9).
+- Plan a fully editable Home with up to eight app shortcuts plus Apps, independent names/icons/app targets, and optional add-or-skip onboarding. This replaces the earlier fixed-categories-plus-extras proposal. Customization is not implemented yet; keep the release unpublished until the scope is complete.
+
 ## 1.3.3
 
 - Rewrote the README around nia’s everyday experience, screenshots and installation.

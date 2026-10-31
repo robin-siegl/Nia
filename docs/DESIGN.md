@@ -13,18 +13,23 @@ nia gives everyday tasks a predictable place and keeps other apps available in a
 
 ## Home and navigation
 
-Keep these entries in order: **Phone, Messages, Music, Calendar, Maps, Apps**.
+The **1.4.0 target** is a user-defined Home. Every app shortcut can be added, removed, renamed, assigned an outline icon, pointed at another app and reordered. Keep **zero to eight app shortcuts plus Apps**, for a maximum of nine main Home entries. Apps remains a reserved, visible destination.
 
-| Area | Design rule |
+| Area | Design rule for 1.4.0 |
 | --- | --- |
-| Icon grid | Three columns, two rows; simple outline category icons, with Apps as the sixth icon |
-| Text list | The same entries as full-width text rows; Apps has the same treatment |
-| Clock and date | Time opens Clock; date opens the assigned Calendar app |
-| Bottom corners | Two fixed optional slots, each Empty or App, with an outline icon |
+| Icon grid | Three columns, up to three rows; no vertical scrolling or extra pages; the shared Apps pull starts directly |
+| Text list | Scroll large-text entries beneath a collapsible clock/date, with an always-reachable Apps action and a deliberate pull beyond the end to open the drawer |
+| Shortcut content | Independent name, app target and outline icon, such as Google Maps with a map icon |
+| Clock and date | Time opens Clock; date opens its independently assigned Calendar app |
+| Bottom corners | Existing optional Empty/App slots, kept separate from the main-area limit in the current proposal |
 | App list | Alphabetical app names and search; no app-brand icons, usage ranking or recommendations |
 | Settings access | Gear in Apps and a touch-and-hold action on empty Home space |
 
-The five everyday shortcuts keep their names, symbols and order when their assigned apps change. Keep the rest of Home open. Extra Home pages, rearrangement, folders, widgets, badges and feeds are outside the current design. Settings cannot be assigned to a corner.
+Recommend a Settings arrangement editor and one order shared by grid/list, with Apps pinned last. Keep Home focused on launching. A fresh-install **Add your apps** step can add shortcuts or skip to Apps-only; do not force the old five categories. Upgrades retain existing choices and do not repeat completed setup.
+
+The current source still renders the five legacy categories while this feature is being planned. Their preserved upgrade entries become ordinary editable shortcuts. See the [1.4.0 plan](ROADMAP.md#140-in-preparation) for migration and interaction details.
+
+Keep the rest of Home open. Folders, widgets, badges and feeds remain outside this design. Settings cannot be assigned to a corner. Custom Home labels do not rename apps in the full app list.
 
 Swipe up and the visible Apps entry open the same drawer. Pulling down dismisses it only when its list is already at the top. Back dismisses the keyboard before closing Apps; Android Home returns to a clean Home without an old query or keyboard. App selectors keep selection simple; app action menus belong in the full app list.
 
@@ -45,7 +50,7 @@ Avoid surface tints, gradients or translucent wallpaper effects that turn the OL
 
 Use Material typography for controls: readable body text, quieter supporting text and a clear page title. Reuse the existing 8/12/16/24dp spacing rhythm and consistent outline icon weight. Settings use 24dp horizontal content padding and a maximum content width of 600dp. Keep Home's full-width header calibration separate from that settings constraint.
 
-Respect system text scaling in controls and app names. The calibrated Pixel-style header keeps fixed proportions; offer the existing scalable clock layout when that treatment is unsuitable.
+Respect system text scaling in controls and app names. The calibrated Pixel-style header keeps fixed proportions at rest; offer the existing scalable clock layout when that treatment is unsuitable.
 
 ## Pixel-style header
 
@@ -60,7 +65,7 @@ Scale anchors by window width. Subtract the already-applied safe-drawing top ins
 
 Use the bundled Nia Header font subsets. In monochrome OLED mode, the clock uses `#E2E2E2` and the date white; colored themes share their generated foreground. Preserve the attribution in [third-party notices](../THIRD_PARTY_NOTICES.md).
 
-**Settings → Home screen → Pixel-style clock** controls this layout. Turning it off restores the scalable clock; landscape uses the compact layout. nia does not read or track the system clock style, size slider or future OS changes. The original phone screenshots are not distributed here.
+**Settings → Home screen → Pixel-style clock** controls this layout. Turning it off restores the scalable clock. nia requests portrait orientation on phones; the compact layout remains a fallback for windows whose shape Android controls. nia does not read or track the system clock style, size slider or future OS changes. The original phone screenshots are not distributed here.
 
 Exact Pixel weather remains deferred. The reference's large outline clock complication and small colored condition icon are separate elements. Do not replace them with generic symbols, invented conditions or assets of uncertain provenance. See the [platform boundary](ARCHITECTURE.md#platform-boundaries).
 
@@ -93,9 +98,17 @@ All timing inherits Android's animation-duration scale. The unlock lead-in is a 
 
 Delay search autofocus until the drawer settles. Block accidental launches during transitions, then release input after completion or cancellation. Press feedback stays subtle and uses Android's haptic preference. Keep lifecycle mechanics in the [architecture guide](ARCHITECTURE.md#unlock-and-input-reliability).
 
+### Planned Home scrolling and Apps transition in 1.4.0
+
+For a long Home list, keep app text at the selected size. Collapse the large clock/date into a readable compact header as the user scrolls, then restore it when returning toward the top. This is an intentional scroll interaction; the header remains expanded and stationary for an unlock reveal.
+
+Both grid and list use the same resisted Apps pull, progressive header/drawer transition, chevron/progress cue and haptic feedback. Grid mode and a list that fits enter it directly; a long list enters it after scrolling to its end. Use a soft haptic when the pull begins, a firmer cue when opening is armed, and a quiet **Release to open Apps** hint. Release while armed to open; release early or reverse to cancel. A fling alone does not arm or open Apps. Give each cue only on its state transition and use hysteresis to prevent repeated feedback.
+
+Keep a visible Apps button as a direct alternative. Respect system haptics, Reduced motion and disabled animations. Canceling or closing Apps restores the Home presentation from before the pull; an explicit Home request or fresh unlock restores the full header before it becomes visible. See the [detailed sequence](ROADMAP.md#opening-apps-from-home). This interaction is planned, not implemented yet.
+
 ## Accessibility and review
 
-Provide at least 48dp touch targets, meaningful spoken labels for icon-only actions, visible focus/selection states and a visible alternative to gestures. Keep controls reachable with large text, display scaling, keyboard insets, landscape and screen cutouts. Hidden Home content must not remain a duplicate accessibility destination beneath Apps.
+Provide at least 48dp touch targets, meaningful spoken labels for icon-only actions, visible focus/selection states and a visible alternative to gestures. Keep controls reachable with large text, display scaling, keyboard insets, system-controlled window resizing and screen cutouts. Hidden Home content must not remain a duplicate accessibility destination beneath Apps.
 
 Review real Compose renders in monochrome and color light/dark themes, plus a narrow screen with large text. Use the [device checklist](DEVICE_TESTING.md) for TalkBack, keyboard and system gestures. Do not present a mockup or native test render as a physical-phone result.
 
@@ -103,4 +116,4 @@ Reference captures: [Settings](screenshots/settings-overview.png), [app actions]
 
 ### Android guidance
 
-Use [settings guidance](https://developer.android.com/design/ui/mobile/guides/patterns/settings), [Compose accessibility defaults](https://developer.android.com/develop/ui/compose/accessibility/api-defaults) and [inset handling](https://developer.android.com/develop/ui/compose/system/insets-ui) as platform references. Adapt them to nia's fixed, minimal Home rather than adding controls simply because a component exists.
+Use [settings guidance](https://developer.android.com/design/ui/mobile/guides/patterns/settings), [Compose accessibility defaults](https://developer.android.com/develop/ui/compose/accessibility/api-defaults) and [inset handling](https://developer.android.com/develop/ui/compose/system/insets-ui) and [event-based haptics](https://developer.android.com/develop/ui/views/haptics/haptic-feedback) as platform references. Adapt them to nia's minimal Home and user-defined shortcuts rather than adding controls simply because a component exists.

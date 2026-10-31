@@ -64,6 +64,8 @@ Launch and App-info actions use `LauncherApps`. An unassigned category opens its
 
 The manifest exposes HOME/DEFAULT and LAUNCHER entry points and uses `singleTask`. The system Home chooser uses `RoleManager.ROLE_HOME`, with a Home-settings fallback. Default-launcher status refreshes on resume.
 
+The activity requests `screenOrientation="portrait"`, covering all nia screens on the primary phone. Keep the compact-layout fallback for Android-controlled windows: the platform can override orientation restrictions in multi-window and on large screens. Do not add sensor listeners or recreate the activity manually to fight those policies. See [activity orientation](https://developer.android.com/guide/topics/manifest/activity-element#screen) and [Android 16 large-screen behavior](https://developer.android.com/about/versions/16/behavior-changes-16#adaptive-layouts).
+
 `Navigation` is an immutable stack of `Screen` values. Keep its simple Back behavior. `onNewIntent` handles a new HOME intent synchronously, returns navigation Home and signals transient drawer/keyboard reset. `HomeAppsScreen` keeps Home composed beneath Apps so the header and drawer share continuous state. Use this path for both taps and gestures.
 
 ## Preferences and backups
@@ -77,6 +79,22 @@ Keep decoding strict. Validate schema, colors, enums and component identities be
 `RestorePreview` computes each changed before/after value and sanitizes unavailable assignments. Before applying, the ViewModel re-reads current preferences and available apps. If the result changed, show the revised preview for review. Keep duplicate submission guards and apply the reviewed state together. Cancel or a failed import must leave existing settings intact.
 
 Reset appearance/behavior restores default preferences while retaining everyday app assignments, Clock and both corner configurations. Full reset clears the saved state and returns to setup. Both UI actions require confirmation.
+
+### Planned 1.4.0 Home model
+
+The user-defined Home requirements are recorded in the [1.4.0 plan](ROADMAP.md#140-in-preparation); they are not implemented yet. Replace `HomeCategory`-driven rendering with one ordered shortcut list whose entries carry stable IDs, user labels, outline icons and nullable app targets. Support zero to eight app entries and generate the mandatory Apps destination separately. Do not split the model into permanent built-ins plus optional extras.
+
+Migrate old on-device state and schema-1–5 backups into ordinary editable entries while preserving their old names, icons, targets and order. Fresh installs start empty; an explicitly saved empty list must remain Apps-only rather than triggering legacy default seeding. New exports are planned as schema 6. Keep the Clock assignment and a separately migrated Calendar/header assignment independent of the list, so removing a Home shortcut cannot break header actions.
+
+Use the same resolved entries for Home, previews, the editor and onboarding. Keep editor drafts through picker navigation and recreation, and commit each validated edit atomically. Preserve user labels/icons when changing the app target. Custom labels apply only to Home; `AppRepository` and full-list search retain actual app names. Keep the current schema-5 runtime behavior until migration and UI changes are implemented together.
+
+### Planned shared Home gesture coordination
+
+Use one Apps pull/arming state machine for both grid and list, coordinated with drawer motion and the compact-header transition. Grid and fitting lists enter it directly; an overflowing list first consumes Home scroll. Keep list offset, header-collapse offset, pull progress and the pre-pull Home presentation in transient UI state, not persisted settings. Preserve ownership of the current pointer stream through collapse, scrolling and handoff; remeasurement must not turn an ordinary scroll into an immediate launch.
+
+Only direct finger drag in the Apps pull phase contributes to pull progress; for an overflowing list, this begins beyond its end. Fling velocity alone cannot arm opening in either view. Use a threshold with hysteresis, emit haptics only on meaningful state transitions, and settle open on an armed release. Cancellation/reversal clears partial pull state and touch blocking. Do not disable or consume the in-progress gesture merely because new taps are blocked.
+
+Restore the pre-pull Home scroll/header presentation on cancellation or when dismissing Apps, and reset to the expanded header for an explicit Home request or actual new unlock before Home is revealed. Drive unlock resets from the existing current session state, not a potentially historical screen broadcast. Keep state reads observable in composition, and preserve autofocus only after drawer settling. See the [interaction sequence](ROADMAP.md#opening-apps-from-home) for the planned behavior and acceptance checks.
 
 ## Unlock and input reliability
 
