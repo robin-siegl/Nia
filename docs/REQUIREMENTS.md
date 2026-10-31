@@ -2,6 +2,12 @@
 
 Product specification · 31 October 2026
 
+## 1.3.1 unlock reliability
+
+- Run a queued unlock reveal only in a resumed, focused, interactive and unlocked nia window; mark it handled after visible completion. Preserve unfinished work across focus interruptions, coalesced pause/resume frames and activity recreation.
+- Preserve observed locks through late stop callbacks and pin a pending handoff when nia resumes before the background grace period ends. Explicit app departures discard work rather than replaying it on ordinary returns.
+- Validate deferred screen-off events against current power/keyguard state. Keep the clock/date stationary, existing motion timings and the 1.3.0 Home input fix. No new permissions or background polling; Pixel's system-side fade remains outside nia's control.
+
 ## 1.3.0 everyday improvements
 
 - Holding an app name in Apps opens a small menu for App info or assignment to the left/right corner. Assignment keeps the selected corner icon; normal category/corner pickers remain selection-only.

@@ -32,6 +32,7 @@ class HomeInputRecoveryTest {
     private var locked by mutableStateOf(false)
     private var unlock by mutableStateOf<UnlockRevealRequest?>(null)
     private var open by mutableStateOf(false)
+    private var active by mutableStateOf(true)
     private var categories = 0
     private var clocks = 0
     private var corners = 0
@@ -50,7 +51,7 @@ class HomeInputRecoveryTest {
                     // A fixed clock and plain callback counters must not accidentally refresh Home.
                     HomeAppsScreen(p, listOf(app), false, "14:03", "Fri, 30 Oct", open, { open = it },
                         { clocks++ }, { categories++ }, {}, {}, {}, { corners++ },
-                        unlockRequest = unlock, deviceLocked = locked)
+                        unlockRequest = unlock, deviceLocked = locked, revealAllowed = active)
                 }
             }
         }
@@ -153,6 +154,60 @@ class HomeInputRecoveryTest {
         rule.mainClock.advanceTimeBy(64)
         assertFalse(open)
         rule.runOnIdle { scale.scaleFactor = 1f; Snapshot.sendApplyNotifications() }
+        assertHomeResponds()
+    }
+
+    @Test fun `unlock stays pending until the Home window can show it`() {
+        render()
+        rule.runOnIdle { active = false; Snapshot.sendApplyNotifications() }
+        beginUnlock()
+        rule.mainClock.advanceTimeBy(2_000)
+        assertTrue("An unfocused window consumed the reveal", unlock!!.pending)
+        assertEquals(0, categories)
+        rule.runOnIdle { active = true; Snapshot.sendApplyNotifications() }
+        rule.mainClock.advanceTimeBy(64)
+        assertTrue("Reveal was marked handled before finishing", unlock!!.pending)
+        rule.mainClock.advanceTimeBy(1_000)
+        assertFalse(unlock!!.pending)
+        assertHomeResponds()
+    }
+
+    @Test fun `a focus interruption retains the reveal until a visible completion`() {
+        render()
+        beginUnlock()
+        rule.mainClock.advanceTimeBy(240)
+        assertTrue("In-progress reveal was consumed too early", unlock!!.pending)
+        rule.runOnIdle { active = false; Snapshot.sendApplyNotifications() }
+        rule.mainClock.advanceTimeBy(2_000)
+        assertTrue(unlock!!.pending)
+        rule.runOnIdle { active = true; Snapshot.sendApplyNotifications() }
+        rule.mainClock.advanceTimeBy(64)
+        assertTrue(unlock!!.pending)
+        rule.mainClock.advanceTimeBy(1_000)
+        assertFalse(unlock!!.pending)
+        rule.runOnIdle { active = false; Snapshot.sendApplyNotifications() }
+        rule.mainClock.advanceTimeBy(32)
+        rule.runOnIdle { active = true; Snapshot.sendApplyNotifications() }
+        rule.mainClock.advanceTimeBy(32)
+        assertHomeResponds()
+    }
+
+    @Test fun `a retained replacement restarts when pause and resume happen between frames`() {
+        render()
+        beginUnlock()
+        rule.mainClock.advanceTimeBy(240)
+        val previous = unlock!!
+        rule.runOnIdle {
+            active = false
+            unlock = UnlockRevealRequest()
+            active = true
+            previous.consume()
+            Snapshot.sendApplyNotifications()
+        }
+        rule.mainClock.advanceTimeBy(64)
+        assertTrue("Old completion consumed a replacement reveal", unlock!!.pending)
+        rule.mainClock.advanceTimeBy(1_000)
+        assertFalse(unlock!!.pending)
         assertHomeResponds()
     }
 }

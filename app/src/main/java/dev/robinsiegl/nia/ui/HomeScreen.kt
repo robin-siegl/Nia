@@ -41,21 +41,25 @@ fun HomeScreen(
     motionMode: MotionMode = MotionMode.SYSTEM, unlockRequest: UnlockRevealRequest? = null, deviceLocked: Boolean = false,
     interactionEnabled: Boolean = true, onScrollable: (Boolean) -> Unit = {}, onRevealReady: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
+    revealAllowed: Boolean = true,
 ) {
     val scroll = rememberScrollState()
     val view = LocalView.current
     val reduced = motionMode == MotionMode.REDUCED
     val rows = if (layout == HomeLayout.GRID) 2 else 6
     val reveal = remember { Animatable(if (deviceLocked || unlockRequest?.pending == true) 0f else 1f) }
-    LaunchedEffect(deviceLocked, unlockRequest, motionMode) {
+    LaunchedEffect(deviceLocked, unlockRequest, motionMode, revealAllowed) {
         if (deviceLocked) reveal.snapTo(0f)
-        else if (unlockRequest?.consume() == true) {
+        else if (unlockRequest?.pending == true) {
             reveal.snapTo(0f)
-            // Draw a stable header before revealing shortcuts. The scaled start delay keeps
-            // their first frames out of the system keyguard fade; scale=0 skips it entirely.
-            withFrameNanos { }
-            reveal.animateTo(1f, tween(if (reduced) 120 else 360 + rows * 24,
-                delayMillis = if (reduced) 0 else 120, easing = LinearEasing))
+            if (revealAllowed) {
+                // Draw a stable header before revealing shortcuts in the focused window.
+                // An interrupted effect leaves the request pending for its next visible run.
+                withFrameNanos { }
+                reveal.animateTo(1f, tween(if (reduced) 120 else 360 + rows * 24,
+                    delayMillis = if (reduced) 0 else 120, easing = LinearEasing))
+                unlockRequest.consume()
+            }
         } else reveal.snapTo(1f)
     }
     val revealReady by remember { derivedStateOf { reveal.value == 1f } }

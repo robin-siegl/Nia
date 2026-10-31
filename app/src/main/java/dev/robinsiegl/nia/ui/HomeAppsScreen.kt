@@ -101,6 +101,7 @@ internal fun HomeAppsScreen(
     onApp: (AppEntry) -> Unit, onAppInfo: (AppEntry) -> Unit, onCorner: (CornerPosition) -> Unit,
     contentTopInset: Dp = 0.dp, unlockRequest: UnlockRevealRequest? = null, deviceLocked: Boolean = false, homeRequest: Int = 0,
     onAssignCorner: ((AppEntry, CornerPosition) -> Unit)? = null,
+    revealAllowed: Boolean = true,
 ) {
     val scope = rememberCoroutineScope()
     val state = remember { DrawerMotion(drawerOpen, scope) }
@@ -191,7 +192,7 @@ internal fun HomeAppsScreen(
                     apps.find { it.target == preferences.shortcut(position).app }?.label ?: (position.label + " shortcut, unavailable")
                 }, motionMode = preferences.motionMode, unlockRequest = unlockRequest, deviceLocked = deviceLocked,
                 interactionEnabled = homeReady, onScrollable = { homeScrollable = it },
-                onRevealReady = { shortcutsReady = it })
+                onRevealReady = { shortcutsReady = it }, revealAllowed = revealAllowed)
         }
         if (showDrawer || drawerOpen) {
             Box(Modifier.fillMaxSize().graphicsLayer {

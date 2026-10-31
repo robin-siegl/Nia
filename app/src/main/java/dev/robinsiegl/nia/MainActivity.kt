@@ -17,31 +17,23 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
-import dev.robinsiegl.nia.model.UnlockTracker
-import dev.robinsiegl.nia.model.UnlockRevealRequest
+import dev.robinsiegl.nia.model.UnlockEnvironment
 import dev.robinsiegl.nia.model.Screen
 import dev.robinsiegl.nia.ui.NiaApp
 
 class MainActivity : ComponentActivity() {
     private val model: LauncherViewModel by viewModels()
     private var homeRequest by mutableIntStateOf(0)
-    private var unlockRequest by mutableStateOf<UnlockRevealRequest?>(null)
-    private var deviceLocked by mutableStateOf(false)
-    private var resumed = false
     private lateinit var keyguard: KeyguardManager
     private lateinit var power: PowerManager
-    private val unlocks = UnlockTracker()
+    private val unlock get() = model.unlockSession
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                Intent.ACTION_SCREEN_OFF -> { unlocks.screenOff(); deviceLocked = true }
-                Intent.ACTION_USER_PRESENT -> {
-                    unlocks.userPresent(resumed, SystemClock.uptimeMillis())
-                    if (resumed) checkUnlock() else deviceLocked = unlocks.awaitingUnlock
-                }
-                Intent.ACTION_SCREEN_ON -> if (resumed) checkUnlock()
+                Intent.ACTION_SCREEN_OFF -> unlock.screenOff(environment(), SystemClock.uptimeMillis())
+                Intent.ACTION_USER_PRESENT -> unlock.userPresent(environment(), SystemClock.uptimeMillis())
+                Intent.ACTION_SCREEN_ON -> unlock.refresh(environment(), SystemClock.uptimeMillis())
             }
         }
     }
@@ -50,14 +42,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         keyguard = getSystemService(KeyguardManager::class.java)
         power = getSystemService(PowerManager::class.java)
-        deviceLocked = keyguard.isKeyguardLocked || !power.isInteractive
+        unlock.initialize(environment())
         ContextCompat.registerReceiver(this, screenReceiver, IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_OFF); addAction(Intent.ACTION_SCREEN_ON); addAction(Intent.ACTION_USER_PRESENT)
         }, ContextCompat.RECEIVER_NOT_EXPORTED)
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
         setContent {
-            NiaApp(model, homeRequest, unlockRequest, deviceLocked) { dark ->
+            NiaApp(model, homeRequest, unlock.request, unlock.deviceLocked, revealAllowed = unlock.active) { dark ->
                 val style = if (dark) SystemBarStyle.dark(Color.TRANSPARENT)
                 else SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
                 enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
@@ -65,42 +57,48 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onResume() { super.onResume(); resumed = true; model.refreshDefault(); checkUnlock() }
+    override fun onResume() {
+        super.onResume()
+        model.refreshDefault()
+        unlock.resume(environment(), SystemClock.uptimeMillis())
+    }
 
     override fun onPause() {
-        if (keyguard.isKeyguardLocked || !power.isInteractive) deviceLocked = true
-        resumed = false
+        unlock.pause(environment())
         super.onPause()
     }
 
     override fun onStop() {
-        // During screen-off, onPause can run before keyguard/power state changes.
-        // Decide whether we left for an app only once the window is actually stopped.
-        unlocks.leaveForeground(keyguard.isKeyguardLocked, power.isInteractive)
+        unlock.stop(environment(), isChangingConfigurations)
         super.onStop()
+    }
+
+    override fun onUserLeaveHint() {
+        unlock.userLeaving(environment())
+        super.onUserLeaveHint()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        if (hasFocus && resumed) checkUnlock()
+        if (::keyguard.isInitialized && ::power.isInitialized) {
+            unlock.focusChanged(environment(hasFocus), SystemClock.uptimeMillis())
+        }
     }
 
-    private fun checkUnlock() {
-        val locked = keyguard.isKeyguardLocked
-        val interactive = power.isInteractive
-        val focused = hasWindowFocus()
-        if (unlocks.foreground(locked, interactive, focused, SystemClock.uptimeMillis())) {
-            unlockRequest = if (model.navigation.value.screen == Screen.Home) UnlockRevealRequest() else null
-        }
-        // Keep shortcuts hidden between keyguard dismissal and this window receiving focus.
-        deviceLocked = locked || !interactive || (unlocks.awaitingUnlock && !focused)
-    }
+    private fun environment(focused: Boolean = hasWindowFocus()) = UnlockEnvironment(
+        locked = keyguard.isKeyguardLocked, interactive = power.isInteractive, focused = focused,
+        homeVisible = model.navigation.value.screen == Screen.Home && model.saved.value?.setupComplete != false,
+    )
 
     override fun onDestroy() { unregisterReceiver(screenReceiver); super.onDestroy() }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        if (intent.action == Intent.ACTION_MAIN && intent.hasCategory(Intent.CATEGORY_HOME)) homeRequest++
+        if (intent.action == Intent.ACTION_MAIN && intent.hasCategory(Intent.CATEGORY_HOME)) {
+            model.home()
+            homeRequest++
+            unlock.refresh(environment(), SystemClock.uptimeMillis())
+        }
     }
 }

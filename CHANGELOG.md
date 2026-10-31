@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.1
+
+- Keep unlock reveals queued until nia's window is resumed, focused and unlocked; mark them handled after the reveal finishes. Focus interruptions restart unfinished work when Home becomes visible instead of silently consuming it behind another window.
+- Retain the unlock session across activity recreation, preserve observed locks through a late stop callback and keep pending unlocks when Home resumes before a slow window-focus handoff.
+- Check current screen/keyguard state before acting on deferred screen-off broadcasts. Explicit app departures cancel pending reveals so normal app returns do not replay them.
+- Keep the stationary header, existing motion timings, reduced/disabled animation support and Home input recovery. Add lifecycle/focus regressions; Pixel SystemUI's exit animation still requires physical-device validation.
+
 ## 1.3.0
 
 - Fixed Home remaining unresponsive after unlocking: the shortcut reveal could finish without clearing its parent touch blocker, leaving buttons and swipe-to-Apps disabled until an unrelated refresh. Completion is now observed while input is blocked, including with reduced/disabled animations or animation-scale changes during the reveal.

@@ -22,6 +22,7 @@ import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 
 class LauncherViewModel(application: Application) : AndroidViewModel(application) {
+    internal val unlockSession = UnlockSession()
     private val store = PreferencesStore(application)
     private val repository = AppRepository(application)
     private val releases = ReleaseRepository()
