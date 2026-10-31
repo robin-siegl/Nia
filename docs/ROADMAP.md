@@ -40,11 +40,31 @@ Keep completed users out of onboarding during upgrades. Migrate their existing H
 
 ### Grid and list behavior
 
-- **Grid:** Three columns, up to three rows, with no vertical scrolling or extra pages. Fit the available height by adapting row spacing while retaining 48dp touch targets, header positions and corner access. Check the smallest supported phone/window configuration before promising nine entries everywhere; do not clip actions or silently hide saved entries.
-- **Text list:** Allow the Home shortcut area to scroll when large text or many entries need it. Recommend a fixed, clearly separated Apps row styled like the other text entries, so it stays reachable. Keep clock/date and corner controls outside that scrolling area.
-- **Drawer:** Reuse the current finger-following transition for Apps tap and swipe. Define the boundary between list scrolling and opening Apps explicitly: scrolling entries must not open the drawer accidentally. Validate deliberate swipe behavior with large text and a list at its end before choosing the final handoff.
-- **Motion:** Derive reveal row counts from the configured entries, including the Apps-only case. Preserve the stationary header, Reduced/system-disabled animations and input recovery after cancellation.
+- **Grid:** Three columns, up to three rows, with no vertical scrolling or extra pages. Fit the available height by adapting row spacing while retaining 48dp touch targets, expanded-header anchors and corner access. Check the smallest supported phone/window configuration before promising nine entries everywhere; do not clip actions or silently hide saved entries.
+- **Text list:** Scroll the Home shortcut area when large text or many entries need it. Progressively collapse the large clock/date into an accessible compact header during intentional scrolling. Keep a visible Apps row and corner controls reachable. Use the staged handoff below when pulling beyond the final entry.
+- **Drawer:** Both grid and text list use the same resisted pull, drawer preview, progress cue, haptic thresholds and release/cancel behavior. A grid or fitting/empty list enters this gesture directly. An overflowing list first scrolls its entries, then passes further finger drag into the same gesture at its end. Tapping Apps opens the shared transition directly.
+- **Motion:** Derive reveal row counts from the configured entries, including the Apps-only case. Keep the expanded header stationary during unlock reveals; header collapse is driven by intentional Home-list scrolling. Preserve Reduced/system-disabled animations and input recovery after cancellation.
 - **Header actions:** Keep Clock and Calendar targets independent of the Home shortcut list. Deleting or renaming a Calendar shortcut must not break the date action. Preserve legacy Calendar/Clock choices during migration; allow configuring header apps in Settings.
+
+### Opening Apps from Home
+
+The Apps pull gesture, haptic feedback, progress cue and clock transition apply to **both grid and text-list modes**. The grid itself does not scroll. An overflowing text list consumes normal Home scrolling first, then hands off to the same drawer gesture. Keep the chosen app text size instead of shrinking names to force a large list onto one screen.
+
+1. **At rest:** Show the expanded clock/date at the existing Pixel-style position. Keep the visible Apps action and corner controls available. All grid entries fit; a long text list may overflow.
+2. **Start the interaction:** In grid mode or a list that fits, an upward drag enters the Apps pull gesture directly. In an overflowing list, first collapse the clock/date into a readable compact header and scroll the Home entries; further direct dragging at the end enters the Apps pull gesture.
+3. **Shared pull phase:** Reveal Apps with resistance under the finger in either view. Couple the clock's compact transition to this gesture, retaining any collapse already caused by list scrolling. Show the same quiet chevron/progress feedback. Grid mode keeps its normal Apps icon, and text mode its Apps row; any extra hint appears only during the pull.
+4. **Arm opening:** Give a soft haptic when entering the Apps pull phase and a firmer cue when crossing the ready threshold. Show **Release to open Apps** when armed. Use distinct threshold/cancel bounds so small movements do not repeatedly toggle the state or buzz.
+5. **Release or reverse:** Release while armed to settle Apps fully open; release before the threshold or drag back to cancel. Smoothly reverse partial drawer/header motion to the prior Home presentation. Search autofocus waits until Apps has fully settled.
+
+A normal list fling or momentum reaching the end must not arm or open Apps. Use the same distance-based arming contract in both views; velocity alone does not replace crossing the threshold. A direct tap on Apps uses the same opening animation without requiring a pull.
+
+This borrows the familiar pull-to-refresh interaction, with an upward pull opening another view. It is not a refresh operation and should not show a loading spinner or start network activity.
+
+Use haptics for the two meaningful transitions, not for every row or pixel. Respect Android's haptic setting; visual cues and the Apps button must work when haptics are unavailable or disabled. Do not replay cues from recomposition or restored state. Reduced motion keeps the interaction and compact layout with simpler header changes; disabled animations must still settle immediately and release input.
+
+Scrolling back toward the top restores the expanded clock. Canceling the pull or closing Apps returns to the Home presentation from before that pull: normally expanded in grid mode, potentially compact/scrolled in list mode. An explicit Android Home request or a new unlock resets to the expanded header and start of the list; perform the unlock reset while Home is covered/locked, before the visible shortcut reveal, to avoid a clock jump.
+
+Threshold distance, resistance and compact-header proportions need a native prototype and Pixel testing in both views. The handoff must remain deliberate with the largest supported text/display sizes, and must never require haptics to be understood.
 
 ### Implementation outline
 
@@ -65,12 +85,15 @@ Keep completed users out of onboarding during upgrades. Migrate their existing H
 - Reorder by touch and accessible actions; preserve identity and content through layout switches, restart, restore and signed upgrade. Restore an explicitly empty list without inventing entries.
 - Verify a three-by-three grid on the Pixel with display/font scaling, corners and either clock style. The grid must not scroll. Apps always stays reachable, and the full app list stays alphabetical.
 - Remove the Home Calendar shortcut and verify the independently assigned date action. Missing app targets retain recoverable Home entries.
-- Test large-text Home lists separately from drawer scrolling, autofocus, keyboard dismissal, Back and Android Home. Preserve immediate real-tap/swipe input after normal, canceled and disabled animations.
+- Test the common Apps pull in both grid and list: progressive header/drawer motion, progress cue, both haptic thresholds, reversal and release. Repeat with haptics disabled and with Reduced/zero-duration animations.
+- Test an eight-shortcut Home plus Apps at large text: list scrolling must hand off only after its end; the grid must never scroll. A fling alone must not arm or open Apps.
+- Test interruption by screen lock, Quick Settings, canceled pointers and Android Home. Dismissing Apps preserves the Home position; a new unlock restores the expanded header before revealing shortcuts. Preserve immediate real-tap/swipe input without a clock tick.
+- Verify the visible Apps button, keyboard/TalkBack access, Apps-only Home and a list that fits without scrolling. Open search only after settling, and keep drawer scrolling independent from Home scrolling.
 - Review native previews and complete physical portrait/unlock/gesture checks before marking the release ready.
 
 ### Remaining interaction choices
 
-Settings-only reordering, one order shared across layouts, Apps pinned last and a fixed Apps row in text mode remain the recommended interaction defaults. The current cap interpretation leaves bottom corners separate from the main nine entries. These choices can be refined during review.
+Settings-only reordering, one order shared across layouts, Apps pinned last and an always-reachable Apps row in text mode remain the recommended interaction defaults. Both views share the Apps pull/haptic experience above; only an overflowing list needs a Home-scrolling phase before it. The current cap interpretation leaves bottom corners separate from the main nine entries. These choices can be refined during review.
 
 The fully editable shortcut model and the nine-entry main-area limit replace the earlier five-built-ins-plus-three-extras proposal. The customization and revised onboarding are not implemented yet.
 

@@ -88,6 +88,14 @@ Migrate old on-device state and schema-1–5 backups into ordinary editable entr
 
 Use the same resolved entries for Home, previews, the editor and onboarding. Keep editor drafts through picker navigation and recreation, and commit each validated edit atomically. Preserve user labels/icons when changing the app target. Custom labels apply only to Home; `AppRepository` and full-list search retain actual app names. Keep the current schema-5 runtime behavior until migration and UI changes are implemented together.
 
+### Planned shared Home gesture coordination
+
+Use one Apps pull/arming state machine for both grid and list, coordinated with drawer motion and the compact-header transition. Grid and fitting lists enter it directly; an overflowing list first consumes Home scroll. Keep list offset, header-collapse offset, pull progress and the pre-pull Home presentation in transient UI state, not persisted settings. Preserve ownership of the current pointer stream through collapse, scrolling and handoff; remeasurement must not turn an ordinary scroll into an immediate launch.
+
+Only direct finger drag in the Apps pull phase contributes to pull progress; for an overflowing list, this begins beyond its end. Fling velocity alone cannot arm opening in either view. Use a threshold with hysteresis, emit haptics only on meaningful state transitions, and settle open on an armed release. Cancellation/reversal clears partial pull state and touch blocking. Do not disable or consume the in-progress gesture merely because new taps are blocked.
+
+Restore the pre-pull Home scroll/header presentation on cancellation or when dismissing Apps, and reset to the expanded header for an explicit Home request or actual new unlock before Home is revealed. Drive unlock resets from the existing current session state, not a potentially historical screen broadcast. Keep state reads observable in composition, and preserve autofocus only after drawer settling. See the [interaction sequence](ROADMAP.md#opening-apps-from-home) for the planned behavior and acceptance checks.
+
 ## Unlock and input reliability
 
 Treat **keyguard state, interactivity, lifecycle and window focus as separate observations**. `MainActivity` supplies an `UnlockEnvironment`; `UnlockTracker` recognizes a candidate unlock, while `UnlockSession` owns the queued request and active/locked UI state.

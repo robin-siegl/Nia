@@ -17,8 +17,8 @@ The **1.4.0 target** is a user-defined Home. Every app shortcut can be added, re
 
 | Area | Design rule for 1.4.0 |
 | --- | --- |
-| Icon grid | Three columns, up to three rows; no vertical scrolling or extra pages |
-| Text list | The same user-defined entries; let the entry area scroll for large text while Apps stays reachable |
+| Icon grid | Three columns, up to three rows; no vertical scrolling or extra pages; the shared Apps pull starts directly |
+| Text list | Scroll large-text entries beneath a collapsible clock/date, with an always-reachable Apps action and a deliberate pull beyond the end to open the drawer |
 | Shortcut content | Independent name, app target and outline icon, such as Google Maps with a map icon |
 | Clock and date | Time opens Clock; date opens its independently assigned Calendar app |
 | Bottom corners | Existing optional Empty/App slots, kept separate from the main-area limit in the current proposal |
@@ -50,7 +50,7 @@ Avoid surface tints, gradients or translucent wallpaper effects that turn the OL
 
 Use Material typography for controls: readable body text, quieter supporting text and a clear page title. Reuse the existing 8/12/16/24dp spacing rhythm and consistent outline icon weight. Settings use 24dp horizontal content padding and a maximum content width of 600dp. Keep Home's full-width header calibration separate from that settings constraint.
 
-Respect system text scaling in controls and app names. The calibrated Pixel-style header keeps fixed proportions; offer the existing scalable clock layout when that treatment is unsuitable.
+Respect system text scaling in controls and app names. The calibrated Pixel-style header keeps fixed proportions at rest; offer the existing scalable clock layout when that treatment is unsuitable.
 
 ## Pixel-style header
 
@@ -98,6 +98,14 @@ All timing inherits Android's animation-duration scale. The unlock lead-in is a 
 
 Delay search autofocus until the drawer settles. Block accidental launches during transitions, then release input after completion or cancellation. Press feedback stays subtle and uses Android's haptic preference. Keep lifecycle mechanics in the [architecture guide](ARCHITECTURE.md#unlock-and-input-reliability).
 
+### Planned Home scrolling and Apps transition in 1.4.0
+
+For a long Home list, keep app text at the selected size. Collapse the large clock/date into a readable compact header as the user scrolls, then restore it when returning toward the top. This is an intentional scroll interaction; the header remains expanded and stationary for an unlock reveal.
+
+Both grid and list use the same resisted Apps pull, progressive header/drawer transition, chevron/progress cue and haptic feedback. Grid mode and a list that fits enter it directly; a long list enters it after scrolling to its end. Use a soft haptic when the pull begins, a firmer cue when opening is armed, and a quiet **Release to open Apps** hint. Release while armed to open; release early or reverse to cancel. A fling alone does not arm or open Apps. Give each cue only on its state transition and use hysteresis to prevent repeated feedback.
+
+Keep a visible Apps button as a direct alternative. Respect system haptics, Reduced motion and disabled animations. Canceling or closing Apps restores the Home presentation from before the pull; an explicit Home request or fresh unlock restores the full header before it becomes visible. See the [detailed sequence](ROADMAP.md#opening-apps-from-home). This interaction is planned, not implemented yet.
+
 ## Accessibility and review
 
 Provide at least 48dp touch targets, meaningful spoken labels for icon-only actions, visible focus/selection states and a visible alternative to gestures. Keep controls reachable with large text, display scaling, keyboard insets, system-controlled window resizing and screen cutouts. Hidden Home content must not remain a duplicate accessibility destination beneath Apps.
@@ -108,4 +116,4 @@ Reference captures: [Settings](screenshots/settings-overview.png), [app actions]
 
 ### Android guidance
 
-Use [settings guidance](https://developer.android.com/design/ui/mobile/guides/patterns/settings), [Compose accessibility defaults](https://developer.android.com/develop/ui/compose/accessibility/api-defaults) and [inset handling](https://developer.android.com/develop/ui/compose/system/insets-ui) as platform references. Adapt them to nia's minimal Home and user-defined shortcuts rather than adding controls simply because a component exists.
+Use [settings guidance](https://developer.android.com/design/ui/mobile/guides/patterns/settings), [Compose accessibility defaults](https://developer.android.com/develop/ui/compose/accessibility/api-defaults) and [inset handling](https://developer.android.com/develop/ui/compose/system/insets-ui) and [event-based haptics](https://developer.android.com/develop/ui/views/haptics/haptic-feedback) as platform references. Adapt them to nia's minimal Home and user-defined shortcuts rather than adding controls simply because a component exists.

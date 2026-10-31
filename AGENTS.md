@@ -24,7 +24,7 @@ Use the repository skills below. If your agent does not discover skills automati
 
 For 1.4.0, allow adding, removing, renaming, reassigning, changing the outline icon and reordering every main Home app shortcut. Keep at most eight app shortcuts plus the mandatory Apps entry; keep the icon grid non-scrolling. Preserve existing setups through migration, and let fresh-install onboarding add shortcuts or skip to Apps-only. Keep Clock/Calendar header targets independent of Home entries. See the roadmap for the corner-cap assumption and recommended editing behavior.
 
-Keep Apps available by gesture and a visible entry, and keep the full app list alphabetical and text-only. Corner shortcuts support Empty or App; nia Settings is not a corner action.
+Apply the shared Apps pull, progress feedback, clock transition, haptic thresholds and release/cancel behavior to both grid and list. The grid itself never scrolls; only an overflowing list scrolls before handing off at its end. Ordinary flings do not arm Apps, haptics respect Android settings, and unlocks start with the expanded header. Keep Apps available by gesture and a visible entry, and keep the full app list alphabetical and text-only. Corner shortcuts support Empty or App; nia Settings is not a corner action.
 
 Keep the personal-profile scope, offline core and manual-only update checks. Preserve exact OLED black, matched themes, accessible controls and Android's animation preferences. See the guides for the full behavior and known device limitations.
 
