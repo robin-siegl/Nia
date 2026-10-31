@@ -5,31 +5,47 @@ internal class UnlockTracker {
     private var armed = false
     private var wasForeground = false
     private var backgroundDeadline: Long? = null
+    private var userPresentReceived = false
     val awaitingUnlock: Boolean get() = armed
 
+    fun userLeaving() { armed = false; wasForeground = false; backgroundDeadline = null; userPresentReceived = false }
+
     fun screenOff() {
-        if (wasForeground) { armed = true; backgroundDeadline = null }
+        if (wasForeground) { armed = true; backgroundDeadline = null; userPresentReceived = false }
     }
     fun userPresent(launcherResumed: Boolean, nowMillis: Long = 0) {
         // USER_PRESENT can precede onStart/onResume. Allow that handoff, then expire it
         // if Android unlocked into a different app instead of retaining a stale reveal.
+        userPresentReceived = true
         if (armed && !launcherResumed) backgroundDeadline = nowMillis + 1_500
     }
     fun leaveForeground(locked: Boolean, interactive: Boolean) {
-        if (!locked && interactive) { armed = false; wasForeground = false; backgroundDeadline = null }
-        else if (wasForeground) { armed = true; backgroundDeadline = null }
+        if (!locked && interactive) {
+            // The stop from screen-off can arrive after the device already reports unlocked.
+            // Preserve an observed lock until user-present or an explicit user departure.
+            if (!armed || userPresentReceived) { armed = false; backgroundDeadline = null }
+            wasForeground = false
+        } else if (wasForeground && !armed) {
+            armed = true; backgroundDeadline = null; userPresentReceived = false
+        }
     }
 
     fun foreground(locked: Boolean, interactive: Boolean, focused: Boolean, nowMillis: Long = 0): Boolean {
-        if (locked || !interactive) { armed = true; wasForeground = true; backgroundDeadline = null; return false }
         if (backgroundDeadline?.let { nowMillis >= it } == true) armed = false
-        if (!focused) return false
+        // This callback means nia has resumed. The grace period concerns background time,
+        // not how long Android subsequently takes to give its window focus.
+        backgroundDeadline = null
         wasForeground = true
+        if (locked || !interactive) {
+            if (!armed) { armed = true; userPresentReceived = false }
+            return false
+        }
+        if (!focused) return false
         return armed.also { armed = false; backgroundDeadline = null }
     }
 }
 
-/** An event survives delayed settings loading but cannot replay when Home is remounted. */
+/** Remains pending until visible completion or deliberate cancellation. */
 class UnlockRevealRequest {
     var pending: Boolean = true
         private set

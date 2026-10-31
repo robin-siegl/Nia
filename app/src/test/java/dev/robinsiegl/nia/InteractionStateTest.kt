@@ -39,6 +39,7 @@ class InteractionStateTest {
         tracker.leaveForeground(false, false)
         assertTrue(tracker.foreground(false, true, true))
         tracker.screenOff()
+        tracker.userPresent(true)
         tracker.leaveForeground(false, true)
         assertFalse(tracker.foreground(false, true, true))
     }
@@ -97,5 +98,24 @@ class InteractionStateTest {
         assertTrue(request.consume())
         assertFalse(request.pending)
         assertFalse(request.consume())
+    }
+
+    @Test fun `resuming before the background deadline preserves an unlock through slow window focus`() {
+        val tracker = UnlockTracker()
+        tracker.foreground(false, true, true)
+        tracker.screenOff()
+        tracker.userPresent(false, 100)
+        assertFalse(tracker.foreground(false, true, false, 200))
+        assertTrue(tracker.foreground(false, true, true, 3_000))
+        assertFalse(tracker.foreground(false, true, true, 3_100))
+    }
+
+    @Test fun `a late stop before user present cannot discard an observed lock`() {
+        val tracker = UnlockTracker()
+        tracker.foreground(false, true, true)
+        tracker.screenOff()
+        tracker.leaveForeground(false, true)
+        tracker.userPresent(false, 100)
+        assertTrue(tracker.foreground(false, true, true, 200))
     }
 }

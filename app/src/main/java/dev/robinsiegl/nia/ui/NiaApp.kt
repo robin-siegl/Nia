@@ -54,7 +54,7 @@ fun NiaTheme(palette: NiaPalette, content: @Composable () -> Unit) {
 
 @Composable
 fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: UnlockRevealRequest? = null, deviceLocked: Boolean = false,
-    onSystemBars: (Boolean) -> Unit) {
+    revealAllowed: Boolean = true, onSystemBars: (Boolean) -> Unit) {
     val saved by model.saved.collectAsStateWithLifecycle()
     val apps by model.apps.collectAsStateWithLifecycle()
     val loading by model.loadingApps.collectAsStateWithLifecycle()
@@ -75,6 +75,9 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: UnlockReve
     SideEffect { onSystemBars(palette.isDark) }
     LaunchedEffect(homeRequest) {
         if (homeRequest > 0) { focus.clearFocus(); keyboard?.hide(); model.home() }
+    }
+    LaunchedEffect(saved?.setupComplete, navigation.screen, unlockRequest) {
+        if (saved?.setupComplete == false || navigation.screen != Screen.Home) unlockRequest?.consume()
     }
     LaunchedEffect(model) { model.messages.collect { snackbar.showSnackbar(it) } }
     val export = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) {
@@ -122,7 +125,8 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: UnlockReve
                             onAppInfo = { model.showAppInfo(it.target) }, onCorner = model::openCorner,
                             contentTopInset = padding.calculateTopPadding(), unlockRequest = unlockRequest,
                             deviceLocked = deviceLocked, homeRequest = homeRequest,
-                            onAssignCorner = { app, position -> model.assignCornerFromApps(position, app) })
+                            onAssignCorner = { app, position -> model.assignCornerFromApps(position, app) },
+                            revealAllowed = revealAllowed)
                     } else key(screen) {
                         when (screen) {
                             Screen.Home -> {
