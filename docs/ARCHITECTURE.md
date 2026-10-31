@@ -64,6 +64,8 @@ Launch and App-info actions use `LauncherApps`. An unassigned category opens its
 
 The manifest exposes HOME/DEFAULT and LAUNCHER entry points and uses `singleTask`. The system Home chooser uses `RoleManager.ROLE_HOME`, with a Home-settings fallback. Default-launcher status refreshes on resume.
 
+The activity requests `screenOrientation="portrait"`, covering all nia screens on the primary phone. Keep the compact-layout fallback for Android-controlled windows: the platform can override orientation restrictions in multi-window and on large screens. Do not add sensor listeners or recreate the activity manually to fight those policies. See [activity orientation](https://developer.android.com/guide/topics/manifest/activity-element#screen) and [Android 16 large-screen behavior](https://developer.android.com/about/versions/16/behavior-changes-16#adaptive-layouts).
+
 `Navigation` is an immutable stack of `Screen` values. Keep its simple Back behavior. `onNewIntent` handles a new HOME intent synchronously, returns navigation Home and signals transient drawer/keyboard reset. `HomeAppsScreen` keeps Home composed beneath Apps so the header and drawer share continuous state. Use this path for both taps and gestures.
 
 ## Preferences and backups

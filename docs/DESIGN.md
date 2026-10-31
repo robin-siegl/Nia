@@ -60,7 +60,7 @@ Scale anchors by window width. Subtract the already-applied safe-drawing top ins
 
 Use the bundled Nia Header font subsets. In monochrome OLED mode, the clock uses `#E2E2E2` and the date white; colored themes share their generated foreground. Preserve the attribution in [third-party notices](../THIRD_PARTY_NOTICES.md).
 
-**Settings → Home screen → Pixel-style clock** controls this layout. Turning it off restores the scalable clock; landscape uses the compact layout. nia does not read or track the system clock style, size slider or future OS changes. The original phone screenshots are not distributed here.
+**Settings → Home screen → Pixel-style clock** controls this layout. Turning it off restores the scalable clock. nia requests portrait orientation on phones; the compact layout remains a fallback for windows whose shape Android controls. nia does not read or track the system clock style, size slider or future OS changes. The original phone screenshots are not distributed here.
 
 Exact Pixel weather remains deferred. The reference's large outline clock complication and small colored condition icon are separate elements. Do not replace them with generic symbols, invented conditions or assets of uncertain provenance. See the [platform boundary](ARCHITECTURE.md#platform-boundaries).
 
@@ -95,7 +95,7 @@ Delay search autofocus until the drawer settles. Block accidental launches durin
 
 ## Accessibility and review
 
-Provide at least 48dp touch targets, meaningful spoken labels for icon-only actions, visible focus/selection states and a visible alternative to gestures. Keep controls reachable with large text, display scaling, keyboard insets, landscape and screen cutouts. Hidden Home content must not remain a duplicate accessibility destination beneath Apps.
+Provide at least 48dp touch targets, meaningful spoken labels for icon-only actions, visible focus/selection states and a visible alternative to gestures. Keep controls reachable with large text, display scaling, keyboard insets, system-controlled window resizing and screen cutouts. Hidden Home content must not remain a duplicate accessibility destination beneath Apps.
 
 Review real Compose renders in monochrome and color light/dark themes, plus a narrow screen with large text. Use the [device checklist](DEVICE_TESTING.md) for TalkBack, keyboard and system gestures. Do not present a mockup or native test render as a physical-phone result.
 

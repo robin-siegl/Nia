@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.0 (unreleased)
+
+- Request portrait orientation for nia's activity, covering Home, Apps, Settings, setup and app pickers (issue #9).
+- Home reordering and extra-shortcut enhancements are being planned in the roadmap. They are not implemented yet; keep this release unpublished until the agreed scope is complete.
+
 ## 1.3.3
 
 - Rewrote the README around nia’s everyday experience, screenshots and installation.

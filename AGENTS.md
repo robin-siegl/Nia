@@ -2,6 +2,10 @@
 
 nia is a Kotlin/Jetpack Compose Android launcher. Follow these instructions for changes anywhere in this repository.
 
+## Active release: 1.4.0
+
+Keep the work for issues #9, #10 and #11 in the ongoing **1.4.0 / 1004000** change set. The bug fix and enhancement plans are staged in a draft PR. Keep this version while completing the agreed scope; do not publish or trigger Production APK until the work is finished and the user requests it. The fixed-Home rules below describe the implemented baseline; customization is still under design review. See the [1.4.0 plan](docs/ROADMAP.md#140-in-preparation).
+
 ## Read the relevant guidance
 
 - Read [DESIGN.md](docs/DESIGN.md) for product, UI, copy, accessibility and motion changes.
