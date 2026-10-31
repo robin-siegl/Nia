@@ -14,9 +14,10 @@ data class RestorePreview(
         fun create(current: LauncherPreferences, requested: LauncherPreferences, apps: List<AppEntry>): RestorePreview {
             val available = apps.map { it.target }.toSet()
             val unavailable = buildList {
-                HomeCategory.entries.forEach { category ->
-                    requested.assignments[category]?.takeIf { it !in available }?.let { add(UnavailableAssignment(category.label, it)) }
+                requested.homeShortcuts.forEach { shortcut ->
+                    shortcut.app?.takeIf { it !in available }?.let { add(UnavailableAssignment(shortcut.name, it)) }
                 }
+                requested.calendar?.takeIf { it !in available }?.let { add(UnavailableAssignment("Calendar", it)) }
                 requested.clock?.takeIf { it !in available }?.let { add(UnavailableAssignment("Clock", it)) }
                 CornerPosition.entries.forEach { position ->
                     requested.shortcut(position).app?.takeIf { it !in available }?.let {
@@ -26,7 +27,8 @@ data class RestorePreview(
             }
             fun sanitize(shortcut: CornerShortcut) = if (shortcut.app != null && shortcut.app !in available)
                 CornerShortcut(icon = shortcut.icon) else shortcut
-            val restored = requested.copy(assignments = requested.assignments.filterValues { it in available },
+            val restored = requested.copy(homeShortcuts = requested.homeShortcuts.map { it.copy(app = it.app?.takeIf { target -> target in available }) },
+                calendar = requested.calendar?.takeIf { it in available },
                 clock = requested.clock?.takeIf { it in available },
                 leftShortcut = sanitize(requested.leftShortcut), rightShortcut = sanitize(requested.rightShortcut))
             fun appName(target: AppTarget?, empty: String): String {
@@ -51,10 +53,27 @@ data class RestorePreview(
                 change("Appearance", "Animations", current.motionMode, restored.motionMode) { if (it == MotionMode.SYSTEM) "Standard" else "Reduced" }
                 change("App list", "Keyboard on open", current.searchAutofocus, restored.searchAutofocus, ::toggle)
                 change("App list", "A–Z navigation", current.alphabetScrubber, restored.alphabetScrubber, ::toggle)
-                HomeCategory.entries.forEach { category ->
-                    change("Everyday apps", category.label, current.assignments[category], restored.assignments[category]) { appName(it, "Not assigned") }
+                val beforeHome = current.homeShortcuts.associateBy { it.id }
+                val afterHome = restored.homeShortcuts.associateBy { it.id }
+                fun describe(shortcut: HomeShortcut?) = shortcut?.let {
+                    "${it.name} · ${it.icon.label} icon · ${appName(it.app, "Choose an app")}" } ?: "Not on Home"
+                (beforeHome.keys + afterHome.keys).forEach { id ->
+                    val before = beforeHome[id]
+                    val after = afterHome[id]
+                    if (before == null || after == null) {
+                        change("Home apps", (after ?: before)!!.name, before, after, ::describe)
+                    } else {
+                        change("Home apps", "${before.name} · Name", before.name, after.name) { it }
+                        change("Home apps", "${after.name} · Icon", before.icon, after.icon) { it.label }
+                        change("Home apps", "${after.name} · App", before.app, after.app) { appName(it, "Choose an app") }
+                    }
                 }
-                change("Everyday apps", "Clock", current.clock, restored.clock) { appName(it, "System clock") }
+                if (current.homeShortcuts.map { it.id } != restored.homeShortcuts.map { it.id }) {
+                    add(RestoreChange("Home apps", "Order", (current.homeShortcuts.map { it.name } + "Apps").joinToString(" → "),
+                        (restored.homeShortcuts.map { it.name } + "Apps").joinToString(" → ")))
+                }
+                change("Clock & date", "Clock", current.clock, restored.clock) { appName(it, "System clock") }
+                change("Clock & date", "Calendar", current.calendar, restored.calendar) { appName(it, "Choose an app") }
                 CornerPosition.entries.forEach { position ->
                     val before = current.shortcut(position)
                     val after = restored.shortcut(position)

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
+import java.util.UUID
 
 class LauncherViewModel(application: Application) : AndroidViewModel(application) {
     internal val unlockSession = UnlockSession()
@@ -34,6 +35,8 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     val loadingApps = _loadingApps.asStateFlow()
     private val _selectingApp = MutableStateFlow(false)
     val selectingApp = _selectingApp.asStateFlow()
+    private val _homeDraft = MutableStateFlow<HomeShortcutDraft?>(null)
+    val homeDraft = _homeDraft.asStateFlow()
     private val _navigation = MutableStateFlow(Navigation())
     val navigation = _navigation.asStateFlow()
     private val _isDefault = MutableStateFlow(false)
@@ -73,8 +76,11 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun navigate(screen: Screen) { _navigation.update { it.push(screen) } }
-    fun back() { _navigation.update { it.back() } }
-    fun home() { _navigation.value = Navigation() }
+    fun back() {
+        if (_navigation.value.screen == Screen.HomeShortcutEditor) _homeDraft.value = null
+        _navigation.update { it.back() }
+    }
+    fun home() { _homeDraft.value = null; _navigation.value = Navigation() }
     fun refreshDefault() { _isDefault.value = repository.isDefaultHome() }
     fun homeSelectionIntent() = repository.homeSelectionIntent()
 
@@ -98,8 +104,62 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         store.update { it.copy(setupComplete = true) }; home()
     }
 
-    fun chooseApp(category: HomeCategory?, target: AppTarget) = selectApp { p ->
-        if (category == null) p.copy(clock = target) else p.copy(assignments = p.assignments + (category to target))
+    fun chooseApp(header: HeaderTarget, target: AppTarget) = selectApp { p ->
+        if (header == HeaderTarget.CLOCK) p.copy(clock = target) else p.copy(calendar = target)
+    }
+
+    fun editHomeShortcut(id: String? = null) {
+        val preferences = _saved.value?.preferences ?: return
+        val existing = preferences.homeShortcuts.find { it.id == id }
+        if (id != null && existing == null) return
+        if (existing == null && preferences.homeShortcuts.size >= MAX_HOME_APPS) return
+        _homeDraft.value = HomeShortcutDraft(existing ?: HomeShortcut(UUID.randomUUID().toString(), ""), existing == null)
+        navigate(Screen.HomeShortcutEditor)
+    }
+
+    fun updateHomeDraft(transform: (HomeShortcut) -> HomeShortcut) {
+        _homeDraft.update { it?.copy(shortcut = transform(it.shortcut)) }
+    }
+
+    fun chooseHomeApp(app: AppEntry) {
+        if (_navigation.value.screen != Screen.HomeShortcutPicker || _homeDraft.value == null) return
+        updateHomeDraft { it.copy(app = app.target, name = it.name.ifBlank { app.label.take(MAX_HOME_NAME_LENGTH).trim().filterNot(Char::isISOControl) }) }
+        back()
+    }
+
+    fun saveHomeShortcut() {
+        val draft = _homeDraft.value ?: return
+        if (!draft.canSave || !_selectingApp.compareAndSet(false, true)) return
+        perform("The Home shortcut could not be saved.") {
+            try {
+                val shortcut = draft.shortcut.copy(name = draft.shortcut.name.trim())
+                store.update { state ->
+                    val entries = state.preferences.homeShortcuts
+                    val next = if (draft.isNew) {
+                        require(entries.size < MAX_HOME_APPS)
+                        entries + shortcut
+                    } else {
+                        require(entries.any { it.id == shortcut.id })
+                        entries.map { if (it.id == shortcut.id) shortcut else it }
+                    }
+                    state.copy(preferences = state.preferences.copy(homeShortcuts = next))
+                }
+                back()
+            } finally { _selectingApp.value = false }
+        }
+    }
+
+    fun removeHomeShortcut(id: String) = perform("The Home shortcut could not be removed.") {
+        store.update { it.copy(preferences = it.preferences.copy(homeShortcuts = it.preferences.homeShortcuts.filterNot { entry -> entry.id == id })) }
+        if (_navigation.value.screen == Screen.HomeShortcutEditor) back()
+    }
+
+    fun moveHomeShortcut(id: String, direction: Int) = updatePreferences { p ->
+        val entries = p.homeShortcuts.toMutableList()
+        val index = entries.indexOfFirst { it.id == id }
+        val destination = index + direction.coerceIn(-1, 1)
+        if (index >= 0 && destination in entries.indices) entries.add(destination, entries.removeAt(index))
+        p.copy(homeShortcuts = entries)
     }
 
     private fun selectApp(transform: (LauncherPreferences) -> LauncherPreferences) {
@@ -112,8 +172,8 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun clearAssignment(category: HomeCategory?) = updatePreferences {
-        if (category == null) it.copy(clock = null) else it.copy(assignments = it.assignments - category)
+    fun clearAssignment(header: HeaderTarget) = updatePreferences {
+        if (header == HeaderTarget.CLOCK) it.copy(clock = null) else it.copy(calendar = null)
     }
 
     fun chooseCornerApp(position: CornerPosition, target: AppTarget) = selectApp { p ->
@@ -145,14 +205,26 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         if (launchGate.accept(SystemClock.elapsedRealtime())) action()
     }
 
-    fun openCategory(category: HomeCategory) {
-        val target = _saved.value?.preferences?.assignments?.get(category)
-        if (target == null) { navigate(Screen.Picker(category)); return }
+    fun openHomeShortcut(id: String) {
+        val shortcut = _saved.value?.preferences?.homeShortcuts?.find { it.id == id } ?: return
+        val target = shortcut.app
+        if (target == null) { editHomeShortcut(id); return }
         launch { try { repository.launch(target); home() }
         catch (_: RuntimeException) {
             launchGate.reset()
-            navigate(Screen.Picker(category))
-            events.trySend("That app is unavailable. Choose another app for ${category.label}.")
+            editHomeShortcut(id)
+            events.trySend("That app is unavailable. Choose another app for ${shortcut.name}.")
+        } }
+    }
+
+    fun openCalendar() {
+        val target = _saved.value?.preferences?.calendar
+        if (target == null) { navigate(Screen.Picker(HeaderTarget.CALENDAR)); return }
+        launch { try { repository.launch(target); home() }
+        catch (_: RuntimeException) {
+            launchGate.reset()
+            navigate(Screen.Picker(HeaderTarget.CALENDAR))
+            events.trySend("Choose the calendar app you want to open.")
         } }
     }
 
@@ -163,7 +235,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
             home()
         } catch (_: RuntimeException) {
             launchGate.reset()
-            navigate(Screen.Picker(null))
+            navigate(Screen.Picker(HeaderTarget.CLOCK))
             events.trySend("Choose the clock app you want to open.")
         } }
     }
@@ -248,7 +320,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun resetAppearance() = updatePreferences { current ->
-        LauncherPreferences(assignments = current.assignments, clock = current.clock,
+        LauncherPreferences(homeShortcuts = current.homeShortcuts, clock = current.clock, calendar = current.calendar,
             leftShortcut = current.leftShortcut, rightShortcut = current.rightShortcut)
     }
 

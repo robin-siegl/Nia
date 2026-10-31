@@ -4,37 +4,58 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
+import android.os.Build
+import android.view.HapticFeedbackConstants
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.nestedscroll.*
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import dev.robinsiegl.nia.model.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
+private class PointerTermination {
+    var active = false
+    var releasedNormally = false
+    var startedOpen = false
+}
+
 internal val DrawerProgress = SemanticsPropertyKey<Float>("DrawerProgress")
+internal val AppsPullArmed = SemanticsPropertyKey<Boolean>("AppsPullArmed")
 internal val DrawerSettling = SemanticsPropertyKey<Boolean>("DrawerSettling")
 
 internal fun drawerShouldOpen(progress: Float, velocityY: Float, velocityThreshold: Float): Boolean = when {
@@ -59,6 +80,10 @@ internal class DrawerMotion(initialOpen: Boolean, private val scope: CoroutineSc
     fun snapClosed() {
         animation?.cancel(); generation++
         progress = 0f; targetOpen = false; dragging = false; settling = false
+    }
+
+    fun preview(value: Float) {
+        if (!settling) { dragging = true; progress = value.coerceIn(0f, 1f) }
     }
 
     fun drag(delta: Float, travel: Float): Float {
@@ -97,14 +122,21 @@ internal class DrawerMotion(initialOpen: Boolean, private val scope: CoroutineSc
 internal fun HomeAppsScreen(
     preferences: LauncherPreferences, apps: List<AppEntry>, loading: Boolean, time: String, date: String,
     drawerOpen: Boolean, onDrawerOpenChanged: (Boolean) -> Unit,
-    onClock: () -> Unit, onCategory: (HomeCategory) -> Unit, onSettings: () -> Unit,
+    onClock: () -> Unit, onShortcut: (String) -> Unit, onSettings: () -> Unit,
     onApp: (AppEntry) -> Unit, onAppInfo: (AppEntry) -> Unit, onCorner: (CornerPosition) -> Unit,
     contentTopInset: Dp = 0.dp, unlockRequest: UnlockRevealRequest? = null, deviceLocked: Boolean = false, homeRequest: Int = 0,
     onAssignCorner: ((AppEntry, CornerPosition) -> Unit)? = null,
-    revealAllowed: Boolean = true,
+    revealAllowed: Boolean = true, onDate: () -> Unit = {},
+    onPullCue: ((PullCue) -> Unit)? = null,
 ) {
     val scope = rememberCoroutineScope()
     val state = remember { DrawerMotion(drawerOpen, scope) }
+    val pull = remember { AppsPull() }
+    val pointer = remember { PointerTermination() }
+    // Reset before the first unlock/Home frame; keep the offset while Apps is temporarily on top.
+    val homeScroll = key(homeRequest, unlockRequest) { rememberScrollState() }
+    val view = LocalView.current
+    val cueNow by rememberUpdatedState(onPullCue)
     val externalOpen by rememberUpdatedState(drawerOpen)
     val onChanged by rememberUpdatedState(onDrawerOpenChanged)
     val reduced = preferences.motionMode == MotionMode.REDUCED
@@ -112,6 +144,7 @@ internal fun HomeAppsScreen(
     val lockedNow by rememberUpdatedState(deviceLocked)
     val density = LocalDensity.current
     val velocityThreshold = with(density) { 700.dp.toPx() }
+    val pullThreshold = with(density) { 112.dp.toPx() }
     val listState = rememberLazyListState()
     var homeScrollable by remember { mutableStateOf(false) }
     var shortcutsReady by remember { mutableStateOf(!deviceLocked) }
@@ -121,36 +154,57 @@ internal fun HomeAppsScreen(
     fun moved(open: Boolean) { if (externalOpen != open) onChanged(open) }
     fun request(open: Boolean) {
         if (!open) { focus.clearFocus(); keyboard?.hide() }
+        pull.reset()
         state.moveTo(open, reducedNow, ::moved)
     }
     fun drag(delta: Float): Float {
         if (!state.dragging) { focus.clearFocus(); keyboard?.hide() }
+        if (!externalOpen && !state.targetOpen) {
+            if (!state.dragging && delta >= 0f) return 0f
+            val consumed = pull.drag(delta, pullThreshold) { cue ->
+                cueNow?.invoke(cue)
+                view.performHapticFeedback(if (cue == PullCue.START) HapticFeedbackConstants.CLOCK_TICK
+                    else if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.LONG_PRESS)
+            }
+            state.preview(pull.preview)
+            return consumed
+        }
         return state.drag(delta, travel)
     }
-    fun finish(velocity: Float) { request(drawerShouldOpen(state.progress, velocity, velocityThreshold)) }
+    fun finish(velocity: Float) {
+        if (!state.dragging || state.settling) return
+        if (!pointer.releasedNormally) { request(pointer.startedOpen); return }
+        // Opening requires a deliberate distance. A fling can only help dismiss an already open drawer.
+        request(if (!externalOpen && !state.targetOpen) pull.armed else drawerShouldOpen(state.progress, velocity, velocityThreshold))
+    }
     LaunchedEffect(drawerOpen) {
         if (drawerOpen != state.targetOpen) {
             if (drawerOpen) request(true)
-            else { focus.clearFocus(); keyboard?.hide(); state.snapClosed() }
+            else { focus.clearFocus(); keyboard?.hide(); pull.reset(); state.snapClosed() }
         }
     }
     var handledHome by remember { mutableIntStateOf(homeRequest) }
-    LaunchedEffect(homeRequest) {
-        if (handledHome != homeRequest) {
-            handledHome = homeRequest; focus.clearFocus(); keyboard?.hide(); state.snapClosed()
+    LaunchedEffect(deviceLocked, unlockRequest) {
+        if (deviceLocked || unlockRequest?.pending == true) {
+            focus.clearFocus(); keyboard?.hide(); pull.reset(); state.snapClosed(); moved(false)
         }
     }
-    val connection = remember(state, listState) {
+    LaunchedEffect(homeRequest) {
+        if (handledHome != homeRequest) {
+            handledHome = homeRequest; focus.clearFocus(); keyboard?.hide(); pull.reset(); state.snapClosed(); moved(false)
+        }
+    }
+    val connection = remember(state, listState, pullThreshold, velocityThreshold) {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                if (source != NestedScrollSource.UserInput || state.settling || lockedNow) return Offset.Zero
+                if (source != NestedScrollSource.UserInput || !pointer.active || state.settling || lockedNow) return Offset.Zero
                 if (state.dragging || (state.progress == 1f && !listState.canScrollBackward && available.y > 0)) {
                     return Offset(0f, drag(available.y))
                 }
                 return Offset.Zero
             }
             override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
-                if (source != NestedScrollSource.UserInput || state.settling || lockedNow) return Offset.Zero
+                if (source != NestedScrollSource.UserInput || !pointer.active || state.settling || lockedNow) return Offset.Zero
                 if (state.dragging || (state.progress == 0f && available.y < 0)) return Offset(0f, drag(available.y))
                 return Offset.Zero
             }
@@ -166,7 +220,6 @@ internal fun HomeAppsScreen(
             }
         }
     }
-    val busy = state.settling || state.dragging
     val atHome by remember { derivedStateOf { !state.settling && !state.dragging && state.progress == 0f } }
     val atApps by remember { derivedStateOf { !state.settling && !state.dragging && state.progress == 1f } }
     val showDrawer by remember { derivedStateOf { state.progress > 0f || state.settling } }
@@ -174,8 +227,32 @@ internal fun HomeAppsScreen(
     val appsReady = atApps && !deviceLocked
     val homeDrag = rememberDraggableState { drag(it) }
     val headerDrag = rememberDraggableState { drag(it) }
-    BackHandler(enabled = showDrawer && !appsReady) { /* Finish this transition before accepting another. */ }
-    BoxWithConstraints(Modifier.fillMaxSize().testTag("home-apps-surface").nestedScroll(connection).semantics {
+    BackHandler(enabled = showDrawer && !appsReady) { request(false) }
+    BoxWithConstraints(Modifier.fillMaxSize().testTag("home-apps-surface").nestedScroll(connection)
+        .pointerInput(state) {
+            awaitEachGesture {
+                awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+                pointer.active = true
+                pointer.releasedNormally = false
+                pointer.startedOpen = externalOpen
+                try {
+                    do {
+                        // Observe termination before draggable/scrollable handles the same up event.
+                        // Those APIs also call onDragStopped(0) for cancellation; zero is not a release.
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                        if (event.changes.none { it.pressed }) {
+                            pointer.active = false
+                            pointer.releasedNormally = event.type == PointerEventType.Release
+                            break
+                        }
+                    } while (true)
+                } finally {
+                    pointer.active = false
+                    if (!pointer.releasedNormally && state.dragging) request(pointer.startedOpen)
+                }
+            }
+        }.semantics {
+        this[AppsPullArmed] = pull.armed
         this[DrawerProgress] = state.progress
         this[DrawerSettling] = state.settling
     }) {
@@ -185,14 +262,17 @@ internal fun HomeAppsScreen(
             .draggable(homeDrag, Orientation.Vertical,
                 enabled = !homeScrollable && shortcutsReady && !state.settling && !deviceLocked && !externalOpen,
                 onDragStopped = { finish(it) })) {
-            HomeScreen(preferences.layout, time, date, onClock, onCategory, { request(true) },
+            HomeScreen(preferences.layout, time, date, onClock, onShortcut, { request(true) },
                 textSize = preferences.homeTextSize, onSettings = onSettings, pixelClockLayout = preferences.pixelClockLayout,
                 contentTopInset = contentTopInset, leftShortcut = preferences.leftShortcut, rightShortcut = preferences.rightShortcut,
                 onCorner = onCorner, cornerLabel = { position ->
                     apps.find { it.target == preferences.shortcut(position).app }?.label ?: (position.label + " shortcut, unavailable")
                 }, motionMode = preferences.motionMode, unlockRequest = unlockRequest, deviceLocked = deviceLocked,
                 interactionEnabled = homeReady, onScrollable = { homeScrollable = it },
-                onRevealReady = { shortcutsReady = it }, revealAllowed = revealAllowed)
+                onRevealReady = { shortcutsReady = it }, revealAllowed = revealAllowed,
+                shortcuts = preferences.homeShortcuts, onDate = onDate, scroll = homeScroll,
+                gesturesEnabled = !state.settling && !externalOpen && !deviceLocked && shortcutsReady,
+                pullProgress = (state.progress / 0.3f).coerceIn(0f, 1f))
         }
         if (showDrawer || drawerOpen) {
             Box(Modifier.fillMaxSize().graphicsLayer {
@@ -208,7 +288,23 @@ internal fun HomeAppsScreen(
                         enabled = !state.settling && !deviceLocked, onDragStopped = { finish(it) }))
             }
         }
-        if (busy || deviceLocked || !shortcutsReady) Box(Modifier.fillMaxSize().pointerInput(Unit) {
+        if (pull.active) Column(Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp)
+            .background(MaterialTheme.colorScheme.background).padding(horizontal = 20.dp, vertical = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            val ink = MaterialTheme.colorScheme.onSurface
+            Canvas(Modifier.size(28.dp).semantics { stateDescription = if (pull.armed) "Ready to open Apps" else "Pulling Apps" }) {
+                val stroke = 1.5.dp.toPx()
+                drawCircle(ink.copy(alpha = 0.18f), radius = size.minDimension / 2 - stroke, style = Stroke(stroke))
+                drawArc(ink, -90f, 360f * (pull.distance / pullThreshold).coerceIn(0f, 1f), false,
+                    topLeft = Offset(stroke, stroke), size = androidx.compose.ui.geometry.Size(size.width - stroke * 2, size.height - stroke * 2),
+                    style = Stroke(stroke, cap = StrokeCap.Round))
+                drawLine(ink, Offset(size.width * 0.32f, size.height * 0.56f), Offset(size.width * 0.5f, size.height * 0.38f), stroke, StrokeCap.Round)
+                drawLine(ink, Offset(size.width * 0.5f, size.height * 0.38f), Offset(size.width * 0.68f, size.height * 0.56f), stroke, StrokeCap.Round)
+            }
+            Text(if (pull.armed) "Release to open Apps" else "Pull to open Apps", fontSize = 14.sp,
+                modifier = Modifier.padding(top = 6.dp))
+        }
+        if (state.settling || deviceLocked || !shortcutsReady) Box(Modifier.fillMaxSize().pointerInput(Unit) {
             awaitPointerEventScope {
                 while (true) awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
             }

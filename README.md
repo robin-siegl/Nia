@@ -2,7 +2,7 @@
 
 **A quieter way home.**
 
-nia is a minimalist Android launcher built around five everyday shortcuts, a clock and date, and a searchable app list. Keep the apps you reach for close, with a little more space around everything else.
+nia is a minimalist Android launcher with your chosen shortcuts, a clock and date, and a searchable app list. Keep the apps you reach for close, with a little more space around everything else.
 
 [Download nia](https://github.com/robin-siegl/Nia/releases/latest) · [Changelog](CHANGELOG.md) · [Privacy](docs/PRIVACY.md)
 
@@ -14,13 +14,19 @@ nia is a minimalist Android launcher built around five everyday shortcuts, a clo
 
 ## Your essentials, in a familiar place
 
-**Phone. Messages. Music. Calendar. Maps.** Assign each shortcut to the app you prefer. Choose an outline icon grid or a plain text list; the order stays the same.
+Choose the apps that belong on your Home. Add up to **eight apps plus Apps**, pick their names and outline icons, and arrange them in your own order. Use a three-column icon grid or a plain text list; both share your arrangement.
 
-The time opens Clock, and the date opens your Calendar. Two optional bottom corners give you quick access to other apps, with a choice of matching outline icons. Leave both empty for a simpler Home.
+Start with an empty Home and add just what you need during setup, or later in **Settings → Home apps**. Every app entry can be edited or removed. Upgrading from an earlier nia keeps your existing shortcuts.
+
+The time opens Clock, and the date opens your separately assigned Calendar. Two optional bottom corners give you quick access to other apps, with a choice of matching outline icons. Leave both empty for a simpler Home.
+
+<p>
+  <img src="docs/screenshots/home-shortcut-editor.png" width="220" alt="Edit a Home app's name, target and outline icon" />
+</p>
 
 ## All your apps, a swipe away
 
-Swipe up or tap **Apps** to open an alphabetical list of app names. Search by name, initials or words in any order, or enable A–Z navigation to jump through the list.
+Pull up and release, or tap **Apps**, to open an alphabetical list of app names. A gentle visual cue and optional system haptics show when the pull is ready. Large Home lists scroll first, with a compact clock and a reachable Apps row; the icon grid stays on one screen. Search by name, initials or words in any order, or enable A–Z navigation to jump through the list.
 
 You can have the keyboard open automatically when Apps is ready. When a search finds just one app, press Enter to open it. Touch and hold an app name for App info or to assign it to a corner.
 
@@ -41,9 +47,9 @@ Monochrome dark mode uses **true `#000000` black**. Colored themes can use a pur
 
 ## A few thoughtful details
 
-- Guided setup helps you choose your layout, apps and colors.
+- Guided setup helps you choose your layout, apps and colors—or skip adding apps for an Apps-only Home.
 - Settings show your current choices, with readable controls and an adjustable Home text size.
-- Save your settings to a file and review the changes before restoring a backup.
+- Save your settings to a file and review names, icons, order, app assignments and other changes before restoring a backup.
 - Check for a new GitHub release from **About nia** whenever you choose.
 - Choose reduced animations; both motion options follow Android's animation settings.
 

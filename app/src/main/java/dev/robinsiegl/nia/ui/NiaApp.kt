@@ -60,6 +60,7 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: UnlockReve
     val loading by model.loadingApps.collectAsStateWithLifecycle()
     val selectingApp by model.selectingApp.collectAsStateWithLifecycle()
     val navigation by model.navigation.collectAsStateWithLifecycle()
+    val homeDraft by model.homeDraft.collectAsStateWithLifecycle()
     val isDefault by model.isDefault.collectAsStateWithLifecycle()
     val storageError by model.storageError.collectAsStateWithLifecycle()
     val restore by model.restore.collectAsStateWithLifecycle()
@@ -120,7 +121,7 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: UnlockReve
                         val (time, date) = rememberClockText()
                         HomeAppsScreen(preferences, apps, loading, time, date, drawerOpen = screen == Screen.Apps,
                             onDrawerOpenChanged = { if (it) model.navigate(Screen.Apps) else model.back() },
-                            onClock = model::openClock, onCategory = model::openCategory,
+                            onClock = model::openClock, onShortcut = model::openHomeShortcut, onDate = model::openCalendar,
                             onSettings = { model.navigate(Screen.Settings) }, onApp = { model.openApp(it.target) },
                             onAppInfo = { model.showAppInfo(it.target) }, onCorner = model::openCorner,
                             contentTopInset = padding.calculateTopPadding(), unlockRequest = unlockRequest,
@@ -132,7 +133,7 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: UnlockReve
                             Screen.Home -> {
                                 OnboardingScreen(preferences, apps, saved?.setupStep ?: SetupStep.LAYOUT, isDefault,
                                     onChange = model::updatePreferences, onStep = model::moveSetup,
-                                    onAssign = { model.navigate(Screen.Picker(it)) }, onClear = model::clearAssignment,
+                                    onEditHome = model::editHomeShortcut, onMoveHome = model::moveHomeShortcut,
                                     onDefault = setDefault, onStart = model::finishSetup,
                                     onApps = { model.navigate(Screen.Apps) }, onImport = beginImport,
                                     storageError = storageError,
@@ -144,9 +145,17 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: UnlockReve
                                 alphabetScrubber = preferences.alphabetScrubber,
                                 onAssignCorner = { app, position -> model.assignCornerFromApps(position, app) })
                             is Screen.Picker -> AppListScreen(apps, loading, false,
-                                title = screen.category?.label ?: "Clock", onBack = model::back,
-                                onSelect = { model.chooseApp(screen.category, it.target) }, alphabetScrubber = preferences.alphabetScrubber,
+                                title = screen.header.label, onBack = model::back,
+                                onSelect = { model.chooseApp(screen.header, it.target) }, alphabetScrubber = preferences.alphabetScrubber,
                                 interactionEnabled = !selectingApp)
+                            Screen.HomeShortcutEditor -> homeDraft?.let { draft ->
+                                HomeShortcutEditorScreen(draft, apps, selectingApp, model::updateHomeDraft,
+                                    onChooseApp = { model.navigate(Screen.HomeShortcutPicker) }, onSave = model::saveHomeShortcut,
+                                    onRemove = { model.removeHomeShortcut(draft.shortcut.id) }, onBack = model::back)
+                            }
+                            Screen.HomeShortcutPicker -> AppListScreen(apps, loading, false,
+                                title = "Choose app", onBack = model::back, onSelect = model::chooseHomeApp,
+                                alphabetScrubber = preferences.alphabetScrubber)
                             is Screen.CornerPicker -> AppListScreen(apps, loading, false,
                                 title = screen.position.label + " shortcut", onBack = model::back,
                                 onSelect = { model.chooseCornerApp(screen.position, it.target) }, alphabetScrubber = preferences.alphabetScrubber,
@@ -160,6 +169,7 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: UnlockReve
                                 onExport = { export.launch("nia-settings-${LocalDate.now()}.json") }, onImport = beginImport,
                                 onResetAppearance = model::resetAppearance, onResetAll = model::resetAll, onOpenLink = openLink,
                                 onAssignCorner = { model.navigate(Screen.CornerPicker(it)) },
+                                onEditHome = model::editHomeShortcut, onMoveHome = model::moveHomeShortcut,
                                 updateCheck = updateCheck, onCheckUpdates = model::checkForUpdates)
                         }
                     }

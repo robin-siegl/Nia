@@ -1,6 +1,6 @@
 package dev.robinsiegl.nia.data
 
-import dev.robinsiegl.nia.model.LauncherPreferences
+import dev.robinsiegl.nia.model.*
 import dev.robinsiegl.nia.model.PreferencesValidation
 import dev.robinsiegl.nia.model.SavedState
 import kotlinx.serialization.Serializable
@@ -21,7 +21,7 @@ class BackupException(message: String) : IllegalArgumentException(message)
 
 object BackupCodec {
     const val MAX_BYTES = 256 * 1024
-    private const val CURRENT_VERSION = 5
+    private const val CURRENT_VERSION = 6
     val json = Json { encodeDefaults = true; prettyPrint = true; explicitNulls = false }
 
     fun export(preferences: LauncherPreferences, exportedAt: String = Instant.now().toString()): ByteArray {
@@ -45,7 +45,7 @@ object BackupCodec {
             if (root["profile"]?.jsonPrimitive?.content != "personal") {
                 throw BackupException("This version of nia supports personal-profile backups only.")
             }
-            val compatible = if (version <= 4) JsonObject(root + ("settings" to migrateSettings(root.getValue("settings").jsonObject))) else root
+            val compatible = if (version <= 5) JsonObject(root + ("settings" to migrateHome(migrateSettings(root.getValue("settings").jsonObject)))) else root
             val backup = json.decodeFromJsonElement<SettingsBackup>(compatible)
             PreferencesValidation.validate(backup.settings)
             return backup.settings
@@ -56,11 +56,23 @@ object BackupCodec {
         }
     }
 
-    /** Read 1.2 preferences without bringing the removed Settings shortcut back onto Home. */
+    /** A missing list denotes legacy on-device state; an explicitly empty list is an Apps-only Home. */
     fun decodeState(text: String): SavedState {
         val root = json.parseToJsonElement(text).jsonObject
-        val compatible = root["preferences"]?.let { JsonObject(root + ("preferences" to migrateSettings(it.jsonObject))) } ?: root
+        val preferences = root["preferences"]?.jsonObject ?: JsonObject(emptyMap())
+        val migrated = migrateSettings(preferences).let { if ("homeShortcuts" in it) it else migrateHome(it) }
+        val compatible = JsonObject(root + ("preferences" to migrated))
         return json.decodeFromJsonElement(compatible)
+    }
+
+    private fun migrateHome(settings: JsonObject): JsonObject {
+        // Older schema versions cannot smuggle current-model fields past validation.
+        require("homeShortcuts" !in settings && "calendar" !in settings)
+        val assignments = settings["assignments"]?.let { json.decodeFromJsonElement<Map<HomeCategory, AppTarget>>(it) } ?: emptyMap()
+        return JsonObject((settings - "assignments") + mapOf(
+            "homeShortcuts" to json.encodeToJsonElement(legacyHomeShortcuts(assignments)),
+            "calendar" to (assignments[HomeCategory.CALENDAR]?.let { json.encodeToJsonElement(it) } ?: JsonNull),
+        ))
     }
 
     private fun migrateSettings(settings: JsonObject): JsonObject = JsonObject(settings.mapValues { (key, value) ->

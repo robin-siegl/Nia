@@ -28,18 +28,19 @@ internal fun HomePreview(preferences: LauncherPreferences, modifier: Modifier = 
         }
         Spacer(Modifier.height(16.dp))
         if (preferences.layout == HomeLayout.GRID) {
-            val shortcuts = HomeCategory.entries.toList() + listOf(null)
+            val shortcuts = preferences.homeShortcuts + listOf(null)
             shortcuts.chunked(3).forEach { row ->
                 Row(Modifier.fillMaxWidth().padding(vertical = 12.dp)) {
-                    row.forEach { category ->
+                    row.forEach { shortcut ->
                         Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                            if (category == null) AppsIcon(Modifier.size(22.dp)) else CategoryIcon(category, Modifier.size(22.dp))
+                            if (shortcut == null) AppsIcon(Modifier.size(22.dp)) else ShortcutGlyph(shortcut.icon, Modifier.size(22.dp))
                         }
                     }
+                    repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
                 }
             }
         } else {
-            (HomeCategory.entries.map { it.label } + "Apps").forEach { label ->
+            (preferences.homeShortcuts.map { it.name } + "Apps").forEach { label ->
                 Text(label, fontSize = (20 * scale).sp, fontWeight = FontWeight.Light,
                     modifier = Modifier.padding(vertical = 3.dp))
             }

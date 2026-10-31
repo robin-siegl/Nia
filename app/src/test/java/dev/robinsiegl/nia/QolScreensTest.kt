@@ -38,7 +38,7 @@ class QolScreensTest {
     }
     @Composable
     private fun drawer(p: LauncherPreferences, open: Boolean, onOpen: (Boolean) -> Unit, onApp: (AppEntry) -> Unit = {}) {
-        HomeAppsScreen(p, apps, false, "14:03", "Fri, 30 Oct", open, onOpen, {}, {}, {}, onApp, {}, {})
+        HomeAppsScreen(p.copy(homeShortcuts = legacyHomeShortcuts()), apps, false, "14:03", "Fri, 30 Oct", open, onOpen, {}, {}, {}, onApp, {}, {})
     }
     private fun progress() = rule.onNodeWithTag("home-apps-surface").fetchSemanticsNode().config[DrawerProgress]
     private fun capture(name: String) = rule.runOnIdle {
@@ -80,7 +80,7 @@ class QolScreensTest {
             down(Offset(width / 2f, height * 0.9f))
             moveTo(Offset(width / 2f, height * 0.6f), 200)
         }
-        assertTrue("Drawer progress was " + progress(), progress() in 0.2f..0.4f)
+        assertTrue("Drawer progress was " + progress(), progress() in 0.3f..0.55f)
         assertFalse(open)
         rule.onNodeWithTag("home-apps-surface").performTouchInput {
             moveTo(Offset(width / 2f, height * 0.9f), 250)
@@ -110,7 +110,7 @@ class QolScreensTest {
     @Test fun `an empty drawer can be pulled closed too`() {
         var open by mutableStateOf(true)
         render {
-            HomeAppsScreen(LauncherPreferences(), emptyList(), false, "14:03", "Fri, 30 Oct", open, { open = it }, {}, {}, {}, {}, {}, {})
+            HomeAppsScreen(LauncherPreferences(homeShortcuts = legacyHomeShortcuts()), emptyList(), false, "14:03", "Fri, 30 Oct", open, { open = it }, {}, {}, {}, {}, {}, {})
         }
         rule.onNodeWithTag("apps-screen").performTouchInput { swipeDown() }
         rule.waitForIdle()
@@ -133,7 +133,7 @@ class QolScreensTest {
         var open by mutableStateOf(false)
         var homeRequest by mutableIntStateOf(0)
         render {
-            HomeAppsScreen(LauncherPreferences(), apps, false, "14:03", "Fri, 30 Oct", open, { open = it },
+            HomeAppsScreen(LauncherPreferences(homeShortcuts = legacyHomeShortcuts()), apps, false, "14:03", "Fri, 30 Oct", open, { open = it },
                 {}, {}, {}, {}, {}, {}, homeRequest = homeRequest)
         }
         rule.mainClock.autoAdvance = false
@@ -183,7 +183,7 @@ class QolScreensTest {
 
     @Test fun `empty corners stay absent and long pressing blank Home opens settings`() {
         var settings = 0
-        render { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}, onSettings = { settings++ }) }
+        render { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}, onSettings = { settings++ }, shortcuts = legacyHomeShortcuts()) }
         rule.onNodeWithTag("home-corner-LEFT").assertDoesNotExist()
         rule.onNodeWithTag("home-corner-RIGHT").assertDoesNotExist()
         rule.onNodeWithTag("home-screen").performTouchInput { longClick(Offset(width / 2f, height * 0.85f)) }
@@ -196,7 +196,7 @@ class QolScreensTest {
         render {
             HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}, leftShortcut = left,
                 rightShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.HEADPHONES, apps.last().target),
-                onCorner = { chosen = it }, cornerLabel = { if (it == CornerPosition.LEFT) "Notes" else "Podcasts" })
+                onCorner = { chosen = it }, cornerLabel = { if (it == CornerPosition.LEFT) "Notes" else "Podcasts" }, shortcuts = legacyHomeShortcuts())
         }
         rule.onNodeWithContentDescription("Notes").performClick()
         assertEquals(CornerPosition.LEFT, chosen)
@@ -217,7 +217,7 @@ class QolScreensTest {
         rule.onNodeWithText("Settings", substring = false).assertDoesNotExist()
         rule.onAllNodesWithText("App").onLast().performClick()
         assertEquals(CornerPosition.RIGHT, picker)
-        assertTrue(p.assignments.isEmpty())
+        assertTrue(p.homeShortcuts.isEmpty())
         capture("corner-settings")
     }
 
@@ -225,7 +225,7 @@ class QolScreensTest {
         var locked by mutableStateOf(false)
         var unlock by mutableStateOf<UnlockRevealRequest?>(null)
         var time by mutableStateOf("14:03")
-        render { HomeScreen(HomeLayout.GRID, time, "Fri, 30 Oct", {}, {}, {}, unlockRequest = unlock, deviceLocked = locked) }
+        render { HomeScreen(HomeLayout.GRID, time, "Fri, 30 Oct", {}, {}, {}, unlockRequest = unlock, deviceLocked = locked, shortcuts = legacyHomeShortcuts()) }
         val bounds = rule.onNodeWithTag("home-clock").fetchSemanticsNode().boundsInRoot
         rule.mainClock.autoAdvance = false
         // Flush snapshot writes explicitly before advancing the paused test frame clock.

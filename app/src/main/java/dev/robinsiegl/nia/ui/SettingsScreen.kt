@@ -46,7 +46,7 @@ private fun settingsSummary(section: SettingsSection, p: LauncherPreferences): S
     SettingsSection.APPEARANCE -> "${if (p.colorStyle == ColorStyle.MONOCHROME) "Black & white" else "Color"} · ${when (p.themeMode) {
         ThemeMode.SYSTEM -> "Follow system"; ThemeMode.LIGHT -> "Light"; ThemeMode.DARK -> "Dark"
     }}"
-    SettingsSection.ASSIGNMENTS -> "${HomeCategory.entries.count { p.assignments[it] != null }} of ${HomeCategory.entries.size} shortcuts assigned"
+    SettingsSection.ASSIGNMENTS -> "${p.homeShortcuts.size} ${if (p.homeShortcuts.size == 1) "app" else "apps"} · Add, edit and arrange"
     SettingsSection.SHORTCUTS -> when {
         p.leftShortcut.action == ShortcutAction.APP && p.rightShortcut.action == ShortcutAction.APP -> "Both corners"
         p.leftShortcut.action == ShortcutAction.APP -> "Left corner"
@@ -61,18 +61,23 @@ private fun settingsSummary(section: SettingsSection, p: LauncherPreferences): S
 fun SettingsDetailScreen(
     section: SettingsSection, preferences: LauncherPreferences, apps: List<AppEntry>, storageError: Boolean,
     onBack: () -> Unit, onChange: ((LauncherPreferences) -> LauncherPreferences) -> Unit,
-    onAssign: (HomeCategory?) -> Unit, onClear: (HomeCategory?) -> Unit,
+    onAssign: (HeaderTarget) -> Unit, onClear: (HeaderTarget) -> Unit,
     onExport: () -> Unit, onImport: () -> Unit, onResetAppearance: () -> Unit, onResetAll: () -> Unit,
     onOpenLink: (String) -> Unit,
     onAssignCorner: (CornerPosition) -> Unit = {},
+    onEditHome: (String?) -> Unit = {}, onMoveHome: (String, Int) -> Unit = { _, _ -> },
     updateCheck: UpdateCheck = UpdateCheck.Idle, onCheckUpdates: () -> Unit = {},
 ) {
     SettingsLayout(section.title, onBack) {
         when (section) {
-            SettingsSection.HOME -> HomeSettings(preferences, onChange)
+            SettingsSection.HOME -> {
+                HomeSettings(preferences, onChange)
+                SectionLabel("Clock & date")
+                AssignmentsSettings(preferences, apps, onAssign, onClear)
+            }
             SettingsSection.SHORTCUTS -> CornerSettings(preferences, apps, onChange, onAssignCorner)
             SettingsSection.APPEARANCE -> AppearanceSettings(preferences, onChange)
-            SettingsSection.ASSIGNMENTS -> AssignmentsSettings(preferences, apps, onAssign, onClear)
+            SettingsSection.ASSIGNMENTS -> HomeAppsSettings(preferences, apps, onEditHome, onMoveHome)
             SettingsSection.APP_LIST -> {
                 SettingSwitch("Keyboard on open", "Open the keyboard when Apps is ready to search.", preferences.searchAutofocus) {
                     value -> onChange { it.copy(searchAutofocus = value) }
@@ -131,14 +136,11 @@ internal fun AppearanceSettings(preferences: LauncherPreferences, onChange: ((La
 
 @Composable
 internal fun AssignmentsSettings(
-    preferences: LauncherPreferences, apps: List<AppEntry>, onAssign: (HomeCategory?) -> Unit, onClear: (HomeCategory?) -> Unit,
+    preferences: LauncherPreferences, apps: List<AppEntry>, onAssign: (HeaderTarget) -> Unit, onClear: (HeaderTarget) -> Unit,
 ) {
-    SettingsDescription("Choose which app each shortcut opens. The date opens Calendar; the time opens Clock.",
-        Modifier.padding(top = 8.dp, bottom = 12.dp))
-    HomeCategory.entries.forEach { category ->
-        AssignmentRow(category.label, preferences.assignments[category], apps, { onAssign(category) }, { onClear(category) })
-    }
-    AssignmentRow("Clock", preferences.clock, apps, { onAssign(null) }, { onClear(null) }, "System clock")
+    SettingsDescription("These choices stay separate from your Home apps.", Modifier.padding(top = 8.dp, bottom = 12.dp))
+    AssignmentRow("Clock", preferences.clock, apps, { onAssign(HeaderTarget.CLOCK) }, { onClear(HeaderTarget.CLOCK) }, "System clock")
+    AssignmentRow("Calendar", preferences.calendar, apps, { onAssign(HeaderTarget.CALENDAR) }, { onClear(HeaderTarget.CALENDAR) }, "Choose an app")
 }
 
 private enum class ResetOption { APPEARANCE, ALL }
