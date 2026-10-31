@@ -4,7 +4,7 @@ nia is a Kotlin/Jetpack Compose Android launcher. Follow these instructions for 
 
 ## Active release: 1.4.0
 
-Keep the work for issues #9, #10 and #11 in the ongoing **1.4.0 / 1004000** change set. The bug fix and enhancement plans are staged in a draft PR. Keep this version while completing the agreed scope; do not publish or trigger Production APK until the work is finished and the user requests it. The fixed-Home rules below describe the implemented baseline; customization is still under design review. See the [1.4.0 plan](docs/ROADMAP.md#140-in-preparation).
+Keep the work for issues #9, #10 and #11 in the ongoing **1.4.0 / 1004000** change set. The bug fix and enhancement plans are staged in a draft PR. Keep this version while completing the agreed scope; do not publish or trigger Production APK until the work is finished and the user requests it. The user has clarified the 1.4.0 target: all Home app shortcuts are editable, with at most eight app entries plus Apps. Current fixed-category source is legacy behavior to migrate, not a product constraint to retain. See the [1.4.0 plan](docs/ROADMAP.md#140-in-preparation).
 
 ## Read the relevant guidance
 
@@ -22,7 +22,9 @@ Use the repository skills below. If your agent does not discover skills automati
 
 ## Preserve the product
 
-Keep Phone, Messages, Music, Calendar and Maps in their fixed order, with Apps available by gesture and a visible entry. Keep the app list alphabetical and text-only. Corner shortcuts support Empty or App; nia Settings is not a corner action.
+For 1.4.0, allow adding, removing, renaming, reassigning, changing the outline icon and reordering every main Home app shortcut. Keep at most eight app shortcuts plus the mandatory Apps entry; keep the icon grid non-scrolling. Preserve existing setups through migration, and let fresh-install onboarding add shortcuts or skip to Apps-only. Keep Clock/Calendar header targets independent of Home entries. See the roadmap for the corner-cap assumption and recommended editing behavior.
+
+Keep Apps available by gesture and a visible entry, and keep the full app list alphabetical and text-only. Corner shortcuts support Empty or App; nia Settings is not a corner action.
 
 Keep the personal-profile scope, offline core and manual-only update checks. Preserve exact OLED black, matched themes, accessible controls and Android's animation preferences. See the guides for the full behavior and known device limitations.
 

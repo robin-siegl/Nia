@@ -3,7 +3,7 @@
 ## 1.4.0 (unreleased)
 
 - Request portrait orientation for nia's activity, covering Home, Apps, Settings, setup and app pickers (issue #9).
-- Home reordering and extra-shortcut enhancements are being planned in the roadmap. They are not implemented yet; keep this release unpublished until the agreed scope is complete.
+- Plan a fully editable Home with up to eight app shortcuts plus Apps, independent names/icons/app targets, and optional add-or-skip onboarding. This replaces the earlier fixed-categories-plus-extras proposal. Customization is not implemented yet; keep the release unpublished until the scope is complete.
 
 ## 1.3.3
 

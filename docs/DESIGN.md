@@ -13,18 +13,23 @@ nia gives everyday tasks a predictable place and keeps other apps available in a
 
 ## Home and navigation
 
-Keep these entries in order: **Phone, Messages, Music, Calendar, Maps, Apps**.
+The **1.4.0 target** is a user-defined Home. Every app shortcut can be added, removed, renamed, assigned an outline icon, pointed at another app and reordered. Keep **zero to eight app shortcuts plus Apps**, for a maximum of nine main Home entries. Apps remains a reserved, visible destination.
 
-| Area | Design rule |
+| Area | Design rule for 1.4.0 |
 | --- | --- |
-| Icon grid | Three columns, two rows; simple outline category icons, with Apps as the sixth icon |
-| Text list | The same entries as full-width text rows; Apps has the same treatment |
-| Clock and date | Time opens Clock; date opens the assigned Calendar app |
-| Bottom corners | Two fixed optional slots, each Empty or App, with an outline icon |
+| Icon grid | Three columns, up to three rows; no vertical scrolling or extra pages |
+| Text list | The same user-defined entries; let the entry area scroll for large text while Apps stays reachable |
+| Shortcut content | Independent name, app target and outline icon, such as Google Maps with a map icon |
+| Clock and date | Time opens Clock; date opens its independently assigned Calendar app |
+| Bottom corners | Existing optional Empty/App slots, kept separate from the main-area limit in the current proposal |
 | App list | Alphabetical app names and search; no app-brand icons, usage ranking or recommendations |
 | Settings access | Gear in Apps and a touch-and-hold action on empty Home space |
 
-The five everyday shortcuts keep their names, symbols and order when their assigned apps change. Keep the rest of Home open. Extra Home pages, rearrangement, folders, widgets, badges and feeds are outside the current design. Settings cannot be assigned to a corner.
+Recommend a Settings arrangement editor and one order shared by grid/list, with Apps pinned last. Keep Home focused on launching. A fresh-install **Add your apps** step can add shortcuts or skip to Apps-only; do not force the old five categories. Upgrades retain existing choices and do not repeat completed setup.
+
+The current source still renders the five legacy categories while this feature is being planned. Their preserved upgrade entries become ordinary editable shortcuts. See the [1.4.0 plan](ROADMAP.md#140-in-preparation) for migration and interaction details.
+
+Keep the rest of Home open. Folders, widgets, badges and feeds remain outside this design. Settings cannot be assigned to a corner. Custom Home labels do not rename apps in the full app list.
 
 Swipe up and the visible Apps entry open the same drawer. Pulling down dismisses it only when its list is already at the top. Back dismisses the keyboard before closing Apps; Android Home returns to a clean Home without an old query or keyboard. App selectors keep selection simple; app action menus belong in the full app list.
 
@@ -103,4 +108,4 @@ Reference captures: [Settings](screenshots/settings-overview.png), [app actions]
 
 ### Android guidance
 
-Use [settings guidance](https://developer.android.com/design/ui/mobile/guides/patterns/settings), [Compose accessibility defaults](https://developer.android.com/develop/ui/compose/accessibility/api-defaults) and [inset handling](https://developer.android.com/develop/ui/compose/system/insets-ui) as platform references. Adapt them to nia's fixed, minimal Home rather than adding controls simply because a component exists.
+Use [settings guidance](https://developer.android.com/design/ui/mobile/guides/patterns/settings), [Compose accessibility defaults](https://developer.android.com/develop/ui/compose/accessibility/api-defaults) and [inset handling](https://developer.android.com/develop/ui/compose/system/insets-ui) as platform references. Adapt them to nia's minimal Home and user-defined shortcuts rather than adding controls simply because a component exists.

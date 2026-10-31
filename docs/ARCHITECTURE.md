@@ -80,6 +80,14 @@ Keep decoding strict. Validate schema, colors, enums and component identities be
 
 Reset appearance/behavior restores default preferences while retaining everyday app assignments, Clock and both corner configurations. Full reset clears the saved state and returns to setup. Both UI actions require confirmation.
 
+### Planned 1.4.0 Home model
+
+The user-defined Home requirements are recorded in the [1.4.0 plan](ROADMAP.md#140-in-preparation); they are not implemented yet. Replace `HomeCategory`-driven rendering with one ordered shortcut list whose entries carry stable IDs, user labels, outline icons and nullable app targets. Support zero to eight app entries and generate the mandatory Apps destination separately. Do not split the model into permanent built-ins plus optional extras.
+
+Migrate old on-device state and schema-1–5 backups into ordinary editable entries while preserving their old names, icons, targets and order. Fresh installs start empty; an explicitly saved empty list must remain Apps-only rather than triggering legacy default seeding. New exports are planned as schema 6. Keep the Clock assignment and a separately migrated Calendar/header assignment independent of the list, so removing a Home shortcut cannot break header actions.
+
+Use the same resolved entries for Home, previews, the editor and onboarding. Keep editor drafts through picker navigation and recreation, and commit each validated edit atomically. Preserve user labels/icons when changing the app target. Custom labels apply only to Home; `AppRepository` and full-list search retain actual app names. Keep the current schema-5 runtime behavior until migration and UI changes are implemented together.
+
 ## Unlock and input reliability
 
 Treat **keyguard state, interactivity, lifecycle and window focus as separate observations**. `MainActivity` supplies an `UnlockEnvironment`; `UnlockTracker` recognizes a candidate unlock, while `UnlockSession` owns the queued request and active/locked UI state.
