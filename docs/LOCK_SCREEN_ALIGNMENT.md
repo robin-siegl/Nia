@@ -27,6 +27,12 @@ The reveal request survives settings loading and is consumed once, including acr
 
 Reduced motion uses a 120ms fade with no lead-in, movement or stagger. Compose animations inherit Android's duration scale, including zero-duration animations. The two clocks remain separate system/app views: nia does not own or replace Android's lock-screen exit animation. A cold process created after the unlock broadcast may not observe that unlock. Warm/cold unlocks, biometric unlock and the visual handoff require validation on the physical Pixel; native UI tests exercise the event ordering and stationary header, not Pixel SystemUI.
 
+### Home input recovery
+
+Reveal completion must be read in composition even while the parent disables input, and its captured Boolean is reported to the parent. Previously the input-enabled condition short-circuited this read, leaving the completion state read only inside `SideEffect`. The icons could finish appearing while the parent's invisible touch blocker stayed active until another Home recomposition, such as a clock update.
+
+Regression tests render the actual Home/drawer container with a fixed clock and use real pointer events for category, Clock, corner, Apps and swipe actions. They cover grid/list unlocks, reduced motion, zero animation scale, switching scale during the reveal and drawer transitions, and a cancelled swipe. The animation scale is injected into Compose's effect context; these tests do not claim to reproduce Pixel's complete Battery Saver policy. Battery Saver was not required to reproduce the input freeze. This fix adds no permission, battery exemption, polling or recovery timer.
+
 ## Permissions and reliability
 
 Select nia as the default Home app through Android's Home role. No accessibility service, device administrator, notification access, overlay, root or battery-optimization exemption is needed for the implemented launcher behavior. nia has no always-running service or background polling loop.

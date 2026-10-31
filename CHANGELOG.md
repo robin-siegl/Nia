@@ -2,6 +2,7 @@
 
 ## 1.3.0
 
+- Fixed Home remaining unresponsive after unlocking: the shortcut reveal could finish without clearing its parent touch blocker, leaving buttons and swipe-to-Apps disabled until an unrelated refresh. Completion is now observed while input is blocked, including with reduced/disabled animations or animation-scale changes during the reveal.
 - App-name long presses now offer App info and assignment to either corner, keeping the chosen icon and fixed Home categories.
 - About can manually check the latest public GitHub release and open its APK or release page. Added loading, retry, rate-limit, no-release, current-version and missing-APK states. Internet permission is used only for this requested check; no automatic checks/downloads or install permission.
 - Restore previews each changed preference and app assignment with current/backup values, lists unavailable apps and rechecks the result before applying. Duplicate restore submissions are blocked.
