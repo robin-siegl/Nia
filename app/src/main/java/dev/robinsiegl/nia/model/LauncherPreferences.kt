@@ -37,6 +37,28 @@ data class AppTarget(val packageName: String, val activityName: String) {
 
 data class AppEntry(val target: AppTarget, val label: String)
 
+const val MAX_HOME_APPS = 8
+const val MAX_HOME_NAME_LENGTH = 80
+
+/** A Home entry's identity is independent of its editable label, icon and app. Apps is generated separately. */
+@Serializable
+data class HomeShortcut(
+    val id: String,
+    val name: String,
+    val icon: ShortcutIcon = ShortcutIcon.STAR,
+    val app: AppTarget? = null,
+)
+
+enum class HeaderTarget(val label: String) { CLOCK("Clock"), CALENDAR("Calendar") }
+
+data class HomeShortcutDraft(val shortcut: HomeShortcut, val isNew: Boolean) {
+    val canSave: Boolean get() = PreferencesValidation.isHomeName(shortcut.name.trim()) && (!isNew || shortcut.app != null)
+}
+
+/** Only used when converting a pre-1.4 setup. New installations start with no Home apps. */
+fun legacyHomeShortcuts(assignments: Map<HomeCategory, AppTarget> = emptyMap()): List<HomeShortcut> =
+    HomeCategory.entries.map { HomeShortcut("legacy-${it.name.lowercase()}", it.label, ShortcutIcon.valueOf(it.name), assignments[it]) }
+
 @Serializable
 data class LauncherPreferences(
     val layout: HomeLayout = HomeLayout.GRID,
@@ -51,8 +73,9 @@ data class LauncherPreferences(
     val motionMode: MotionMode = MotionMode.SYSTEM,
     val leftShortcut: CornerShortcut = CornerShortcut(),
     val rightShortcut: CornerShortcut = CornerShortcut(),
-    val assignments: Map<HomeCategory, AppTarget> = emptyMap(),
+    val homeShortcuts: List<HomeShortcut> = emptyList(),
     val clock: AppTarget? = null,
+    val calendar: AppTarget? = null,
 ) {
     fun shortcut(position: CornerPosition) = if (position == CornerPosition.LEFT) leftShortcut else rightShortcut
     fun withShortcut(position: CornerPosition, shortcut: CornerShortcut) =
@@ -72,16 +95,25 @@ object PreferencesValidation {
     private val activityPattern = Regex("[A-Za-z_.][A-Za-z0-9_.$]*")
 
     fun isColor(value: String): Boolean = colorPattern.matches(value)
+    fun isHomeName(value: String): Boolean = value.isNotBlank() && value.length <= MAX_HOME_NAME_LENGTH &&
+        value == value.trim() && value.none { it.isISOControl() }
+
 
     fun validate(preferences: LauncherPreferences) {
         require(isColor(preferences.seedColor)) { "Choose a color in #RRGGBB format." }
+        require(preferences.homeShortcuts.size <= MAX_HOME_APPS) { "Home can contain up to eight apps plus Apps." }
+        require(preferences.homeShortcuts.map { it.id }.distinct().size == preferences.homeShortcuts.size) { "Home shortcut IDs must be unique." }
+        preferences.homeShortcuts.forEach {
+            require(it.id.matches(Regex("[A-Za-z0-9_-]{1,80}"))) { "The settings file contains an invalid shortcut ID." }
+            require(isHomeName(it.name)) { "Shortcut names must contain 1–80 characters without line breaks." }
+        }
         val shortcuts = listOf(preferences.leftShortcut, preferences.rightShortcut)
         shortcuts.forEach {
             require((it.action == ShortcutAction.APP) == (it.app != null)) {
                 "An app shortcut must have an assigned app. Empty shortcuts cannot contain an app."
             }
         }
-        (preferences.assignments.values + listOfNotNull(preferences.clock) + shortcuts.mapNotNull { it.app }).forEach { target ->
+        (preferences.homeShortcuts.mapNotNull { it.app } + listOfNotNull(preferences.clock, preferences.calendar) + shortcuts.mapNotNull { it.app }).forEach { target ->
             require(target.packageName.length <= 255 && packagePattern.matches(target.packageName)) {
                 "The settings file contains an invalid app package."
             }

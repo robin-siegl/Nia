@@ -61,21 +61,21 @@ class ScreensTest {
         }
 
     @Test fun `grid provides all five accessible shortcuts and opens the chosen category`() {
-        var selected: HomeCategory? = null
-        render { HomeScreen(HomeLayout.GRID, "09:41", "Friday, October 30", {}, { selected = it }, {}) }
+        var selected: String? = null
+        render { HomeScreen(HomeLayout.GRID, "09:41", "Friday, October 30", {}, { selected = it }, {}, shortcuts = legacyHomeShortcuts()) }
         HomeCategory.entries.forEach { rule.onNodeWithContentDescription(it.label).assertIsDisplayed() }
         rule.onNodeWithText("Music").assertDoesNotExist()
         rule.onNodeWithText("Apps").assertDoesNotExist()
         rule.onNodeWithContentDescription("Apps").assertIsDisplayed()
         screenshot("home-oled-grid")
         rule.onNodeWithContentDescription("Music").performClick()
-        assertEquals(HomeCategory.MUSIC, selected)
+        assertEquals("legacy-music", selected)
     }
 
     @Test fun `text home provides the same categories and Apps button`() {
         var opened = false
         render(LauncherPreferences(themeMode = ThemeMode.LIGHT)) {
-            HomeScreen(HomeLayout.LIST, "09:41", "Friday, October 30", {}, {}, { opened = true })
+            HomeScreen(HomeLayout.LIST, "09:41", "Friday, October 30", {}, {}, { opened = true }, shortcuts = legacyHomeShortcuts())
         }
         HomeCategory.entries.forEach { rule.onNodeWithText(it.label).assertIsDisplayed() }
         assertEquals(rule.onNodeWithTag("home-entry-Music").fetchSemanticsNode().boundsInRoot.height,
@@ -91,7 +91,7 @@ class ScreensTest {
         render {
             HomeScreen(HomeLayout.GRID, "09:41", "Friday, October 30", {}, {}, { openedApps = true },
                 rightShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.CAMERA, AppTarget("example.camera", ".Main")),
-                onCorner = { openedCorner = true }, cornerLabel = { "Camera" })
+                onCorner = { openedCorner = true }, cornerLabel = { "Camera" }, shortcuts = legacyHomeShortcuts())
         }
         rule.onNodeWithContentDescription("Apps").performClick()
         rule.onNodeWithContentDescription("Camera").performClick()
@@ -106,11 +106,11 @@ class ScreensTest {
                 HomeScreen(HomeLayout.LIST, "09:41", "Friday, October 30", {}, {}, { opened = true },
                     textSize = HomeTextSize.LARGE,
                     rightShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.CAMERA, AppTarget("example.camera", ".Main")),
-                    cornerLabel = { "Camera" })
+                    cornerLabel = { "Camera" }, shortcuts = legacyHomeShortcuts())
             }
         }
         rule.onNodeWithContentDescription("Camera").assertIsDisplayed()
-        rule.onNodeWithText("Apps").performScrollTo().performClick()
+        rule.onNodeWithText("Apps").assertIsDisplayed().performClick()
         assertTrue(opened)
         screenshot("home-large-system-text")
     }
@@ -201,14 +201,14 @@ class ScreensTest {
 
     @Test fun `violet light palette home renders`() {
         render(LauncherPreferences(colorStyle = ColorStyle.COLOR, themeMode = ThemeMode.LIGHT)) {
-            HomeScreen(HomeLayout.LIST, "09:41", "Friday, October 30", {}, {}, {})
+            HomeScreen(HomeLayout.LIST, "09:41", "Friday, October 30", {}, {}, {}, shortcuts = legacyHomeShortcuts())
         }
         screenshot("home-violet-light")
     }
 
     @Test fun `violet dark palette draws the generated background`() {
         val p = LauncherPreferences(colorStyle = ColorStyle.COLOR, themeMode = ThemeMode.DARK)
-        render(p) { HomeScreen(HomeLayout.LIST, "09:41", "Friday, October 30", {}, {}, {}) }
+        render(p) { HomeScreen(HomeLayout.LIST, "09:41", "Friday, October 30", {}, {}, {}, shortcuts = legacyHomeShortcuts()) }
         val bitmap = screenshot("home-violet-dark")
         assertEquals(Palette.generate(p, false).background, bitmap.getPixel(0, 0))
     }
@@ -238,11 +238,11 @@ class ScreensTest {
     fun `Pixel header matches screenshot ink anchors and stays fixed with status bar insets`() {
         var inset by mutableStateOf(0.dp)
         var clockOpened = false
-        var category: HomeCategory? = null
+        var dateOpened = false
         render {
             Box(Modifier.fillMaxSize().padding(top = inset)) {
-                HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", { clockOpened = true }, { category = it }, {},
-                    contentTopInset = inset)
+                HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", { clockOpened = true }, {}, {},
+                    contentTopInset = inset, onDate = { dateOpened = true }, shortcuts = legacyHomeShortcuts())
             }
         }
         fun ink(bitmap: android.graphics.Bitmap, area: android.graphics.Rect): android.graphics.Rect {
@@ -269,7 +269,7 @@ class ScreensTest {
         rule.onNodeWithTag("home-clock").performClick()
         rule.onNodeWithTag("home-date").performClick()
         assertTrue(clockOpened)
-        assertEquals(HomeCategory.CALENDAR, category)
+        assertTrue(dateOpened)
         rule.runOnIdle { inset = 24.dp }
         check(screenshot("home-pixel-reference-insets"))
     }
@@ -288,7 +288,7 @@ class ScreensTest {
 
     @Test @Config(qualifiers = "w892dp-h412dp-xhdpi")
     fun `landscape uses the compact scalable clock instead of portrait lock screen anchors`() {
-        render { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}) }
+        render { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}, shortcuts = legacyHomeShortcuts()) }
         rule.onNodeWithTag("pixel-clock-header").assertDoesNotExist()
         rule.onNodeWithText("14:03").assertIsDisplayed()
         rule.onNodeWithContentDescription("Apps").assertIsDisplayed()
@@ -344,10 +344,10 @@ class ScreensTest {
         screenshot("settings-overview")
         rule.onNodeWithText("Appearance").performClick()
         rule.onNodeWithText("System").assertIsDisplayed()
-        rule.onNodeWithText("Everyday apps").assertDoesNotExist()
+        rule.onNodeWithText("Home apps").assertDoesNotExist()
         rule.onNodeWithContentDescription("Back").performClick()
-        rule.onNodeWithText("Everyday apps").performClick()
-        rule.onNodeWithText("Clock").assertIsDisplayed()
+        rule.onNodeWithText("Home apps").performClick()
+        rule.onNodeWithText("Add app").assertIsDisplayed()
         rule.onNodeWithText("System").assertDoesNotExist()
         rule.onNodeWithContentDescription("Back").performClick()
         rule.onNodeWithText("Default launcher").performScrollTo().performClick()
@@ -379,25 +379,32 @@ class ScreensTest {
         assertEquals(1, resets)
     }
 
-    @Test fun `guided setup keeps its step through app selection and completes all four stages`() {
+    @Test fun `guided setup can add a custom app and keeps its step through the editor and picker`() {
         var saved by mutableStateOf(SavedState(preferences = LauncherPreferences(themeMode = ThemeMode.DARK)))
-        var picker by mutableStateOf<Screen.Picker?>(null)
+        var draft by mutableStateOf<HomeShortcutDraft?>(null)
+        var picker by mutableStateOf(false)
         var isDefault by mutableStateOf(false)
         val signal = AppEntry(AppTarget("org.example.signal", "Main"), "Signal")
         render {
             NiaTheme(Palette.generate(saved.preferences, false)) {
                 Surface(Modifier.fillMaxSize()) {
-                    val currentPicker = picker
-                    if (saved.setupComplete) HomeScreen(saved.preferences.layout, "09:41", "Friday, October 30", {}, {}, {})
-                    else if (currentPicker != null) AppListScreen(listOf(signal), false, false, onBack = { picker = null }, onSelect = { app ->
-                        val p = saved.preferences
-                        saved = saved.copy(preferences = if (currentPicker.category == null) p.copy(clock = app.target)
-                            else p.copy(assignments = p.assignments + (currentPicker.category to app.target)))
-                        picker = null
-                    }) else OnboardingScreen(saved.preferences, listOf(signal), saved.setupStep, isDefault,
-                        onChange = { change -> saved = saved.copy(preferences = change(saved.preferences)) },
-                        onStep = { saved = saved.copy(setupStep = it) }, onAssign = { picker = Screen.Picker(it) }, onClear = {},
-                        onDefault = { isDefault = true }, onStart = { saved = saved.copy(setupComplete = true) }, onApps = {}, onImport = {})
+                    val current = draft
+                    when {
+                        saved.setupComplete -> HomeScreen(saved.preferences.layout, "09:41", "Friday, October 30", {}, {}, {},
+                            shortcuts = saved.preferences.homeShortcuts)
+                        picker -> AppListScreen(listOf(signal), false, false, onBack = { picker = false }, onSelect = { app ->
+                            draft = current!!.copy(shortcut = current.shortcut.copy(app = app.target, name = app.label)); picker = false
+                        })
+                        current != null -> HomeShortcutEditorScreen(current, listOf(signal), false,
+                            onChange = { draft = current.copy(shortcut = it(current.shortcut)) }, onChooseApp = { picker = true },
+                            onSave = { saved = saved.copy(preferences = saved.preferences.copy(homeShortcuts = listOf(current.shortcut))); draft = null },
+                            onRemove = {}, onBack = { draft = null })
+                        else -> OnboardingScreen(saved.preferences, listOf(signal), saved.setupStep, isDefault,
+                            onChange = { change -> saved = saved.copy(preferences = change(saved.preferences)) },
+                            onStep = { saved = saved.copy(setupStep = it) },
+                            onEditHome = { draft = HomeShortcutDraft(HomeShortcut("signal", ""), true) }, onMoveHome = { _, _ -> },
+                            onDefault = { isDefault = true }, onStart = { saved = saved.copy(setupComplete = true) }, onApps = {}, onImport = {})
+                    }
                 }
             }
         }
@@ -405,11 +412,16 @@ class ScreensTest {
         screenshot("onboarding-layout")
         rule.onNodeWithText("Text list").performClick()
         rule.onNodeWithText("Continue").performClick()
-        rule.onNodeWithText("Messages").performClick()
+        rule.onNodeWithText("Skip for now").assertIsDisplayed()
+        rule.onNodeWithText("Add app").performScrollTo().performClick()
+        rule.onNodeWithText("Save").assertIsNotEnabled()
+        rule.onNodeWithText("Choose an app").performClick()
         rule.onNodeWithText("Signal").performClick()
+        rule.onNodeWithTag("home-shortcut-name").performTextReplacement("Messages")
+        rule.onNodeWithText("Save").performScrollTo().performClick()
         rule.onNodeWithText("2 of 4").assertIsDisplayed()
-        rule.onNodeWithText("Signal").assertIsDisplayed()
-        assertEquals(signal.target, saved.preferences.assignments[HomeCategory.MESSAGES])
+        rule.onNodeWithText("Messages").assertIsDisplayed()
+        assertEquals(signal.target, saved.preferences.homeShortcuts.single().app)
         rule.onNodeWithText("Continue").performClick()
         rule.onNodeWithText("3 of 4").assertIsDisplayed()
         rule.onNodeWithText("Color").performClick()
@@ -424,8 +436,19 @@ class ScreensTest {
         rule.onNodeWithText("Continue").performClick()
         rule.onNodeWithText("Start using nia").performClick()
         assertTrue(saved.setupComplete)
+        rule.onNodeWithText("Messages").assertIsDisplayed()
         rule.onNodeWithText("Apps").assertIsDisplayed()
-        rule.onNodeWithContentDescription("Settings").assertDoesNotExist()
+    }
+
+    @Test fun `Add your apps can skip to appearance without populating Home`() {
+        var step by mutableStateOf(SetupStep.APPS)
+        val p = LauncherPreferences()
+        render {
+            OnboardingScreen(p, emptyList(), step, false, {}, { step = it }, {}, { _, _ -> }, {}, {}, {}, {})
+        }
+        rule.onNodeWithText("Skip for now").performClick()
+        assertEquals(SetupStep.APPEARANCE, step)
+        assertTrue(p.homeShortcuts.isEmpty())
     }
 
     @Test fun `setup recovery keeps app access and restore available without overwriting bad settings`() {
@@ -433,7 +456,7 @@ class ScreensTest {
         var recovery = false
         var apps = false
         render {
-            OnboardingScreen(LauncherPreferences(), emptyList(), SetupStep.LAYOUT, false, {}, {}, {}, {}, {}, {},
+            OnboardingScreen(LauncherPreferences(), emptyList(), SetupStep.LAYOUT, false, {}, {}, {}, { _, _ -> }, {}, {},
                 { apps = true }, { restored = true }, storageError = true, onRecovery = { recovery = true })
         }
         rule.onNodeWithText("Continue").assertIsNotEnabled()
@@ -450,7 +473,7 @@ class ScreensTest {
         val p = LauncherPreferences(colorStyle = ColorStyle.COLOR, themeMode = ThemeMode.DARK)
         render(p) {
             CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 2f)) {
-                OnboardingScreen(p, emptyList(), step, false, {}, { step = it }, {}, {}, {}, {}, {}, {})
+                OnboardingScreen(p, emptyList(), step, false, {}, { step = it }, {}, { _, _ -> }, {}, {}, {}, {})
             }
         }
         rule.onNodeWithText("Continue").assertIsDisplayed()

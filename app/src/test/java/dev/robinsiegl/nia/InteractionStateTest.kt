@@ -62,14 +62,14 @@ class InteractionStateTest {
         assertFalse(drawerShouldOpen(0.49f, 0f, 700f))
         assertTrue(drawerShouldOpen(0.51f, 0f, 700f))
     }
-    @Test fun `changing one corner keeps the other corner and fixed assignments intact`() {
+    @Test fun `changing one corner keeps the other corner and Home apps intact`() {
         val right = CornerShortcut(ShortcutAction.APP, ShortcutIcon.HEADPHONES, AppTarget("example.podcast", ".Main"))
-        val p = LauncherPreferences(rightShortcut = right, assignments = mapOf(HomeCategory.MUSIC to AppTarget("example.music", ".Main")))
+        val p = LauncherPreferences(rightShortcut = right, homeShortcuts = listOf(HomeShortcut("music", "Music", ShortcutIcon.MUSIC, AppTarget("example.music", ".Main"))))
         val left = CornerShortcut(ShortcutAction.APP, ShortcutIcon.CAMERA, AppTarget("example.camera", ".Main"))
         val changed = p.withShortcut(CornerPosition.LEFT, left)
         assertEquals(left, changed.shortcut(CornerPosition.LEFT))
         assertEquals(right, changed.shortcut(CornerPosition.RIGHT))
-        assertEquals(p.assignments, changed.assignments)
+        assertEquals(p.homeShortcuts, changed.homeShortcuts)
     }
 
     @Test fun `user present before onResume retains the actual Home unlock`() {

@@ -13,7 +13,7 @@ nia gives everyday tasks a predictable place and keeps other apps available in a
 
 ## Home and navigation
 
-The **1.4.0 target** is a user-defined Home. Every app shortcut can be added, removed, renamed, assigned an outline icon, pointed at another app and reordered. Keep **zero to eight app shortcuts plus Apps**, for a maximum of nine main Home entries. Apps remains a reserved, visible destination.
+Home is user-defined in **1.4.0**. Every app shortcut can be added, removed, renamed, assigned an outline icon, pointed at another app and reordered. Keep **zero to eight app shortcuts plus Apps**, for a maximum of nine main Home entries. Apps remains a reserved, visible destination.
 
 | Area | Design rule for 1.4.0 |
 | --- | --- |
@@ -21,13 +21,13 @@ The **1.4.0 target** is a user-defined Home. Every app shortcut can be added, re
 | Text list | Scroll large-text entries beneath a collapsible clock/date, with an always-reachable Apps action and a deliberate pull beyond the end to open the drawer |
 | Shortcut content | Independent name, app target and outline icon, such as Google Maps with a map icon |
 | Clock and date | Time opens Clock; date opens its independently assigned Calendar app |
-| Bottom corners | Existing optional Empty/App slots, kept separate from the main-area limit in the current proposal |
+| Bottom corners | Optional Empty/App slots, separate from the main-area limit |
 | App list | Alphabetical app names and search; no app-brand icons, usage ranking or recommendations |
 | Settings access | Gear in Apps and a touch-and-hold action on empty Home space |
 
-Recommend a Settings arrangement editor and one order shared by grid/list, with Apps pinned last. Keep Home focused on launching. A fresh-install **Add your apps** step can add shortcuts or skip to Apps-only; do not force the old five categories. Upgrades retain existing choices and do not repeat completed setup.
+Use **Settings → Home apps** for adding, editing and reordering. Grid/list share one order, with Apps pinned last. Keep Home focused on launching. The fresh-install **Add your apps** step can add shortcuts or skip to Apps-only. Upgrades retain existing choices and do not repeat completed setup.
 
-The current source still renders the five legacy categories while this feature is being planned. Their preserved upgrade entries become ordinary editable shortcuts. See the [1.4.0 plan](ROADMAP.md#140-in-preparation) for migration and interaction details.
+Legacy categories migrate into ordinary editable shortcuts. See [1.4.0 validation](ROADMAP.md#140-in-preparation) for the remaining device checks.
 
 Keep the rest of Home open. Folders, widgets, badges and feeds remain outside this design. Settings cannot be assigned to a corner. Custom Home labels do not rename apps in the full app list.
 
@@ -98,21 +98,21 @@ All timing inherits Android's animation-duration scale. The unlock lead-in is a 
 
 Delay search autofocus until the drawer settles. Block accidental launches during transitions, then release input after completion or cancellation. Press feedback stays subtle and uses Android's haptic preference. Keep lifecycle mechanics in the [architecture guide](ARCHITECTURE.md#unlock-and-input-reliability).
 
-### Planned Home scrolling and Apps transition in 1.4.0
+### Home scrolling and the Apps pull
 
 For a long Home list, keep app text at the selected size. Collapse the large clock/date into a readable compact header as the user scrolls, then restore it when returning toward the top. This is an intentional scroll interaction; the header remains expanded and stationary for an unlock reveal.
 
 Both grid and list use the same resisted Apps pull, progressive header/drawer transition, chevron/progress cue and haptic feedback. Grid mode and a list that fits enter it directly; a long list enters it after scrolling to its end. Use a soft haptic when the pull begins, a firmer cue when opening is armed, and a quiet **Release to open Apps** hint. Release while armed to open; release early or reverse to cancel. A fling alone does not arm or open Apps. Give each cue only on its state transition and use hysteresis to prevent repeated feedback.
 
-Keep a visible Apps button as a direct alternative. Respect system haptics, Reduced motion and disabled animations. Canceling or closing Apps restores the Home presentation from before the pull; an explicit Home request or fresh unlock restores the full header before it becomes visible. See the [detailed sequence](ROADMAP.md#opening-apps-from-home). This interaction is planned, not implemented yet.
+Keep a visible Apps button as a direct alternative. Respect system haptics, Reduced motion and disabled animations. Canceling or closing Apps restores the Home presentation from before the pull; an explicit Home request or fresh unlock restores the full header before it becomes visible. See the [detailed sequence](ROADMAP.md#opening-apps-from-home). Physical Pixel timing and haptic feel still require device review.
 
 ## Accessibility and review
 
-Provide at least 48dp touch targets, meaningful spoken labels for icon-only actions, visible focus/selection states and a visible alternative to gestures. Keep controls reachable with large text, display scaling, keyboard insets, system-controlled window resizing and screen cutouts. Hidden Home content must not remain a duplicate accessibility destination beneath Apps.
+Provide at least 48dp touch targets, meaningful spoken labels for icon-only actions, visible focus/selection states and a visible alternative to gestures. Keep controls reachable with large text, display scaling, keyboard insets, system-controlled window resizing and screen cutouts. A short grid window can use the compact header to retain all nine minimum-size touch targets. Hidden Home content must not remain a duplicate accessibility destination beneath Apps.
 
 Review real Compose renders in monochrome and color light/dark themes, plus a narrow screen with large text. Use the [device checklist](DEVICE_TESTING.md) for TalkBack, keyboard and system gestures. Do not present a mockup or native test render as a physical-phone result.
 
-Reference captures: [Settings](screenshots/settings-overview.png), [app actions](screenshots/app-actions.png), [corner icons](screenshots/shortcut-icons.png) and [restore preview](screenshots/restore-preview.png).
+Reference captures: [nine-entry grid](screenshots/home-nine-grid.png), [large-text list](screenshots/home-nine-list-large.png), [Home app editor](screenshots/home-shortcut-editor.png), [Settings](screenshots/settings-overview.png), [app actions](screenshots/app-actions.png), [corner icons](screenshots/shortcut-icons.png) and [restore preview](screenshots/restore-preview.png).
 
 ### Android guidance
 

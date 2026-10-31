@@ -4,7 +4,7 @@ enum class SettingsSection(val title: String, val description: String) {
     HOME("Home screen", "Layout, clock and text size"),
     SHORTCUTS("Corner shortcuts", "Optional shortcuts at the bottom of Home"),
     APPEARANCE("Appearance", "Colors, theme and animations"),
-    ASSIGNMENTS("Everyday apps", "Apps for your Home shortcuts and clock"),
+    ASSIGNMENTS("Home apps", "Add, edit and arrange your shortcuts"),
     APP_LIST("App list", "Search and A–Z navigation"),
     BACKUP("Backup & reset", "Save, restore or reset your settings"),
     ABOUT("About nia", "Updates, privacy and project information"),
@@ -15,7 +15,9 @@ sealed interface Screen {
     data object Apps : Screen
     data object Settings : Screen
     data class SettingsDetail(val section: SettingsSection) : Screen
-    data class Picker(val category: HomeCategory?) : Screen
+    data class Picker(val header: HeaderTarget) : Screen
+    data object HomeShortcutEditor : Screen
+    data object HomeShortcutPicker : Screen
     data class CornerPicker(val position: CornerPosition) : Screen
 }
 

@@ -46,26 +46,34 @@ internal fun CornerSettings(preferences: LauncherPreferences, apps: List<AppEntr
     }
     SettingsDescription("Open Settings from Apps, or touch and hold empty space on Home.", Modifier.padding(top = 24.dp))
     choosingIcon?.let { position ->
-        AlertDialog(onDismissRequest = { choosingIcon = null }, title = { Text("${position.label} shortcut icon") },
-            text = {
-                LazyVerticalGrid(columns = GridCells.Adaptive(56.dp),
-                    modifier = Modifier.fillMaxWidth().heightIn(max = 360.dp).selectableGroup().testTag("shortcut-icon-grid")) {
-                    items(ShortcutIcon.entries, key = { it.name }) { icon ->
-                        Box(contentAlignment = Alignment.Center) {
-                            val active = icon == preferences.shortcut(position).icon
-                            val shape = RoundedCornerShape(12.dp)
-                            Box(modifier = Modifier.size(48.dp).clip(shape)
-                                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = if (active) 0.12f else 0f))
-                                .border(if (active) 1.dp else 0.dp,
-                                    MaterialTheme.colorScheme.onSurface.copy(alpha = if (active) 0.8f else 0f), shape)
-                                .selectable(selected = active, role = Role.RadioButton, onClick = {
-                                onChange { it.withShortcut(position, it.shortcut(position).copy(icon = icon)) }; choosingIcon = null
-                            }).semantics {
-                                contentDescription = icon.label
-                            }, contentAlignment = Alignment.Center) { ShortcutGlyph(icon, Modifier.size(26.dp)) }
-                        }
+        ShortcutIconPicker("${position.label} shortcut icon", preferences.shortcut(position).icon,
+            onDismiss = { choosingIcon = null }, onSelect = { icon ->
+                onChange { it.withShortcut(position, it.shortcut(position).copy(icon = icon)) }; choosingIcon = null
+            })
+    }
+}
+
+@Composable
+internal fun ShortcutIconPicker(title: String, selected: ShortcutIcon, onDismiss: () -> Unit, onSelect: (ShortcutIcon) -> Unit) {
+    AlertDialog(onDismissRequest = { onDismiss() }, title = { Text(title) },
+        text = {
+            LazyVerticalGrid(columns = GridCells.Adaptive(56.dp),
+                modifier = Modifier.fillMaxWidth().heightIn(max = 360.dp).selectableGroup().testTag("shortcut-icon-grid")) {
+                items(ShortcutIcon.entries, key = { it.name }) { icon ->
+                    Box(contentAlignment = Alignment.Center) {
+                        val active = icon == selected
+                        val shape = RoundedCornerShape(12.dp)
+                        Box(modifier = Modifier.size(48.dp).clip(shape)
+                            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = if (active) 0.12f else 0f))
+                            .border(if (active) 1.dp else 0.dp,
+                                MaterialTheme.colorScheme.onSurface.copy(alpha = if (active) 0.8f else 0f), shape)
+                            .selectable(selected = active, role = Role.RadioButton, onClick = {
+                            onSelect(icon)
+                        }).semantics {
+                            contentDescription = icon.label
+                        }, contentAlignment = Alignment.Center) { ShortcutGlyph(icon, Modifier.size(26.dp)) }
                     }
                 }
-            }, confirmButton = { TextButton(onClick = { choosingIcon = null }) { Text("Cancel") } })
-    }
+            }
+        }, confirmButton = { TextButton(onClick = { onDismiss() }) { Text("Cancel") } })
 }

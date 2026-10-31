@@ -122,15 +122,15 @@ class EverydayPolishScreensTest {
     @Test fun `restore preview shows exact changes and cancellation cannot apply them`() {
         val p = LauncherPreferences()
         val requested = p.copy(layout = HomeLayout.LIST, searchAutofocus = true,
-            assignments = mapOf(HomeCategory.MUSIC to notes.target))
+            homeShortcuts = listOf(HomeShortcut("music", "Music", ShortcutIcon.MUSIC, notes.target)))
         val preview = RestorePreview.create(p, requested, listOf(notes))
         var restores = 0
         var cancels = 0
         render { RestoreDialog(preview, false, { restores++ }, { cancels++ }) }
-        rule.onNodeWithText("3 changes from this backup.").assertIsDisplayed()
+        rule.onNodeWithText("4 changes from this backup.").assertIsDisplayed()
         rule.onNodeWithText("Current: Icon grid").assertIsDisplayed()
         rule.onNodeWithText("Backup: Text list").assertIsDisplayed()
-        rule.onNodeWithText("Backup: Notes · example.notes").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithText("Backup: Music · Music icon · Notes · example.notes").performScrollTo().assertIsDisplayed()
         capture("restore-preview")
         rule.onNodeWithText("Cancel").performClick()
         assertEquals(1, cancels); assertEquals(0, restores)
@@ -148,7 +148,7 @@ class EverydayPolishScreensTest {
     @Test fun `large text restore can reach the final assignment and keeps its buttons visible`() {
         val target = notes.target
         val requested = LauncherPreferences(layout = HomeLayout.LIST, searchAutofocus = true,
-            assignments = HomeCategory.entries.associateWith { target },
+            homeShortcuts = legacyHomeShortcuts(HomeCategory.entries.associateWith { target }),
             rightShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.TRAIN, target))
         render {
             CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 2f)) {
@@ -178,7 +178,7 @@ class EverydayPolishScreensTest {
     @Test fun `pending unlock animates on delayed Home composition and never replays after remount`() {
         val event = UnlockRevealRequest()
         var show by mutableStateOf(true)
-        render { if (show) HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}, unlockRequest = event) }
+        render { if (show) HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}, unlockRequest = event, shortcuts = legacyHomeShortcuts()) }
         rule.mainClock.autoAdvance = false
         // Compose may run before frame-clock control is paused; use a fresh event for the explicit transition below.
         rule.mainClock.advanceTimeBy(1000)
@@ -193,7 +193,7 @@ class EverydayPolishScreensTest {
     @Test fun `unlock frames keep the clock and date fixed during the delayed shortcut reveal`() {
         var locked by mutableStateOf(true)
         var event by mutableStateOf<UnlockRevealRequest?>(null)
-        render { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}, unlockRequest = event, deviceLocked = locked) }
+        render { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}, unlockRequest = event, deviceLocked = locked, shortcuts = legacyHomeShortcuts()) }
         val clock = rule.onNodeWithTag("home-clock").fetchSemanticsNode().boundsInRoot
         rule.mainClock.autoAdvance = false
         capture("unlock-motion-00")

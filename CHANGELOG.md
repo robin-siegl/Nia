@@ -2,10 +2,13 @@
 
 ## 1.4.0 (unreleased)
 
-- Specify a shared resisted Apps pull, clock transition, progress cue and threshold haptics for both grid and list. Large-text lists scroll before handing off; grids stay fixed. The interaction remains planned, including cancellation, accessibility and unlock continuity.
-
-- Request portrait orientation for nia's activity, covering Home, Apps, Settings, setup and app pickers (issue #9).
-- Plan a fully editable Home with up to eight app shortcuts plus Apps, independent names/icons/app targets, and optional add-or-skip onboarding. This replaces the earlier fixed-categories-plus-extras proposal. Customization is not implemented yet; keep the release unpublished until the scope is complete.
+- Make every Home app editable: add, remove, rename, reassign, choose an outline icon and reorder in Settings → Home apps. Keep up to eight apps plus the reserved Apps entry, with one order shared across grid/list.
+- Let new users add apps during setup or skip to an Apps-only Home. Migrate existing five-category setups into ordinary editable entries without repeating completed setup.
+- Add a shared resisted pull to open Apps in both layouts, with a progress cue, threshold haptics and deliberate release/cancel behavior. Large lists scroll first and show a compact header and pinned Apps row; grids stay on one screen. A fling alone cannot open Apps.
+- Preserve the Home scroll/header position when canceling or closing Apps. Explicit Home requests and new unlocks start from the expanded header; screen lock also clears open-drawer navigation and stale search. Keep search autofocus after settling and respect reduced/disabled animations.
+- Separate Clock and Calendar header targets from Home app entries. Preserve shortcut content, header apps and corners when resetting appearance.
+- Export backup schema 6 and import schemas 1–6, preserving legacy corner migrations. Restore previews include custom names, icons, order and header assignments; unavailable apps keep recoverable Home entries.
+- Request portrait orientation throughout nia on phones (issue #9). Pixel SystemUI/unlock timing and the shared gesture still need physical-phone verification before publication.
 
 ## 1.3.3
 

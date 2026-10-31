@@ -49,7 +49,7 @@ class HomeInputRecoveryTest {
             NiaTheme(Palette.generate(p, true)) {
                 Surface(Modifier.fillMaxSize()) {
                     // A fixed clock and plain callback counters must not accidentally refresh Home.
-                    HomeAppsScreen(p, listOf(app), false, "14:03", "Fri, 30 Oct", open, { open = it },
+                    HomeAppsScreen(p.copy(homeShortcuts = legacyHomeShortcuts()), listOf(app), false, "14:03", "Fri, 30 Oct", open, { open = it },
                         { clocks++ }, { categories++ }, {}, {}, {}, { corners++ },
                         unlockRequest = unlock, deviceLocked = locked, revealAllowed = active)
                 }

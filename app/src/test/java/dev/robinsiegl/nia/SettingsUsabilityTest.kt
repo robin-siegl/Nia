@@ -122,13 +122,13 @@ class SettingsUsabilityTest {
 
     @Test fun `overview reflects saved choices and the non-default launcher action remains available`() {
         val p = LauncherPreferences(layout = HomeLayout.LIST, pixelClockLayout = false, themeMode = ThemeMode.DARK,
-            searchAutofocus = true, assignments = mapOf(HomeCategory.MUSIC to AppTarget("example.music", ".Main")))
+            searchAutofocus = true, homeShortcuts = listOf(HomeShortcut("music", "Music", ShortcutIcon.MUSIC, AppTarget("example.music", ".Main"))))
         var setDefault = 0
         var changeDefault = 0
         render(light = true) { SettingsScreen(false, false, {}, {}, { setDefault++ }, { changeDefault++ }, p) }
         rule.onNodeWithText("Text list · Classic clock").assertIsDisplayed()
         rule.onNodeWithText("Black & white · Dark").assertIsDisplayed()
-        rule.onNodeWithText("1 of 5 shortcuts assigned").assertIsDisplayed()
+        rule.onNodeWithText("1 app · Add, edit and arrange").assertIsDisplayed()
         rule.onNodeWithText("Keyboard opens with Apps").performScrollTo().assertIsDisplayed()
         capture("settings-overview-light")
         rule.onNodeWithText("Default launcher").performScrollTo().performClick()
