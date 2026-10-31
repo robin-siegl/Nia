@@ -59,10 +59,13 @@ fun HomeScreen(
         } else reveal.snapTo(1f)
     }
     val revealReady by remember { derivedStateOf { reveal.value == 1f } }
-    val enabled = interactionEnabled && !deviceLocked && revealReady
+    // Observe completion even while the parent's input blocker is active. Reading it only
+    // inside SideEffect leaves that blocker stale until an unrelated Home recomposition.
+    val shortcutsRevealed = revealReady && !deviceLocked
+    val enabled = interactionEnabled && shortcutsRevealed
     // Observe measurement here so the parent is updated when maxValue changes after first layout.
     val canScroll = scroll.maxValue > 0
-    SideEffect { onScrollable(canScroll); onRevealReady(!deviceLocked && revealReady) }
+    SideEffect { onScrollable(canScroll); onRevealReady(shortcutsRevealed) }
     BoxWithConstraints(modifier.fillMaxSize().testTag("home-screen").then(
         if (enabled) Modifier.pointerInput(onSettings) {
             awaitEachGesture {

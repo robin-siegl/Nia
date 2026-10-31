@@ -90,7 +90,7 @@ Minimum Android is 10 (API 29); the build compiles/targets API 36. The user's An
 
 ## Verification
 
-The test suite covers palette contrast across RGB samples, theme behavior, smart search/order, backup compatibility, saved setup progress, navigation, guided setup, Settings pages, About links, drawer drag/cancellation, keyboard readiness, corner actions, unlock state, disabled system animations and screen rendering. Python tests also exercise signing helpers and release version validation. Robolectric renders the Compose UI at API 35; screenshots are included in CI's test-report artifact. Use the [device acceptance checklist](docs/DEVICE_TESTING.md) for physical Pixel unlocks/gestures, Recents and signed upgrades.
+The test suite covers palette contrast across RGB samples, theme behavior, smart search/order, backup compatibility, saved setup progress, navigation, guided setup, Settings pages, About links, drawer drag/cancellation, keyboard readiness, corner actions, unlock state, disabled system animations and screen rendering. Home input recovery tests keep the clock fixed and verify real taps/swipes after unlocks and animation-scale changes. Python tests also exercise signing helpers and release version validation. Robolectric renders the Compose UI at API 35; screenshots are included in CI's test-report artifact. Use the [device acceptance checklist](docs/DEVICE_TESTING.md) for physical Pixel unlocks/gestures, Battery Saver, Recents and signed upgrades.
 
 ## Scope and next steps
 
