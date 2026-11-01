@@ -28,6 +28,8 @@ Use one continuously transformed clock/date header. Changing its height must mov
 
 Support long-press dragging on Home and in Settings → Home shortcuts, including auto-scroll in long lists. Preview locally, commit one validated order on drop, and write nothing on cancel. Keep keyboard/TalkBack alternatives. App-list long presses offer Add to Home, App info and Quick corner assignments; assignment pickers have no action menu. Commands are a typed allowlist, never arbitrary intents or executable text. Use the public torch API, observe actual state, handle unavailable hardware and release callbacks; do not add camera, accessibility, overlay or battery-exemption permissions for these features.
 
+Use Clock for alarm/timer setup and preset execution, and Android's volume panel for sound controls. Only preset commands have a duration: 1–1,440 whole minutes, independently stored per shortcut. Share the duration picker, validate backups and show duration changes in restore previews. A theme toggle chooses the opposite visible Light/Dark theme, overriding System for nia only. Preserve existing assignments and clear preset parameters when choosing another target.
+
 Use the shared Material Symbols catalog and icon picker for Home apps and Quick corners. Preserve serialized icon IDs and the legacy Settings migration; verify bundled resources with `python3 scripts/sync_material_symbols.py --check`. The import/generation workflow is in CONTRIBUTING.md.
 
 Keep the personal-profile scope, offline core and manual-only update checks. Preserve exact OLED black, matched themes, accessible controls and Android's animation preferences. See the guides for the full behavior and known device limitations.

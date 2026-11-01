@@ -31,11 +31,14 @@ Choose from **193 Material Symbols** with searchable names, keywords and categor
 
 Swipe up to open an alphabetical list of app names. The clock shrinks as your shortcuts move upward; long lists then scroll before handing off to Apps. A small chevron and one light haptic mark the deliberate pull. The icon grid stays on one screen. Search by name, initials or words in any order, or enable A–Z navigation to jump through the list.
 
-You can have the keyboard open automatically when Apps is ready. Prefer a visible shortcut? Add **Open Apps** or **Search apps** wherever you want; neither is added automatically. **Toggle flashlight** and **Start a timer** are available as optional commands too. The timer opens your Clock app so you can choose a duration there. When a search finds just one app, press Enter to open it. Touch and hold an app name to add it to Home, open App info or assign it to a Quick corner.
+You can have the keyboard open automatically when Apps is ready. Prefer a visible shortcut? Add **Open Apps** or **Search apps** wherever you want; neither is added automatically. When a search finds just one app, press Enter to open it. Touch and hold an app name to add it to Home, open App info or assign it to a Quick corner.
+
+Commands can also toggle the flashlight or nia's light/dark theme, open Android's sound controls, or hand you to Clock to set an alarm or timer. **Preset timer** starts a saved duration in Clock: choose 5, 15 or 25 minutes, or enter your own. Every Home shortcut and Quick corner can have its own preset. The theme toggle selects Light or Dark; choose System in Appearance to follow your phone again.
 
 <p>
   <img src="docs/screenshots/home-scroll-mid.png" width="220" alt="The same clock shrinking as the Home shortcuts move upward" />
-  <img src="docs/screenshots/shortcut-command-picker.png" width="220" alt="Optional commands for Apps, search and the flashlight" />
+  <img src="docs/screenshots/shortcut-command-picker.png" width="220" alt="Choose a command for Apps, search, flashlight, Clock, theme or sound controls" />
+  <img src="docs/screenshots/timer-duration-picker.png" width="220" alt="Choose a timer preset or enter a custom duration, then confirm it" />
 </p>
 
 ## Colors that belong together

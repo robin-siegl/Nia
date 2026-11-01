@@ -37,9 +37,9 @@ class BackupCodecTest {
         return JsonObject(root + mapOf("settings" to settings, "schemaVersion" to JsonPrimitive(version))).toString()
     }
 
-    @Test fun `schema seven round trips independent home entries and header assignments`() {
+    @Test fun `schema eight round trips independent home entries and header assignments`() {
         assertEquals(p, BackupCodec.decode(exported().encodeToByteArray()))
-        assertTrue(exported().contains("\"schemaVersion\": 7"))
+        assertTrue(exported().contains("\"schemaVersion\": 8"))
     }
     @Test fun `fresh defaults and deliberately empty Home remain empty after backup and device reload`() {
         val empty = LauncherPreferences(calendar = calendar)
@@ -102,7 +102,7 @@ class BackupCodecTest {
     }
     @Test fun `other files future schemas and unsupported profiles are rejected`() {
         rejected("{}"); rejected(exported().replace("nia.settings", "other.settings"))
-        rejected(exported().replace("\"schemaVersion\": 7", "\"schemaVersion\": 8"))
+        rejected(exported().replace("\"schemaVersion\": 8", "\"schemaVersion\": 9"))
         rejected(exported().replace("\"personal\"", "\"private\""))
         rejected(exported().replace("\"personal\"", "\"work\""))
     }

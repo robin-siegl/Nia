@@ -291,7 +291,8 @@ internal fun HomeAppsScreen(
                 textSize = preferences.homeTextSize, onSettings = onSettings, pixelClockLayout = preferences.pixelClockLayout,
                 contentTopInset = contentTopInset, leftShortcut = preferences.leftShortcut, rightShortcut = preferences.rightShortcut,
                 onCorner = onCorner, cornerLabel = { position ->
-                    preferences.shortcut(position).command?.label ?: apps.find { it.target == preferences.shortcut(position).app }?.label ?: (position.label + " shortcut, unavailable")
+                    preferences.shortcut(position).let { it.command?.displayName(it.timerMinutes) } ?:
+                        apps.find { it.target == preferences.shortcut(position).app }?.label ?: (position.label + " shortcut, unavailable")
                 }, motionMode = preferences.motionMode, unlockRequest = unlockRequest, deviceLocked = deviceLocked,
                 interactionEnabled = homeReady,
                 onRevealReady = { shortcutsReady = it }, revealAllowed = revealAllowed,

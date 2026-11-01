@@ -2,6 +2,7 @@ package dev.robinsiegl.nia.platform
 
 import android.app.role.RoleManager
 import android.content.ComponentName
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.LauncherApps
@@ -15,6 +16,7 @@ import android.provider.Settings
 import dev.robinsiegl.nia.model.AppEntry
 import dev.robinsiegl.nia.model.AppSearch
 import dev.robinsiegl.nia.model.AppTarget
+import dev.robinsiegl.nia.model.MAX_TIMER_MINUTES
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -64,11 +66,26 @@ class AppRepository(private val context: Context) {
         context.startActivity(Intent(AlarmClock.ACTION_SHOW_ALARMS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 
-    fun startTimer() {
+    fun startTimer(minutes: Int? = null) {
+        require(minutes == null || minutes in 1..MAX_TIMER_MINUTES)
         // Omitting LENGTH opens the clock app's timer setup instead of starting a preset.
-        context.startActivity(Intent(AlarmClock.ACTION_SET_TIMER)
+        val intent = Intent(AlarmClock.ACTION_SET_TIMER)
             .putExtra(AlarmClock.EXTRA_SKIP_UI, false)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (minutes != null) intent.putExtra(AlarmClock.EXTRA_LENGTH, minutes * 60)
+        context.startActivity(intent)
+    }
+
+    fun setAlarm() {
+        context.startActivity(Intent(AlarmClock.ACTION_SET_ALARM)
+            .putExtra(AlarmClock.EXTRA_SKIP_UI, false).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+
+    fun openSoundControls() {
+        try { context.startActivity(Intent(Settings.Panel.ACTION_VOLUME).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+        catch (_: ActivityNotFoundException) {
+            context.startActivity(Intent(Settings.ACTION_SOUND_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        }
     }
 
     fun isDefaultHome(): Boolean {
