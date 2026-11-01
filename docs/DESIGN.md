@@ -33,6 +33,8 @@ Keep the rest of Home open. Folders, widgets, badges and feeds remain outside th
 
 Swipe up and an optional Open Apps command open the same drawer. Search apps opens it with search focused after settling. Expose Open Apps through Home accessibility actions when no visible command is configured. Pulling down dismisses it only when its list is already at the top. Back dismisses the keyboard before closing Apps; Android Home returns to a clean Home without an old query or keyboard. App selectors keep selection simple; app action menus belong in the full app list.
 
+Start a timer opens a compatible Clock app's timer setup. Let the user choose the duration and manage the timer there; keep nia free of a second timer interface, countdown or alarm service. Use the same command picker and editable outline icon on Home and in Quick corners.
+
 ## Color and typography
 
 Use the shared `Palette` and `NiaTheme` across launcher-owned surfaces.

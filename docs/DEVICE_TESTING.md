@@ -72,6 +72,7 @@ The primary phone is reported to run Android 17. Record what is actually install
 - Drag toward the top/bottom of long Home and Settings lists. Scroll the list and reach off-screen positions without starting the Apps gesture. Reorder the optional Apps command like any other entry. Check the Move up/down alternatives with TalkBack and a keyboard.
 - Open Apps and Search apps from Home and both corners. Search apps focuses only after settling and does not change Keyboard on open. A later ordinary opening follows the saved preference.
 - Toggle flashlight repeatedly and change its state through Quick Settings between taps. Test a busy camera, absent flash and process/activity recreation. Report unavailable hardware without crashing; add no camera permission prompt or camera session.
+- Start a timer from Home and either Quick corner. Open the Clock app's duration entry without a preset or automatic countdown, choose a duration there, then return Home. Let Clock ring and cancel the timer there, including after nia is stopped. Try multiple compatible Clock apps, a disabled/missing handler and an immediate retry after failure. Keep existing assignments and show a useful error if no app can open. No exact-alarm access or runtime permission prompt should appear in nia.
 - Export and restore mixed app/command shortcuts and corners. Preview command changes, preserve names/icons/order, and reject unknown command IDs, simultaneous app/command targets and command fields disguised as old schema versions.
 
 ## Icon picker

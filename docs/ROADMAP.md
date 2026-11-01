@@ -13,7 +13,7 @@ Version 1.4.0 is published. Prepare this Home interaction and command update as 
 | Arrangement | Long-press drag on Home and in Settings → Home shortcuts, edge scrolling for long lists, and accessible alternatives |
 | Home content | Zero to nine editable app/command shortcuts; no automatic, reserved or sticky Apps entry |
 | App menu | Add to Home with a prefilled editor, App info and either Quick corner |
-| Commands | Optional Open Apps, Search apps and Toggle flashlight on Home or in a Quick corner |
+| Commands | Optional Open Apps, Search apps, Toggle flashlight and Start a timer on Home or in a Quick corner |
 
 ### Opening Apps from Home
 
@@ -31,7 +31,7 @@ Keep one saved order across layouts. Preview a drag locally, save one validated 
 
 App-list Add to Home opens a draft with the app already assigned. Save applies the shortcut; Back discards it. Names and outline icons remain independent of the chosen app or command. The shared picker includes 193 bundled Material Symbols.
 
-Commands are a typed allowlist, not arbitrary intents or scripts. Open Apps follows the normal keyboard preference; Search apps overrides it for that opening only. Toggle flashlight uses Android's public torch API and actual torch callbacks, handles unavailable hardware/camera resources and adds no camera permission or camera session. Extra commands such as a timer or an appearance switch can be considered after feedback.
+Commands are a typed allowlist, not arbitrary intents or scripts. Open Apps follows the normal keyboard preference; Search apps overrides it for that opening only. Toggle flashlight uses Android's public torch API and actual torch callbacks, handles unavailable hardware/camera resources and adds no camera permission or camera session. Start a timer hands duration selection and all timer behavior to a compatible Clock app through Android's timer action; nia adds no timer service. Extra commands such as an appearance switch can be considered after feedback.
 
 ### Compatibility
 
@@ -49,6 +49,7 @@ Run the automated checks and inspect native light/dark, intermediate-scroll and 
 - Real drags across grid rows, list and Settings edge scrolling, canceled drags, accessible arrangement and immediate taps/swipes afterward.
 - Add to Home from filtered Apps, draft cancellation, full-Home feedback, command changes and search focus only after settling.
 - Flashlight toggling, changes from Quick Settings, a busy camera, unavailable hardware and normal callback cleanup.
+- Start a timer from Home and both corners, choose a duration in Clock, return to nia and verify that Clock rings and cancels normally. Check missing/disabled timer apps and retry without a blocked shortcut.
 - Unlock, Battery Saver, Quick Settings interruption, Android Home and ordinary app returns without replaying unlock effects.
 
 Keep physical-phone results separate from Robolectric simulations. The [design](DESIGN.md) and [architecture](ARCHITECTURE.md) guides own lasting product and implementation rules.

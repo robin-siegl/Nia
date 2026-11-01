@@ -14,6 +14,8 @@ Your chosen apps and commands, layout, colors, app-list preferences and unfinish
 
 Open Apps and Search apps use nia's local app list. Toggle flashlight uses Android's torch control and observes its current on/off state. It does not open the camera, capture images, request camera permission or send torch state elsewhere. Android and other apps can change or make the flashlight unavailable.
 
+Start a timer opens a compatible Clock app through Android. That app handles the duration you enter, countdown, alerts and cancellation under its own settings. nia does not run a timer in the background or record timer history. Android's normal Set alarm permission allows this handoff; nia does not request exact-alarm access or a runtime permission prompt for it.
+
 ## Backups
 
 **Save backup** creates a JSON file wherever you choose through Android's document picker. It contains nia's preferences and assigned app identifiers. It does not contain other apps' data, a complete app inventory, search history or setup progress. If you save to a cloud document provider, that provider handles the file under its own policies.

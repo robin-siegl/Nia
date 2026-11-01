@@ -64,6 +64,13 @@ class AppRepository(private val context: Context) {
         context.startActivity(Intent(AlarmClock.ACTION_SHOW_ALARMS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 
+    fun startTimer() {
+        // Omitting LENGTH opens the clock app's timer setup instead of starting a preset.
+        context.startActivity(Intent(AlarmClock.ACTION_SET_TIMER)
+            .putExtra(AlarmClock.EXTRA_SKIP_UI, false)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+
     fun isDefaultHome(): Boolean {
         val role = context.getSystemService(RoleManager::class.java)
         return role.isRoleAvailable(RoleManager.ROLE_HOME) && role.isRoleHeld(RoleManager.ROLE_HOME)
