@@ -4,7 +4,7 @@ nia is a Kotlin/Jetpack Compose Android launcher. Follow these instructions for 
 
 ## Active release: 1.4.0
 
-Keep the work for issues #9, #10 and #11 in the ongoing **1.4.0 / 1004000** change set. The change set includes portrait mode, editable Home apps, optional onboarding and the shared Apps pull. Keep this version while completing the agreed scope; do not publish or trigger Production APK until the work is finished and the user requests it. The user has clarified the 1.4.0 target: all Home app shortcuts are editable, with at most eight app entries plus Apps. Current fixed-category source is legacy behavior to migrate, not a product constraint to retain. See the [1.4.0 plan](docs/ROADMAP.md#140-in-preparation).
+Keep the work for issues #9, #10 and #11 in the ongoing **1.4.0 / 1004000** change set. The change set includes portrait mode, editable Home apps, optional onboarding and the shared Apps pull. Keep this version while completing the agreed scope; do not publish or trigger Production APK until the work is finished and the user requests it. The user has clarified the 1.4.0 target: all Home app shortcuts are editable, with at most eight app entries plus Apps. Legacy fixed-category preferences migrate into ordinary editable entries. See the [1.4.0 plan](docs/ROADMAP.md#140-in-preparation).
 
 ## Read the relevant guidance
 
@@ -24,7 +24,9 @@ Use the repository skills below. If your agent does not discover skills automati
 
 For 1.4.0, allow adding, removing, renaming, reassigning, changing the outline icon and reordering every main Home app shortcut. Keep at most eight app shortcuts plus the mandatory Apps entry; keep the icon grid non-scrolling. Preserve existing setups through migration, and let fresh-install onboarding add shortcuts or skip to Apps-only. Keep Clock/Calendar header targets independent of Home entries. The two corner slots are separate from the main-area cap; Settings → Home apps owns arrangement.
 
-Apply the shared Apps pull, progress feedback, clock transition, haptic thresholds and release/cancel behavior to both grid and list. The grid itself never scrolls; only an overflowing list scrolls before handing off at its end. Ordinary flings do not arm Apps, haptics respect Android settings, and unlocks start with the expanded header. Keep Apps available by gesture and a visible entry, and keep the full app list alphabetical and text-only. Corner shortcuts support Empty or App; nia Settings is not a corner action.
+Apply the shared Apps pull, progress feedback, clock transition, haptic thresholds and release/cancel behavior to both grid and list. The grid itself never scrolls; only an overflowing list scrolls before handing off at its end. Ordinary flings do not arm Apps, haptics respect Android settings, and unlocks start with the expanded header. Keep Apps available by gesture and a visible entry, and keep the full app list alphabetical and text-only. Quick corners support Empty or App; nia Settings is not a corner action.
+
+Use the shared Material Symbols catalog and icon picker for Home apps and Quick corners. Preserve serialized icon IDs and the legacy Settings migration; verify bundled resources with `python3 scripts/sync_material_symbols.py --check`. The import/generation workflow is in CONTRIBUTING.md.
 
 Keep the personal-profile scope, offline core and manual-only update checks. Preserve exact OLED black, matched themes, accessible controls and Android's animation preferences. See the guides for the full behavior and known device limitations.
 

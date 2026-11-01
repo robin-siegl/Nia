@@ -29,38 +29,22 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import dev.robinsiegl.nia.model.HomeCategory
-
-private val categoryVectors = HomeCategory.entries.associateWith { category ->
-    val path = when (category) {
-        HomeCategory.PHONE -> "M7,3H4C3.4,3 3,3.5 3,4C3,13.4 10.6,21 20,21C20.5,21 21,20.6 21,20V17L16,15L14,17C10.9,15.6 8.4,13.1 7,10L9,8Z"
-        HomeCategory.MESSAGES -> "M4,4H20V17H9L4,21Z M8,9H16 M8,13H13"
-        HomeCategory.MUSIC -> "M9,17V5L20,3V15 M9,8L20,6 M9,17C9,21 3,22 3,18C3,14 9,14 9,17 M20,15C20,19 14,20 14,16C14,12 20,12 20,15"
-        HomeCategory.CALENDAR -> "M4,5H20V21H4Z M4,10H20 M8,3V7 M16,3V7 M8,14H10 M14,14H16 M8,17H10"
-        HomeCategory.MAPS -> "M3,5L9,3L15,5L21,3V19L15,21L9,19L3,21Z M9,3V19 M15,5V21"
-    }
-    ImageVector.Builder(category.label, 24.dp, 24.dp, 24f, 24f)
-        .addPath(addPathNodes(path), fill = null, stroke = SolidColor(Color.Black), strokeLineWidth = 1.5f,
-            strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round).build()
-}
+import dev.robinsiegl.nia.R
+import androidx.compose.ui.res.painterResource
 
 internal fun outlineIcon(name: String, path: String) = ImageVector.Builder(name, 24.dp, 24.dp, 24f, 24f)
     .addPath(addPathNodes(path), fill = null, stroke = SolidColor(Color.Black), strokeLineWidth = 1.5f,
         strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round).build()
 
-private val appsVector = outlineIcon("Apps", "M4,4H10V10H4Z M14,4H20V10H14Z M4,14H10V20H4Z M14,14H20V20H14Z")
-internal val settingsVector = outlineIcon("Settings",
-    "M9,3H15L15.7,5.3L17.4,6.3L19.7,5.8L21.2,8.4L19.6,10.1V13.9L21.2,15.6L19.7,18.2L17.4,17.7L15.7,18.7L15,21H9L8.3,18.7L6.6,17.7L4.3,18.2L2.8,15.6L4.4,13.9V10.1L2.8,8.4L4.3,5.8L6.6,6.3L8.3,5.3Z M16,12A4,4 0,1 1,8,12A4,4 0,1 1,16,12")
-
 @Composable
 fun AppsIcon(modifier: Modifier = Modifier) {
-    Icon(appsVector, contentDescription = null, modifier = modifier)
+    Icon(painterResource(R.drawable.ic_material_apps), contentDescription = null, modifier = modifier)
 }
 
 @Composable
 fun SettingsButton(onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
     IconButton(onClick, modifier = modifier.size(48.dp), enabled = enabled) {
-        Icon(settingsVector, contentDescription = "Settings", modifier = Modifier.size(24.dp))
+        Icon(painterResource(R.drawable.ic_material_settings), contentDescription = "Settings", modifier = Modifier.size(24.dp))
     }
 }
 
@@ -83,11 +67,6 @@ internal fun Modifier.dragToSelect(onSelect: (Offset, IntSize) -> Unit, onFinish
             finish()
         }
     }
-}
-
-@Composable
-fun CategoryIcon(category: HomeCategory, modifier: Modifier = Modifier) {
-    Icon(categoryVectors.getValue(category), contentDescription = null, modifier = modifier)
 }
 
 @Composable

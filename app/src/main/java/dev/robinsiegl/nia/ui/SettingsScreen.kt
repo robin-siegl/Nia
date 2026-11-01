@@ -75,7 +75,7 @@ fun SettingsDetailScreen(
                 SectionLabel("Clock & date")
                 AssignmentsSettings(preferences, apps, onAssign, onClear)
             }
-            SettingsSection.SHORTCUTS -> CornerSettings(preferences, apps, onChange, onAssignCorner)
+            SettingsSection.SHORTCUTS -> QuickCornerSettings(preferences, apps, onChange, onAssignCorner)
             SettingsSection.APPEARANCE -> AppearanceSettings(preferences, onChange)
             SettingsSection.ASSIGNMENTS -> HomeAppsSettings(preferences, apps, onEditHome, onMoveHome)
             SettingsSection.APP_LIST -> {
@@ -154,7 +154,7 @@ private fun BackupSettings(storageError: Boolean, onExport: () -> Unit, onImport
     SettingsAction("Save backup", "Choose where to save the file.", onExport, enabled = !storageError)
     SettingsAction("Restore backup", "Review changes before applying them.", onImport)
     SectionLabel("Reset")
-    SettingsAction("Reset appearance & behavior", "Restore defaults and keep all app assignments and corner shortcuts.",
+    SettingsAction("Reset appearance & behavior", "Restore defaults and keep all app assignments and quick corners.",
         { reset = ResetOption.APPEARANCE }, enabled = !storageError, showChevron = false)
     SettingsAction("Reset all settings", "Clear preferences and app assignments, then start setup again.",
         { reset = ResetOption.ALL }, showChevron = false)
@@ -163,7 +163,7 @@ private fun BackupSettings(storageError: Boolean, onExport: () -> Unit, onImport
         AlertDialog(onDismissRequest = { reset = null },
             title = { Text(if (all) "Reset all settings?" else "Reset appearance & behavior?") },
             text = { Text(if (all) "Your preferences and app assignments will be cleared. You can save a backup before resetting."
-                else "Your layout, colors, text size, search and animation settings will return to their defaults. App assignments and corner shortcuts will stay as they are.") },
+                else "Your layout, colors, text size, search and animation settings will return to their defaults. App assignments and quick corners will stay as they are.") },
             confirmButton = { TextButton(onClick = { reset = null; if (all) onResetAll() else onResetAppearance() }) { Text("Reset") } },
             dismissButton = { TextButton(onClick = { reset = null }) { Text("Cancel") } })
     }

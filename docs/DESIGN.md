@@ -21,7 +21,7 @@ Home is user-defined in **1.4.0**. Every app shortcut can be added, removed, ren
 | Text list | Scroll large-text entries beneath a collapsible clock/date, with an always-reachable Apps action and a deliberate pull beyond the end to open the drawer |
 | Shortcut content | Independent name, app target and outline icon, such as Google Maps with a map icon |
 | Clock and date | Time opens Clock; date opens its independently assigned Calendar app |
-| Bottom corners | Optional Empty/App slots, separate from the main-area limit |
+| Quick corners | Optional Empty/App slots, separate from the main-area limit |
 | App list | Alphabetical app names and search; no app-brand icons, usage ranking or recommendations |
 | Settings access | Gear in Apps and a touch-and-hold action on empty Home space |
 
@@ -50,6 +50,10 @@ Avoid surface tints, gradients or translucent wallpaper effects that turn the OL
 
 Use Material typography for controls: readable body text, quieter supporting text and a clear page title. Reuse the existing 8/12/16/24dp spacing rhythm and consistent outline icon weight. Settings use 24dp horizontal content padding and a maximum content width of 600dp. Keep Home's full-width header calibration separate from that settings constraint.
 
+Shortcut glyphs use the bundled **Material Symbols Outlined**, with unfilled paths, weight 300, grade 0 and 24px optical size. Tint them with the shared foreground. Keep one family across Home, Quick corners and the picker. Use the stable catalog IDs rather than labels or positions; see [icon attribution](../THIRD_PARTY_NOTICES.md#shortcut-and-interface-icons).
+
+The icon picker is a reusable full-screen dialog. Search covers names, category words and synonyms across the entire catalog; selecting a category starts a browse view. Keep search, Close and confirmation available while results scroll. Use a category menu and larger cells at large text sizes, and simplify controls when the keyboard reduces the available height.
+
 Respect system text scaling in controls and app names. The calibrated Pixel-style header keeps fixed proportions at rest; offer the existing scalable clock layout when that treatment is unsuitable.
 
 ## Pixel-style header
@@ -77,7 +81,7 @@ Keep the overview short and show useful current choices. Group related controls 
 - Use lowercase **nia**. Match **Home**, **Apps** and other destination names to their visible labels.
 - Explain the outcome or current value in supporting text. Avoid jargon, repeated labels and long implementation explanations.
 - Make a switch's entire row tappable, with one accessible switch action. Expose mutually exclusive choices as a single-selection group.
-- Show the chosen app or icon and make changing it discoverable. Highlight the selected corner icon.
+- Show the chosen app or icon and make changing it discoverable. Use the shared icon picker for Home apps and Quick corners. Show labeled tiles, search and categories, preview a pending selection, and apply only after confirmation. Cancel leaves the saved choice unchanged.
 - Group custom color controls together, with live light/dark previews. Save wheel/slider changes on release and valid hex input through Apply.
 - Explain what each reset clears and preserves. Confirm both reset actions. Keep the restore preview's labels consistent with Settings.
 
@@ -112,7 +116,7 @@ Provide at least 48dp touch targets, meaningful spoken labels for icon-only acti
 
 Review real Compose renders in monochrome and color light/dark themes, plus a narrow screen with large text. Use the [device checklist](DEVICE_TESTING.md) for TalkBack, keyboard and system gestures. Do not present a mockup or native test render as a physical-phone result.
 
-Reference captures: [nine-entry grid](screenshots/home-nine-grid.png), [large-text list](screenshots/home-nine-list-large.png), [Home app editor](screenshots/home-shortcut-editor.png), [Settings](screenshots/settings-overview.png), [app actions](screenshots/app-actions.png), [corner icons](screenshots/shortcut-icons.png) and [restore preview](screenshots/restore-preview.png).
+Reference captures: [nine-entry grid](screenshots/home-nine-grid.png), [large-text list](screenshots/home-nine-list-large.png), [Home app editor](screenshots/home-shortcut-editor.png), [Settings](screenshots/settings-overview.png), [app actions](screenshots/app-actions.png), [icon picker](screenshots/shortcut-icons.png), [light picker](screenshots/icon-picker-light.png), [large-text picker](screenshots/icon-picker-large-text.png) and [restore preview](screenshots/restore-preview.png).
 
 ### Android guidance
 

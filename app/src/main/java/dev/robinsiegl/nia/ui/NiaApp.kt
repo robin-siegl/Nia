@@ -157,7 +157,7 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: UnlockReve
                                 title = "Choose app", onBack = model::back, onSelect = model::chooseHomeApp,
                                 alphabetScrubber = preferences.alphabetScrubber)
                             is Screen.CornerPicker -> AppListScreen(apps, loading, false,
-                                title = screen.position.label + " shortcut", onBack = model::back,
+                                title = screen.position.label + " quick corner", onBack = model::back,
                                 onSelect = { model.chooseCornerApp(screen.position, it.target) }, alphabetScrubber = preferences.alphabetScrubber,
                                 interactionEnabled = !selectingApp)
                             Screen.Settings -> SettingsScreen(isDefault, storageError, onBack = model::back,

@@ -28,7 +28,7 @@ class RestorePreviewTest {
         assertEquals(18, preview.changes.size)
         assertEquals(requested, preview.preferences)
         assertTrue(preview.changes.all { it.before != it.after })
-        assertEquals(setOf("Home screen", "Appearance", "App list", "Home apps", "Clock & date", "Corner shortcuts"), preview.changes.map { it.section }.toSet())
+        assertEquals(setOf("Home screen", "Appearance", "App list", "Home apps", "Clock & date", "Quick corners"), preview.changes.map { it.section }.toSet())
         assertTrue(preview.changes.first { it.label == "Music" }.after.contains("Music icon"))
         assertTrue(preview.changes.first { it.label == "Clock" }.before.contains("System clock"))
         assertTrue(preview.changes.first { it.label == "Calendar" }.after.contains("First"))

@@ -2,6 +2,10 @@
 
 ## 1.4.0 (unreleased)
 
+- Replace the hand-drawn shortcut icons with 192 bundled Material Symbols Outlined, covering nine categories. Keep existing icon IDs compatible with saved settings and backups, and use matching Material Apps/Settings icons.
+- Add one reusable icon picker for Home apps and Quick corners, with labeled tiles, name/keyword search, categories, selection preview, explicit confirmation, state restoration and a compact layout for large text or the keyboard.
+- Rename Corner shortcuts to Quick corners while preserving existing assignments and backup keys. Bundle Google's Apache 2.0 license and verify the pinned catalog/assets in CI.
+
 - Make every Home app editable: add, remove, rename, reassign, choose an outline icon and reorder in Settings → Home apps. Keep up to eight apps plus the reserved Apps entry, with one order shared across grid/list.
 - Let new users add apps during setup or skip to an Apps-only Home. Migrate existing five-category setups into ordinary editable entries without repeating completed setup.
 - Add a shared resisted pull to open Apps in both layouts, with a progress cue, threshold haptics and deliberate release/cancel behavior. Large lists scroll first and show a compact header and pinned Apps row; grids stay on one screen. A fling alone cannot open Apps.

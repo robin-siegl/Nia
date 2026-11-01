@@ -16,7 +16,9 @@ The **1.4.0 / 1004000** change set includes portrait mode, editable Home apps an
 
 Use **Settings → Home apps** to add, remove, rename, reassign, choose an outline icon and reorder any app entry. Move up/down buttons support touch, keyboard and accessibility actions. Apps stays last and cannot be removed. Grid/list share one saved arrangement.
 
-The main area supports **zero to eight app shortcuts plus Apps**. The two optional bottom corners are separate. Names, targets and icons are independent: Google Maps can have a Maps outline icon, and changing its target keeps the chosen name/icon. Custom Home labels do not rename alphabetical-list entries or become search aliases.
+The shared icon picker offers 192 bundled Material Symbols, categories, keyword search and a confirmed preview. Existing selections stay compatible.
+
+The main area supports **zero to eight app shortcuts plus Apps**. The two optional **Quick corners** are separate. Names, targets and icons are independent: Google Maps can have a Maps outline icon, and changing its target keeps the chosen name/icon. Custom Home labels do not rename alphabetical-list entries or become search aliases.
 
 An unfinished editor draft stays through app/icon picking and activity recreation. Cancel leaves saved shortcuts alone. Saved entries survive restart; transient drafts/navigation do not survive process death. Unavailable apps retain editable names/icons/positions for reassignment.
 
