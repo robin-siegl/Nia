@@ -1,6 +1,7 @@
 package dev.robinsiegl.nia.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -46,11 +47,11 @@ private fun settingsSummary(section: SettingsSection, p: LauncherPreferences): S
     SettingsSection.APPEARANCE -> "${if (p.colorStyle == ColorStyle.MONOCHROME) "Black & white" else "Color"} · ${when (p.themeMode) {
         ThemeMode.SYSTEM -> "Follow system"; ThemeMode.LIGHT -> "Light"; ThemeMode.DARK -> "Dark"
     }}"
-    SettingsSection.ASSIGNMENTS -> "${p.homeShortcuts.size} ${if (p.homeShortcuts.size == 1) "app" else "apps"} · Add, edit and arrange"
+    SettingsSection.ASSIGNMENTS -> "${p.homeShortcuts.size} ${if (p.homeShortcuts.size == 1) "shortcut" else "shortcuts"} · Apps and commands"
     SettingsSection.SHORTCUTS -> when {
-        p.leftShortcut.action == ShortcutAction.APP && p.rightShortcut.action == ShortcutAction.APP -> "Both corners"
-        p.leftShortcut.action == ShortcutAction.APP -> "Left corner"
-        p.rightShortcut.action == ShortcutAction.APP -> "Right corner"
+        p.leftShortcut.action != ShortcutAction.EMPTY && p.rightShortcut.action != ShortcutAction.EMPTY -> "Both corners"
+        p.leftShortcut.action != ShortcutAction.EMPTY -> "Left corner"
+        p.rightShortcut.action != ShortcutAction.EMPTY -> "Right corner"
         else -> "No shortcuts"
     }
     SettingsSection.APP_LIST -> if (p.searchAutofocus) "Keyboard opens with Apps" else "Tap search to open the keyboard"
@@ -67,8 +68,10 @@ fun SettingsDetailScreen(
     onAssignCorner: (CornerPosition) -> Unit = {},
     onEditHome: (String?) -> Unit = {}, onMoveHome: (String, Int) -> Unit = { _, _ -> },
     updateCheck: UpdateCheck = UpdateCheck.Idle, onCheckUpdates: () -> Unit = {},
+    onReorderHome: (suspend (List<String>) -> Boolean)? = null,
 ) {
-    SettingsLayout(section.title, onBack) {
+    val scroll = rememberScrollState()
+    SettingsLayout(section.title, onBack, scroll = scroll) {
         when (section) {
             SettingsSection.HOME -> {
                 HomeSettings(preferences, onChange)
@@ -77,7 +80,7 @@ fun SettingsDetailScreen(
             }
             SettingsSection.SHORTCUTS -> QuickCornerSettings(preferences, apps, onChange, onAssignCorner)
             SettingsSection.APPEARANCE -> AppearanceSettings(preferences, onChange)
-            SettingsSection.ASSIGNMENTS -> HomeAppsSettings(preferences, apps, onEditHome, onMoveHome)
+            SettingsSection.ASSIGNMENTS -> HomeAppsSettings(preferences, apps, onEditHome, onMoveHome, onReorderHome, scroll)
             SettingsSection.APP_LIST -> {
                 SettingSwitch("Keyboard on open", "Open the keyboard when Apps is ready to search.", preferences.searchAutofocus) {
                     value -> onChange { it.copy(searchAutofocus = value) }
@@ -138,7 +141,7 @@ internal fun AppearanceSettings(preferences: LauncherPreferences, onChange: ((La
 internal fun AssignmentsSettings(
     preferences: LauncherPreferences, apps: List<AppEntry>, onAssign: (HeaderTarget) -> Unit, onClear: (HeaderTarget) -> Unit,
 ) {
-    SettingsDescription("These choices stay separate from your Home apps.", Modifier.padding(top = 8.dp, bottom = 12.dp))
+    SettingsDescription("These choices stay separate from your Home shortcuts.", Modifier.padding(top = 8.dp, bottom = 12.dp))
     AssignmentRow("Clock", preferences.clock, apps, { onAssign(HeaderTarget.CLOCK) }, { onClear(HeaderTarget.CLOCK) }, "System clock")
     AssignmentRow("Calendar", preferences.calendar, apps, { onAssign(HeaderTarget.CALENDAR) }, { onClear(HeaderTarget.CALENDAR) }, "Choose an app")
 }

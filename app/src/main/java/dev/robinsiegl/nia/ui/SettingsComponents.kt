@@ -1,6 +1,7 @@
 package dev.robinsiegl.nia.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -20,7 +21,7 @@ private val chevronVector = outlineIcon("Open", "M9,5L16,12L9,19")
 
 /** Keep navigation visible while long settings pages scroll, including at large font sizes. */
 @Composable
-internal fun SettingsLayout(title: String, onBack: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+internal fun SettingsLayout(title: String, onBack: () -> Unit, scroll: ScrollState = rememberScrollState(), content: @Composable ColumnScope.() -> Unit) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         Column(Modifier.widthIn(max = 600.dp).fillMaxSize()) {
             Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(horizontal = 12.dp, vertical = 8.dp),
@@ -32,7 +33,7 @@ internal fun SettingsLayout(title: String, onBack: () -> Unit, content: @Composa
                     modifier = Modifier.weight(1f).padding(start = 12.dp, end = 12.dp).semantics { heading() })
             }
             key(title) {
-                Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())
+                Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(scroll)
                     .testTag("settings-content").padding(horizontal = 24.dp).padding(bottom = 32.dp), content = content)
             }
         }

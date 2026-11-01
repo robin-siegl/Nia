@@ -18,11 +18,11 @@ class AppsPullTest {
         assertFalse(pull.armed)
         pull.drag(-60f, 100f, cues::add)
         assertTrue(pull.armed)
-        assertEquals(listOf(PullCue.START, PullCue.ARMED), cues)
+        assertEquals(listOf(PullCue.ARMED), cues)
         pull.reset()
         assertEquals(0f, pull.preview, 0f); assertFalse(pull.armed)
         pull.drag(-120f, 100f, cues::add)
-        assertEquals(listOf(PullCue.START, PullCue.ARMED, PullCue.START, PullCue.ARMED), cues)
+        assertEquals(listOf(PullCue.ARMED, PullCue.ARMED), cues)
     }
     @Test fun `a downward gesture from rest cannot start opening Apps`() {
         val pull = AppsPull()

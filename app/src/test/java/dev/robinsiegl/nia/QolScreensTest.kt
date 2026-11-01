@@ -54,9 +54,9 @@ class QolScreensTest {
         var launches = 0
         val p = LauncherPreferences(searchAutofocus = true)
         render { drawer(p, open, { open = it }, { launches++ }) }
-        val clockId = rule.onNodeWithTag("pixel-clock-header").fetchSemanticsNode().id
+        val clockId = rule.onNodeWithTag("home-clock-header").fetchSemanticsNode().id
         rule.mainClock.autoAdvance = false
-        rule.onNodeWithContentDescription("Apps").performClick()
+        rule.openAppsFromHome()
         rule.mainClock.advanceTimeBy(80)
         assertTrue(progress() in 0.01f..0.99f)
         assertTrue(rule.onNodeWithTag("home-apps-surface").fetchSemanticsNode().config[DrawerSettling])
@@ -70,7 +70,7 @@ class QolScreensTest {
         rule.mainClock.advanceTimeBy(500)
         assertFalse(open)
         assertEquals(0f, progress(), 0f)
-        assertEquals(clockId, rule.onNodeWithTag("pixel-clock-header").fetchSemanticsNode().id)
+        assertEquals(clockId, rule.onNodeWithTag("home-clock-header").fetchSemanticsNode().id)
     }
 
     @Test fun `drawer follows a partial finger drag and a reversed gesture cancels it`() {
@@ -89,7 +89,7 @@ class QolScreensTest {
         rule.waitForIdle()
         assertEquals(0f, progress(), 0f)
         assertFalse(open)
-        rule.onNodeWithContentDescription("Apps").assertIsDisplayed()
+        rule.onNodeWithContentDescription("Apps").assertDoesNotExist()
     }
 
     @Test fun `scrolling Apps does not dismiss it until the list is at its top`() {
@@ -126,7 +126,7 @@ class QolScreensTest {
         rule.mainClock.advanceTimeBy(32)
         assertEquals(0f, progress(), 0f)
         assertFalse(rule.onNodeWithTag("home-apps-surface").fetchSemanticsNode().config[DrawerSettling])
-        rule.onNodeWithContentDescription("Apps").assertIsDisplayed()
+        rule.onNodeWithContentDescription("Apps").assertDoesNotExist()
     }
 
     @Test fun `Android Home interrupts an opening drawer without leaving input blocked`() {
@@ -137,7 +137,7 @@ class QolScreensTest {
                 {}, {}, {}, {}, {}, {}, homeRequest = homeRequest)
         }
         rule.mainClock.autoAdvance = false
-        rule.onNodeWithContentDescription("Apps").performClick()
+        rule.openAppsFromHome()
         rule.mainClock.advanceTimeBy(64)
         rule.runOnIdle { homeRequest++ }
         rule.mainClock.advanceTimeBy(32)
@@ -183,7 +183,7 @@ class QolScreensTest {
 
     @Test fun `empty corners stay absent and long pressing blank Home opens settings`() {
         var settings = 0
-        render { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}, onSettings = { settings++ }, shortcuts = legacyHomeShortcuts()) }
+        render { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, onSettings = { settings++ }, shortcuts = legacyHomeShortcuts()) }
         rule.onNodeWithTag("home-corner-LEFT").assertDoesNotExist()
         rule.onNodeWithTag("home-corner-RIGHT").assertDoesNotExist()
         rule.onNodeWithTag("home-screen").performTouchInput { longClick(Offset(width / 2f, height * 0.85f)) }
@@ -194,7 +194,7 @@ class QolScreensTest {
         var chosen: CornerPosition? = null
         val left = CornerShortcut(ShortcutAction.APP, ShortcutIcon.NOTES, apps.first().target)
         render {
-            HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}, leftShortcut = left,
+            HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, leftShortcut = left,
                 rightShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.HEADPHONES, apps.last().target),
                 onCorner = { chosen = it }, cornerLabel = { if (it == CornerPosition.LEFT) "Notes" else "Podcasts" }, shortcuts = legacyHomeShortcuts())
         }
@@ -227,7 +227,7 @@ class QolScreensTest {
         var locked by mutableStateOf(false)
         var unlock by mutableStateOf<UnlockRevealRequest?>(null)
         var time by mutableStateOf("14:03")
-        render { HomeScreen(HomeLayout.GRID, time, "Fri, 30 Oct", {}, {}, {}, unlockRequest = unlock, deviceLocked = locked, shortcuts = legacyHomeShortcuts()) }
+        render { HomeScreen(HomeLayout.GRID, time, "Fri, 30 Oct", {}, {}, unlockRequest = unlock, deviceLocked = locked, shortcuts = legacyHomeShortcuts()) }
         val bounds = rule.onNodeWithTag("home-clock").fetchSemanticsNode().boundsInRoot
         rule.mainClock.autoAdvance = false
         // Flush snapshot writes explicitly before advancing the paused test frame clock.
@@ -251,7 +251,7 @@ class QolScreensTest {
         var open by mutableStateOf(false)
         render { drawer(LauncherPreferences(motionMode = MotionMode.REDUCED), open, { open = it }) }
         rule.mainClock.autoAdvance = false
-        rule.onNodeWithContentDescription("Apps").performClick()
+        rule.openAppsFromHome()
         rule.mainClock.advanceTimeBy(48)
         assertTrue(progress() in 0f..0.99f)
         val top = rule.onNodeWithTag("apps-screen", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot.top
@@ -265,7 +265,7 @@ class QolScreensTest {
         render { drawer(LauncherPreferences(), open, { open = it }) }
         rule.mainClock.autoAdvance = false
         capture("drawer-motion-00")
-        rule.onNodeWithContentDescription("Apps").performClick()
+        rule.openAppsFromHome()
         for (frame in 1..8) {
             rule.mainClock.advanceTimeBy(40)
             capture("drawer-motion-" + frame.toString().padStart(2, '0'))

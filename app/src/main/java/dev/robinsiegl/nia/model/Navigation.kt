@@ -4,7 +4,7 @@ enum class SettingsSection(val title: String, val description: String) {
     HOME("Home screen", "Layout, clock and text size"),
     SHORTCUTS("Quick corners", "Optional shortcuts at the bottom of Home"),
     APPEARANCE("Appearance", "Colors, theme and animations"),
-    ASSIGNMENTS("Home apps", "Add, edit and arrange your shortcuts"),
+    ASSIGNMENTS("Home shortcuts", "Apps, commands and arrangement"),
     APP_LIST("App list", "Search and A–Z navigation"),
     BACKUP("Backup & reset", "Save, restore or reset your settings"),
     ABOUT("About nia", "Updates, privacy and project information"),

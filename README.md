@@ -14,28 +14,28 @@ nia is a minimalist Android launcher with your chosen shortcuts, a clock and dat
 
 ## Your essentials, in a familiar place
 
-Choose the apps that belong on your Home. Add up to **eight apps plus Apps**, pick their names and outline icons, and arrange them in your own order. Use a three-column icon grid or a plain text list; both share your arrangement.
+Choose what belongs on your Home. Add up to **nine apps or commands**, pick their names and outline icons, and drag them into your own order. Use a three-column icon grid or a plain text list; both share your arrangement.
 
-Start with an empty Home and add just what you need during setup, or later in **Settings → Home apps**. Every app entry can be edited or removed. Upgrading from an earlier nia keeps your existing shortcuts.
+Start with an empty Home and add just what you need during setup, or later in **Settings → Home shortcuts**. Every entry can be edited or removed. Upgrading from an earlier nia keeps your existing shortcuts.
 
-The time opens Clock, and the date opens your separately assigned Calendar. **Quick corners** put an optional app shortcut in each bottom corner. Leave either one empty for a simpler Home.
+The time opens Clock, and the date opens your separately assigned Calendar. **Quick corners** put an optional app or command in each bottom corner. Leave either one empty for a simpler Home.
 
-Choose from **192 Material Symbols** with searchable names, keywords and categories. Home apps and Quick corners share the same picker: preview a choice, then confirm it.
+Choose from **193 Material Symbols** with searchable names, keywords and categories. Home shortcuts and Quick corners share the same picker: preview a choice, then confirm it.
 
 <p>
-  <img src="docs/screenshots/home-shortcut-editor.png" width="220" alt="Edit a Home app's name, target and outline icon" />
+  <img src="docs/screenshots/home-shortcut-editor.png" width="220" alt="Edit a Home shortcut's name, action and outline icon" />
   <img src="docs/screenshots/shortcut-icons.png" width="220" alt="Search and browse Material Symbols in the shared icon picker" />
 </p>
 
 ## All your apps, a swipe away
 
-Pull up and release, or tap **Apps**, to open an alphabetical list of app names. A gentle visual cue and optional system haptics show when the pull is ready. Large Home lists scroll first, with a compact clock and a reachable Apps row; the icon grid stays on one screen. Search by name, initials or words in any order, or enable A–Z navigation to jump through the list.
+Swipe up to open an alphabetical list of app names. The clock shrinks as your shortcuts move upward; long lists then scroll before handing off to Apps. A small chevron and one light haptic mark the deliberate pull. The icon grid stays on one screen. Search by name, initials or words in any order, or enable A–Z navigation to jump through the list.
 
-You can have the keyboard open automatically when Apps is ready. When a search finds just one app, press Enter to open it. Touch and hold an app name for App info or to assign it to a corner.
+You can have the keyboard open automatically when Apps is ready. Prefer a visible shortcut? Add **Open Apps** or **Search apps** wherever you want; neither is added automatically. **Toggle flashlight** is available as another optional command. When a search finds just one app, press Enter to open it. Touch and hold an app name to add it to Home, open App info or assign it to a Quick corner.
 
 <p>
-  <img src="docs/screenshots/drawer-motion.gif" width="220" alt="nia's app drawer following a swipe and settling into place" />
-  <img src="docs/screenshots/home-corner-shortcuts.png" width="220" alt="Optional outline shortcuts in the bottom corners of nia Home" />
+  <img src="docs/screenshots/home-scroll-mid.png" width="220" alt="The same clock shrinking as the Home shortcuts move upward" />
+  <img src="docs/screenshots/shortcut-command-picker.png" width="220" alt="Optional commands for Apps, search and the flashlight" />
 </p>
 
 ## Colors that belong together
@@ -50,7 +50,7 @@ Monochrome dark mode uses **true `#000000` black**. Colored themes can use a pur
 
 ## A few thoughtful details
 
-- Guided setup helps you choose your layout, apps and colors—or skip adding apps for an Apps-only Home.
+- Guided setup helps you choose your layout, shortcuts and colors—or skip adding shortcuts for an empty Home.
 - Settings show your current choices, with readable controls and an adjustable Home text size.
 - Save your settings to a file and review names, icons, order, app assignments and other changes before restoring a backup.
 - Check for a new GitHub release from **About nia** whenever you choose.

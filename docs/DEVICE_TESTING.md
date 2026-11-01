@@ -19,24 +19,24 @@ The primary phone is reported to run Android 17. Record what is actually install
 ## Installation, setup and Home
 
 - Install and open nia. Complete setup, choose nia in Android's Home dialog, and verify the Home gesture returns to it.
-- Test all four setup stages, Back, Skip setup, Restore and All apps. Add your apps can skip to Apps-only, without inserting the old five categories. Select an app mid-setup, close/reopen nia, and check the stage and assignments remain.
+- Test all four setup stages, Back, Skip setup, Restore and All apps. Your shortcuts can skip to an empty Home, without inserting the old five categories. Select an app mid-setup, close/reopen nia, and check the stage and assignments remain.
 - Change the default launcher from nia Settings, both when nia is default and when it is not. The system chooser must remain available.
 - Open every Settings page and return with Back. Scroll long pages: title and Back stay visible. Check overview summaries and tap both the label and control of each switch; each tap changes the setting once.
 - Return Home from other apps and Recents. Old searches, keyboards and subpages must not remain in front of Home.
-- Switch icon grid/text list with zero, one and eight apps. Preserve the chosen order, names, icons and assignments; Apps stays last. The three-by-three grid never scrolls.
+- Switch icon grid/text list with zero, one and nine app/command shortcuts. Preserve the chosen order, names, icons and assignments; There is no generated Apps entry. An optional Open Apps command can move anywhere. The three-by-three grid never scrolls.
 - With Android auto-rotate enabled, turn the phone sideways and upside down on Home, Apps, setup, Settings, app pickers and dialogs. nia stays upright in portrait. Return Home from a landscape app and repeat after locking/unlocking; other apps keep their own orientation behavior.
-- Open Apps by swipe and its visible entry. Open Settings through Apps and by holding empty Home space. Holding a Home app shortcut must not open Settings.
+- Open Apps by swipe, its accessibility action and an optional configured command. Open Settings through Apps and by holding empty Home space. Holding a Home app shortcut must not open Settings.
 
 ## Apps, assignments and search
 
-- Add, rename, reassign, change icons, reorder and remove Home apps in Settings → Home apps. Try Google Maps with the Maps icon, then another app without losing its chosen name/icon. At eight apps, Add app is disabled.
+- Add, rename, reassign, change icons, reorder and remove Home apps in Settings → Home shortcuts. Try Google Maps with the Maps icon, then another app without losing its chosen name/icon. At nine shortcuts, Add shortcut and app-menu Add to Home are disabled; App info and corner assignment remain available.
 - Tap time and date. Clock opens; date uses its independent Calendar assignment. Remove the Home Calendar shortcut and repeat. Clear/reassign targets and check the unassigned behavior.
 - Install, remove, disable or update an app while nia runs. The list refreshes, distinct launch entries remain identifiable, and unavailable assignments offer recovery.
 - Search mixed case, accents, initials, camel-case initials and word prefixes in different orders. Results remain alphabetical. Clear restores the list; an empty result stays usable.
 - Press Enter/Search with one result, several results and no results. Launch only the sole match. Test a physical keyboard if available.
 - Toggle Keyboard on open. Focus and the real keyboard should appear only after Apps settles. Back first hides the keyboard, then closes Apps.
 - Enable A–Z navigation. Jump to the first, middle and last letters, including in assignment pickers. Search hides it; clearing search restores it. Try TalkBack adjustment and keyboard arrows.
-- Hold an app name for App info and left/right corner assignment. Check the actions while searching, dismiss the menu and repeat. Assignment retains the corner icon; pickers do not show this menu.
+- Hold an app name for Add to Home, App info and left/right Quick corner assignment. Add to Home opens a prefilled draft; Cancel saves nothing and Save returns Home with the shortcut. Check the actions while searching, dismiss the menu and repeat. Assignment retains the corner icon; pickers do not show this menu.
 
 ## Appearance and accessibility
 
@@ -50,13 +50,13 @@ The primary phone is reported to run Android 17. Record what is actually install
 
 ## Drawer, corners and unlocks
 
-- In **both grid and list**, pull up slowly. Check resisted preview, compact clock, start haptic, armed haptic and Release to open Apps hint. Release after the threshold to open; reverse or release early to cancel. Compare tapping Apps and Back.
-- With eight apps, Large text and maximum system font/display size, scroll the list to its end before entering the pull. Keep Apps pinned and corners reachable. A short fast fling or momentum reaching the end must never arm/open Apps in either layout.
+- In **both grid and list**, pull up slowly. Check that the same clock/date shrinks continuously while shortcuts move upward, followed by the resisted drawer preview. Show no pull text or progress ring, and give one threshold haptic only. Release after the threshold to open; reverse or release early to cancel. Compare tapping Apps and Back.
+- With eight apps plus an optional Apps command, Large text and maximum system font/display size, scroll all nine entries before entering the pull. Apps must share the scroll viewport and corners remain reachable. A short fast fling or momentum reaching the end must never arm/open Apps in either layout.
 - Cancel an armed drag with Android's gesture cancellation or a focus interruption. The next real tap/swipe must work. Closing Apps restores the previous scroll/header position; explicit Home and a new unlock reset to the top before the reveal.
 - Recheck with touch haptics disabled, Reduced motion and animation scale zero. Feedback must not repeat as the finger jitters near the threshold, and no launch may depend on haptics.
 - Scroll down Apps, then swipe down. Scroll the list rather than closing it until it reaches the top. Repeat with search results and an empty list.
 - Interrupt a drag/settle with the notification shade, Android Home or screen lock. On return, the next tap and swipe work without waiting for a clock tick or settings change.
-- Configure Empty/App in Quick corners and try icons throughout the chooser. Settings is not offered. Relaunch/reboot, then uninstall an assigned app and verify recovery.
+- Configure Empty/App/Command in Quick corners and try icons throughout the chooser. Settings is not offered. Relaunch/reboot, then uninstall an assigned app and verify recovery.
 - Upgrade a legacy Settings corner: it becomes empty. A legacy gear icon on an app becomes Star while retaining the app.
 - Lock from nia Home, then unlock with face, fingerprint and PIN. The header stays stationary while shortcuts reveal. Lock from another app, unlock there and return Home; no delayed reveal should replay.
 - **Compare tap-to-wake and the power button using the same lock and unlock methods.** Repeat after screen timeout and with ambient display on/off. Record whether a missed animation leaves shortcuts already visible and responsive or hidden with blocked input.
@@ -65,6 +65,14 @@ The primary phone is reported to run Android 17. Record what is actually install
 - Test Standard, Reduced and Android animation scale zero. Change the scale during drawer/reveal motion. Completion or cancellation must restore input.
 - With Battery Saver on and off, test Music, Clock/date, a corner, Apps and swipe-up immediately after settling. Toggle Battery Saver from Quick Settings during a transition and repeat on return. Record phone results separately from simulated scale tests.
 - Double-tap launch targets quickly. Open one activity without leaving navigation stuck. Toggle Android touch haptics and check press feedback follows that preference.
+
+## Reordering and commands
+
+- Long-press drag Home icons across rows and list entries past one another. Repeat in Settings → Home shortcuts and with maximum text/display scaling. Neighbors show the preview, but only dropping saves it. Cancel, leave the screen or lock during the gesture: keep the saved order and restore normal taps/swipes.
+- Drag toward the top/bottom of long Home and Settings lists. Scroll the list and reach off-screen positions without starting the Apps gesture. Reorder the optional Apps command like any other entry. Check the Move up/down alternatives with TalkBack and a keyboard.
+- Open Apps and Search apps from Home and both corners. Search apps focuses only after settling and does not change Keyboard on open. A later ordinary opening follows the saved preference.
+- Toggle flashlight repeatedly and change its state through Quick Settings between taps. Test a busy camera, absent flash and process/activity recreation. Report unavailable hardware without crashing; add no camera permission prompt or camera session.
+- Export and restore mixed app/command shortcuts and corners. Preview command changes, preserve names/icons/order, and reject unknown command IDs, simultaneous app/command targets and command fields disguised as old schema versions.
 
 ## Icon picker
 
@@ -78,11 +86,11 @@ The primary phone is reported to run Android 17. Record what is actually install
 
 - Reboot and force-stop/reopen nia. Verify layout, text size, app choices, corners, animations, colors and app-list preferences persist.
 - Save a backup, change settings, then restore it. Preview each changed current/backup value and omit unchanged entries. Cancel first and confirm nothing changes; reopen and apply.
-- Import supported schema 1–6 backups. Check defaults for older fields, Settings-corner migration and current exports with custom corners and Reduced animations.
+- Import supported schema 1–7 backups. Check defaults for older fields, Settings-corner migration and current exports with custom corners and Reduced animations.
 - Cancel file selection. Try malformed, oversized, unsupported-version and unsupported-profile files. Keep existing settings intact.
 - Restore a backup containing unavailable apps. List the affected assignments and clear only those targets while retaining Home names/icons/order and restoring valid settings.
 - Remove an app while its restore preview is open. Restore must refresh the preview and require another review. Rapid duplicate Restore taps must not apply twice.
-- Cancel both reset confirmations. Reset appearance & behavior keeps Home names/icons/order/targets, Clock, Calendar and both corner apps/icons; Reset all settings returns to setup.
+- Cancel both reset confirmations. Reset appearance & behavior keeps Home names/icons/order/targets, Clock, Calendar and both corner app/command targets and icons; Reset all settings returns to setup.
 - With unreadable saved settings, keep Restore backup and full reset available while saving a backup and partial reset remain disabled.
 - Install over an earlier production release using the same signing key. Confirm the five old categories become editable entries with their targets preserved and completed setup does not repeat. Restore/save an explicitly empty Home, restart and reset appearance: it must stay empty. Confirm settings survive. A debug install is a separate app, not this upgrade test.
 

@@ -62,15 +62,15 @@ class EverydayPolishScreensTest {
         rule.onNodeWithText("Notes").performTouchInput { longClick() }
         assertEquals(0, launches); assertEquals(0, infos)
         rule.onNodeWithText("App info").assertIsDisplayed()
-        rule.onNodeWithText("Assign to left corner").assertIsDisplayed()
-        rule.onNodeWithText("Assign to right corner").assertIsDisplayed()
-        capture("app-actions")
+        rule.onNodeWithText("Left quick corner").assertIsDisplayed()
+        rule.onNodeWithText("Right quick corner").assertIsDisplayed()
+        capture("app-actions-basic")
         rule.onNodeWithText("App info").performClick()
         assertEquals(1, infos)
         rule.onNodeWithText("Notes").performTouchInput { longClick() }
-        rule.onNodeWithText("Assign to left corner").performClick()
+        rule.onNodeWithText("Left quick corner").performClick()
         rule.onNodeWithText("Mail").performTouchInput { longClick() }
-        rule.onNodeWithText("Assign to right corner").performClick()
+        rule.onNodeWithText("Right quick corner").performClick()
         assertEquals(listOf(notes to CornerPosition.LEFT, mail to CornerPosition.RIGHT), assigned)
         assertEquals(0, launches)
     }
@@ -173,13 +173,13 @@ class EverydayPolishScreensTest {
         rule.onNodeWithText("Use icon").performClick()
         assertEquals(ShortcutIcon.CLOUD, p.leftShortcut.icon)
         assertEquals(notes.target, p.leftShortcut.app)
-        assertEquals(192, ShortcutIcon.entries.size)
+        assertEquals(193, ShortcutIcon.entries.size)
     }
 
     @Test fun `pending unlock animates on delayed Home composition and never replays after remount`() {
         val event = UnlockRevealRequest()
         var show by mutableStateOf(true)
-        render { if (show) HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}, unlockRequest = event, shortcuts = legacyHomeShortcuts()) }
+        render { if (show) HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, unlockRequest = event, shortcuts = legacyHomeShortcuts()) }
         rule.mainClock.autoAdvance = false
         // Compose may run before frame-clock control is paused; use a fresh event for the explicit transition below.
         rule.mainClock.advanceTimeBy(1000)
@@ -194,7 +194,7 @@ class EverydayPolishScreensTest {
     @Test fun `unlock frames keep the clock and date fixed during the delayed shortcut reveal`() {
         var locked by mutableStateOf(true)
         var event by mutableStateOf<UnlockRevealRequest?>(null)
-        render { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {}, unlockRequest = event, deviceLocked = locked, shortcuts = legacyHomeShortcuts()) }
+        render { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, unlockRequest = event, deviceLocked = locked, shortcuts = legacyHomeShortcuts()) }
         val clock = rule.onNodeWithTag("home-clock").fetchSemanticsNode().boundsInRoot
         rule.mainClock.autoAdvance = false
         capture("unlock-motion-00")

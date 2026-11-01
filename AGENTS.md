@@ -2,9 +2,9 @@
 
 nia is a Kotlin/Jetpack Compose Android launcher. Follow these instructions for changes anywhere in this repository.
 
-## Active release: 1.4.0
+## Active release: 1.5.0
 
-Keep the work for issues #9, #10 and #11 in the ongoing **1.4.0 / 1004000** change set. The change set includes portrait mode, editable Home apps, optional onboarding and the shared Apps pull. Keep this version while completing the agreed scope; do not publish or trigger Production APK until the work is finished and the user requests it. The user has clarified the 1.4.0 target: all Home app shortcuts are editable, with at most eight app entries plus Apps. Legacy fixed-category preferences migrate into ordinary editable entries. See the [1.4.0 plan](docs/ROADMAP.md#140-in-preparation).
+Version 1.4.0 has been published. Prepare this Home interaction and command update as **1.5.0 / 1005000**. Keep that version through the agreed change set; do not publish or trigger Production APK until the user requests it. See the [1.5.0 plan](docs/ROADMAP.md#150-in-preparation).
 
 ## Read the relevant guidance
 
@@ -22,9 +22,11 @@ Use the repository skills below. If your agent does not discover skills automati
 
 ## Preserve the product
 
-For 1.4.0, allow adding, removing, renaming, reassigning, changing the outline icon and reordering every main Home app shortcut. Keep at most eight app shortcuts plus the mandatory Apps entry; keep the icon grid non-scrolling. Preserve existing setups through migration, and let fresh-install onboarding add shortcuts or skip to Apps-only. Keep Clock/Calendar header targets independent of Home entries. The two corner slots are separate from the main-area cap; Settings → Home apps owns arrangement.
+Allow zero to nine editable Home shortcuts. Every entry can open an app or one of the supported nia commands; its name, icon and order are independent. There is no reserved, automatic or sticky Apps entry. Open Apps and Search apps are optional commands, and swipe-up remains available on an empty Home. Quick corners support Empty, App and Command. Keep Clock/Calendar header targets independent, and keep nia Settings out of the configurable command catalog; Settings remains reachable through Apps and an empty-space long press.
 
-Apply the shared Apps pull, progress feedback, clock transition, haptic thresholds and release/cancel behavior to both grid and list. The grid itself never scrolls; only an overflowing list scrolls before handing off at its end. Ordinary flings do not arm Apps, haptics respect Android settings, and unlocks start with the expanded header. Keep Apps available by gesture and a visible entry, and keep the full app list alphabetical and text-only. Quick corners support Empty or App; nia Settings is not a corner action.
+Use one continuously transformed clock/date header. Changing its height must move the shortcuts upward in both layouts; do not crossfade between duplicate clocks. The grid keeps three columns and at most three rows. A long list scrolls all configured entries, including any optional Apps command, before handing off to the drawer. Show no pull instructions or progress ring, and emit only one threshold haptic per gesture. Ordinary flings cannot arm Apps. Respect Android's haptics and animation preferences, cancellation and input recovery.
+
+Support long-press dragging on Home and in Settings → Home shortcuts, including auto-scroll in long lists. Preview locally, commit one validated order on drop, and write nothing on cancel. Keep keyboard/TalkBack alternatives. App-list long presses offer Add to Home, App info and Quick corner assignments; assignment pickers have no action menu. Commands are a typed allowlist, never arbitrary intents or executable text. Use the public torch API, observe actual state, handle unavailable hardware and release callbacks; do not add camera, accessibility, overlay or battery-exemption permissions for these features.
 
 Use the shared Material Symbols catalog and icon picker for Home apps and Quick corners. Preserve serialized icon IDs and the legacy Settings migration; verify bundled resources with `python3 scripts/sync_material_symbols.py --check`. The import/generation workflow is in CONTRIBUTING.md.
 

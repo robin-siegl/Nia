@@ -199,5 +199,6 @@ enum class ShortcutIcon(val label: String, val category: IconCategory, val keywo
     ROCKET("Rocket", IconCategory.FUN, "space launch science exploration"),
     SCIENCE("Science", IconCategory.FUN, "experiment lab chemistry research"),
     GEAR("Gear", IconCategory.TECH, "settings preferences configuration tools system"),
-    APP_GRID("App grid", IconCategory.TECH, "apps applications grid launcher tiles")
+    APP_GRID("App grid", IconCategory.TECH, "apps applications grid launcher tiles"),
+    FLASHLIGHT("Flashlight", IconCategory.TECH, "torch light lamp flash")
 }

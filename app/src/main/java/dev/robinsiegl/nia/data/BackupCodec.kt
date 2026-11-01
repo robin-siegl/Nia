@@ -21,7 +21,7 @@ class BackupException(message: String) : IllegalArgumentException(message)
 
 object BackupCodec {
     const val MAX_BYTES = 256 * 1024
-    private const val CURRENT_VERSION = 6
+    private const val CURRENT_VERSION = 7
     val json = Json { encodeDefaults = true; prettyPrint = true; explicitNulls = false }
 
     fun export(preferences: LauncherPreferences, exportedAt: String = Instant.now().toString()): ByteArray {
@@ -45,6 +45,7 @@ object BackupCodec {
             if (root["profile"]?.jsonPrimitive?.content != "personal") {
                 throw BackupException("This version of nia supports personal-profile backups only.")
             }
+            if (version <= 6) validateLegacyTargets(root.getValue("settings").jsonObject)
             val compatible = if (version <= 5) JsonObject(root + ("settings" to migrateHome(migrateSettings(root.getValue("settings").jsonObject)))) else root
             val backup = json.decodeFromJsonElement<SettingsBackup>(compatible)
             PreferencesValidation.validate(backup.settings)
@@ -56,7 +57,7 @@ object BackupCodec {
         }
     }
 
-    /** A missing list denotes legacy on-device state; an explicitly empty list is an Apps-only Home. */
+    /** A missing list denotes legacy on-device state; an explicitly empty list stays empty. */
     fun decodeState(text: String): SavedState {
         val root = json.parseToJsonElement(text).jsonObject
         val preferences = root["preferences"]?.jsonObject ?: JsonObject(emptyMap())
@@ -73,6 +74,18 @@ object BackupCodec {
             "homeShortcuts" to json.encodeToJsonElement(legacyHomeShortcuts(assignments)),
             "calendar" to (assignments[HomeCategory.CALENDAR]?.let { json.encodeToJsonElement(it) } ?: JsonNull),
         ))
+    }
+
+    private fun validateLegacyTargets(settings: JsonObject) {
+        settings["homeShortcuts"]?.jsonArray?.let { entries ->
+            require(entries.size <= 8)
+            entries.forEach { require("command" !in it.jsonObject) }
+        }
+        listOf("leftShortcut", "rightShortcut").forEach { key ->
+            settings[key]?.jsonObject?.let { corner ->
+                require("command" !in corner && corner["action"]?.jsonPrimitive?.content != "COMMAND")
+            }
+        }
     }
 
     private fun migrateSettings(settings: JsonObject): JsonObject = JsonObject(settings.mapValues { (key, value) ->

@@ -22,7 +22,7 @@ class IconCatalogTest {
     @Test fun `browse categories and search stay alphabetical without changing persisted identity`() {
         val all = IconCatalog.search("  ")
         assertEquals(ShortcutIcon.entries.toSet(), all.toSet())
-        assertEquals(192, all.size)
+        assertEquals(193, all.size)
         assertEquals(all.sortedBy { it.label.lowercase(java.util.Locale.ROOT) }, all)
         IconCategory.entries.forEach { group ->
             val icons = IconCatalog.search("", group)

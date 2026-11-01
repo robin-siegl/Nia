@@ -199,4 +199,5 @@ internal val ShortcutIcon.drawable: Int get() = when (this) {
     ShortcutIcon.SCIENCE -> R.drawable.ic_material_science
     ShortcutIcon.GEAR -> R.drawable.ic_material_settings
     ShortcutIcon.APP_GRID -> R.drawable.ic_material_grid_view
+    ShortcutIcon.FLASHLIGHT -> R.drawable.ic_material_flashlight_on
 }

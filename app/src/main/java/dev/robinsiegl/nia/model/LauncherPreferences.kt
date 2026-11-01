@@ -13,7 +13,7 @@ enum class HomeCategory(val label: String) {
 @Serializable enum class ThemeMode { SYSTEM, LIGHT, DARK }
 @Serializable enum class SetupStep { LAYOUT, APPS, APPEARANCE, DEFAULT }
 @Serializable enum class MotionMode { SYSTEM, REDUCED }
-@Serializable enum class ShortcutAction { EMPTY, APP }
+@Serializable enum class ShortcutAction { EMPTY, APP, COMMAND }
 enum class CornerPosition(val label: String) { LEFT("Left"), RIGHT("Right") }
 
 @Serializable
@@ -21,6 +21,7 @@ data class CornerShortcut(
     val action: ShortcutAction = ShortcutAction.EMPTY,
     val icon: ShortcutIcon = ShortcutIcon.STAR,
     val app: AppTarget? = null,
+    val command: ShortcutCommand? = null,
 )
 
 @Serializable
@@ -30,25 +31,27 @@ data class AppTarget(val packageName: String, val activityName: String) {
 
 data class AppEntry(val target: AppTarget, val label: String)
 
-const val MAX_HOME_APPS = 8
+const val MAX_HOME_SHORTCUTS = 9
 const val MAX_HOME_NAME_LENGTH = 80
 
-/** A Home entry's identity is independent of its editable label, icon and app. Apps is generated separately. */
+/** A Home entry's identity is independent of its editable label, icon and app/command target. */
 @Serializable
 data class HomeShortcut(
     val id: String,
     val name: String,
     val icon: ShortcutIcon = ShortcutIcon.STAR,
     val app: AppTarget? = null,
+    val command: ShortcutCommand? = null,
 )
 
 enum class HeaderTarget(val label: String) { CLOCK("Clock"), CALENDAR("Calendar") }
 
 data class HomeShortcutDraft(val shortcut: HomeShortcut, val isNew: Boolean) {
-    val canSave: Boolean get() = PreferencesValidation.isHomeName(shortcut.name.trim()) && (!isNew || shortcut.app != null)
+    val canSave: Boolean get() = PreferencesValidation.isHomeName(shortcut.name.trim()) &&
+        !(shortcut.app != null && shortcut.command != null) && (!isNew || shortcut.app != null || shortcut.command != null)
 }
 
-/** Only used when converting a pre-1.4 setup. New installations start with no Home apps. */
+/** Only used when converting a pre-1.4 setup. New installations start with no Home shortcuts. */
 fun legacyHomeShortcuts(assignments: Map<HomeCategory, AppTarget> = emptyMap()): List<HomeShortcut> =
     HomeCategory.entries.map { HomeShortcut("legacy-${it.name.lowercase()}", it.label, ShortcutIcon.valueOf(it.name), assignments[it]) }
 
@@ -94,17 +97,20 @@ object PreferencesValidation {
 
     fun validate(preferences: LauncherPreferences) {
         require(isColor(preferences.seedColor)) { "Choose a color in #RRGGBB format." }
-        require(preferences.homeShortcuts.size <= MAX_HOME_APPS) { "Home can contain up to eight apps plus Apps." }
+        require(preferences.homeShortcuts.size <= MAX_HOME_SHORTCUTS) { "Home can contain up to nine shortcuts." }
         require(preferences.homeShortcuts.map { it.id }.distinct().size == preferences.homeShortcuts.size) { "Home shortcut IDs must be unique." }
         preferences.homeShortcuts.forEach {
             require(it.id.matches(Regex("[A-Za-z0-9_-]{1,80}"))) { "The settings file contains an invalid shortcut ID." }
             require(isHomeName(it.name)) { "Shortcut names must contain 1–80 characters without line breaks." }
+            require(it.app == null || it.command == null) { "Choose an app or a command for each shortcut." }
         }
         val shortcuts = listOf(preferences.leftShortcut, preferences.rightShortcut)
         shortcuts.forEach {
-            require((it.action == ShortcutAction.APP) == (it.app != null)) {
-                "An app shortcut must have an assigned app. Empty shortcuts cannot contain an app."
-            }
+            require(when (it.action) {
+                ShortcutAction.EMPTY -> it.app == null && it.command == null
+                ShortcutAction.APP -> it.app != null && it.command == null
+                ShortcutAction.COMMAND -> it.app == null && it.command != null
+            }) { "A corner must be empty, open an app, or run a command." }
         }
         (preferences.homeShortcuts.mapNotNull { it.app } + listOfNotNull(preferences.clock, preferences.calendar) + shortcuts.mapNotNull { it.app }).forEach { target ->
             require(target.packageName.length <= 255 && packagePattern.matches(target.packageName)) {

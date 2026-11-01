@@ -28,7 +28,7 @@ class RestorePreviewTest {
         assertEquals(18, preview.changes.size)
         assertEquals(requested, preview.preferences)
         assertTrue(preview.changes.all { it.before != it.after })
-        assertEquals(setOf("Home screen", "Appearance", "App list", "Home apps", "Clock & date", "Quick corners"), preview.changes.map { it.section }.toSet())
+        assertEquals(setOf("Home screen", "Appearance", "App list", "Home shortcuts", "Clock & date", "Quick corners"), preview.changes.map { it.section }.toSet())
         assertTrue(preview.changes.first { it.label == "Music" }.after.contains("Music icon"))
         assertTrue(preview.changes.first { it.label == "Clock" }.before.contains("System clock"))
         assertTrue(preview.changes.first { it.label == "Calendar" }.after.contains("First"))
@@ -38,7 +38,7 @@ class RestorePreviewTest {
             leftShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.STAR, first.target))
         val preview = RestorePreview.create(original, LauncherPreferences(), apps)
         assertEquals(listOf("Music", "Order", "Clock", "Left shortcut"), preview.changes.map { it.label })
-        assertEquals(listOf("Not on Home", "Apps", "System clock", "Empty"), preview.changes.map { it.after })
+        assertEquals(listOf("Not on Home", "Empty", "System clock", "Empty"), preview.changes.map { it.after })
     }
     @Test fun `unavailable targets clear assignments but preserve each Home entry and icon`() {
         val current = LauncherPreferences(homeShortcuts = home())
@@ -50,15 +50,15 @@ class RestorePreviewTest {
         assertEquals(home(null), preview.preferences.homeShortcuts)
         assertNull(preview.preferences.clock); assertNull(preview.preferences.calendar)
         assertEquals(CornerShortcut(icon = ShortcutIcon.CLOUD), preview.preferences.rightShortcut)
-        assertEquals("Choose an app", preview.changes.first { it.label == "Music · App" }.after)
+        assertEquals("Choose an action", preview.changes.first { it.label == "Music · Action" }.after)
     }
     @Test fun `renaming changing icons reassigning and reordering have separate exact previews`() {
         val original = LauncherPreferences(homeShortcuts = home() + HomeShortcut("map", "Maps", ShortcutIcon.MAPS, first.target))
         val requested = original.copy(homeShortcuts = listOf(original.homeShortcuts[1], original.homeShortcuts[0].copy(
             name = "My music", icon = ShortcutIcon.HEADPHONES, app = second.target)))
         val changes = RestorePreview.create(original, requested, apps).changes
-        assertEquals(listOf("Music · Name", "My music · Icon", "My music · App", "Order"), changes.map { it.label })
-        assertEquals("Maps → My music → Apps", changes.last().after)
+        assertEquals(listOf("Music · Name", "My music · Icon", "My music · Action", "Order"), changes.map { it.label })
+        assertEquals("Maps → My music", changes.last().after)
     }
     @Test fun `duplicate app labels retain full activity identities`() {
         val renamed = second.copy(label = first.label)

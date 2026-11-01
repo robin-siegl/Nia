@@ -1,0 +1,14 @@
+<!--
+  Material Symbols by Google, Apache License 2.0. See assets/licenses/material-symbols-Apache-2.0.txt.
+  Source: google/material-design-icons@10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7/symbols/android/south_east/materialsymbolsoutlined/south_east_wght300_24px.xml
+  Modified for nia: removed Android theme tint; the shared foreground color is applied in Compose.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+  <path
+      android:fillColor="@android:color/white"
+      android:pathData="M360,740L360,680L637.85,680L180,222.15L222.15,180L680,637.85L680,360L740,360L740,740L360,740Z"/>
+</vector>
