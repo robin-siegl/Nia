@@ -22,6 +22,8 @@ On Windows, use `gradlew.bat` in Command Prompt or `.\gradlew.bat` in PowerShell
 
 Debug builds use `dev.robinsiegl.nia.debug`, so they can coexist with production nia. Open the app and use Android's Home-app chooser to test it as a launcher.
 
+For testing on your phone without a local build, use the manual [Dev APK action](docs/RELEASING.md#trigger-a-dev-build). It creates an optimized, signed **nia Dev** installation with its own settings and a repeatable signing identity. CI's ordinary debug APK uses its runner's debug key and is a separate channel.
+
 ## Check the change
 
 Run checks that exercise the affected behavior:
@@ -34,10 +36,10 @@ python3 -m unittest discover -s scripts/tests -v
 For release packaging or build changes, also run:
 
 ```sh
-./gradlew :app:assembleRelease :app:lintRelease
+./gradlew :app:assembleDev :app:lintDev :app:assembleRelease :app:lintRelease
 ```
 
-An unsigned local release build checks packaging but cannot be installed directly. See [Releasing](docs/RELEASING.md#local-signed-release) for signing.
+Unsigned local dev/release builds check packaging but cannot be installed directly. The dev variant inherits release optimization and uses `dev.robinsiegl.nia.dev`; without Actions metadata its version ends in `-dev`. See [Releasing](docs/RELEASING.md#local-signed-release) for signing.
 
 Use focused tests while iterating. Before finishing app changes, run the relevant wider checks and review rendered screens when the UI changes. Prefer tests of observable behavior over tests that duplicate implementation details.
 

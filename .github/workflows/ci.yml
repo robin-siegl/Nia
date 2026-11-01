@@ -90,3 +90,27 @@ jobs:
           name: nia-debug
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+  dev-build:
+    name: Dev APK validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 12700392
+          log-accepted-android-sdk-licenses: false
+          packages: platform-tools platforms;android-36 build-tools;36.0.0
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew :app:assembleDev :app:lintDev --stacktrace
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-lint-report
+          path: app/build/reports/lint-results-dev.*
+          if-no-files-found: ignore

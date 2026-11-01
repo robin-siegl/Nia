@@ -2,6 +2,14 @@
 
 Use this checklist for the Pixel 10 Pro first, and record other devices separately. Automated tests are useful evidence for state and input behavior; they do not establish physical-device compatibility or SystemUI timing.
 
+## Dev APK downloads
+
+- Run Dev APK from a repository branch, wait for all checks and download its artifact while signed into GitHub. Extract and install the APK; verify the checksum and source/build information in the bundle.
+- Keep nia and nia Dev installed together. Switch the default Home app between them, complete dev setup and import a nia settings backup. Confirm that each installation keeps its own settings.
+- Install another signed dev build with the same base version/code. Check that it updates nia Dev without uninstalling or resetting its setup, Home shortcuts or corners.
+- Check the nia Dev label and About version/run/commit, including large text and both themes. Public-release links should clearly identify their separate channel.
+- Test the optimized dev build's Home, search, gestures and unlock behavior. Record actual phone results separately from automated package/signature checks.
+
 ## Record the test environment
 
 | Field | Record |

@@ -5,6 +5,12 @@ plugins {
 }
 
 val signingPath = providers.environmentVariable("NIA_KEYSTORE_PATH")
+val devBuildId = providers.environmentVariable("NIA_DEV_BUILD_ID").getOrElse("local")
+val devCommit = providers.environmentVariable("NIA_DEV_COMMIT").getOrElse("local")
+require((devBuildId == "local" && devCommit == "local") ||
+    (devBuildId.matches(Regex("[1-9][0-9]*\\.[1-9][0-9]*")) && devCommit.matches(Regex("[0-9a-f]{7}")))) {
+    "Dev build metadata must contain a run.attempt number and a seven-character commit SHA."
+}
 android {
     namespace = "dev.robinsiegl.nia"
     compileSdk = 36
@@ -31,6 +37,12 @@ android {
             isShrinkResources = true
             if (signingPath.isPresent) signingConfig = signingConfigs.getByName("production")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        create("dev") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = if (devBuildId == "local") "-dev" else "-dev.$devBuildId+$devCommit"
+            matchingFallbacks += "release"
         }
     }
     buildFeatures { compose = true; buildConfig = true }

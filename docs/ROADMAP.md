@@ -41,6 +41,8 @@ Schema **8** adds command targets and preset durations. Continue importing schem
 
 ### Before publication
 
+Use the manual [Dev APK action](RELEASING.md#trigger-a-dev-build) for signed branch builds that install as nia Dev with independent settings. Each successful run offers a 30-day artifact with checksum and source/build information, without publishing a release.
+
 Run the automated checks and inspect native light/dark, intermediate-scroll and large-text renders. Then complete the relevant [Pixel checklist](DEVICE_TESTING.md), recording the actual OS build:
 
 - Signed upgrade from 1.4.x, restart, old/current backup restores and an intentionally empty Home.

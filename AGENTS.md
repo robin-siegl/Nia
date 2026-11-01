@@ -4,7 +4,7 @@ nia is a Kotlin/Jetpack Compose Android launcher. Follow these instructions for 
 
 ## Active release: 1.5.0
 
-Version 1.4.0 has been published. Prepare this Home interaction and command update as **1.5.0 / 1005000**. Keep that version through the agreed change set; do not publish or trigger Production APK until the user requests it. See the [1.5.0 plan](docs/ROADMAP.md#150-in-preparation).
+Version 1.4.0 has been published. Prepare the agreed Home interaction, command and dev-build updates as **1.5.0 / 1005000**. Keep that version through the agreed change set; do not publish or trigger Production APK until the user requests it. See the [1.5.0 plan](docs/ROADMAP.md#150-in-preparation).
 
 ## Read the relevant guidance
 
@@ -46,6 +46,8 @@ Before handing off or merging any repository change, including docs and skills:
 Do not bump again for each file, intermediate commit or fix within the same change set. Preserve a correct bump already made for that task. Follow an explicit user-specified version while retaining validation. Do not bump for a review that makes no changes.
 
 Use the [release policy](docs/RELEASING.md#version-policy) for examples, limits and publication rules. Never move an existing release tag, rotate the production signing key, or substitute a workflow-generated version. Do not trigger the Production APK workflow unless requested.
+
+Dev APK is a separate manual workflow for repository branches. Keep its `.dev` application ID, stable signing, optimized build and isolated settings. Read the base version/code from Gradle, adding run/attempt/commit identity only to dev versions and filenames. Rebuilds may use an already-released base version; keep production's main-branch and newer-tag checks strict. Gate downloadable dev APKs on all checks and identity/signature verification, retain them for 30 days and create no tag or release. See the [dev build instructions](docs/RELEASING.md#trigger-a-dev-build).
 
 ## Validate and report
 

@@ -21,7 +21,8 @@ def parse_version(text):
     return value
 
 
-def resolve_version(project_version, project_code, tags):
+def validate_project_version(project_version, project_code):
+    """Validate the committed pair, independently of publication or build channel."""
     chosen = parse_version(project_version)
     code = chosen[0] * 1_000_000 + chosen[1] * 1_000 + chosen[2]
     if code < 1:
@@ -29,6 +30,12 @@ def resolve_version(project_version, project_code, tags):
     if str(project_code) != str(code):
         raise ValueError(f"nia.versionCode must be {code} for nia.versionName={project_version}. "
                          "Update both values in gradle.properties and commit the change.")
+    return code
+
+
+def resolve_version(project_version, project_code, tags):
+    code = validate_project_version(project_version, project_code)
+    chosen = parse_version(project_version)
     stable = []
     for tag in tags:
         if not tag.startswith("v"):
