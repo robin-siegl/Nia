@@ -30,7 +30,7 @@ class HomeCustomizationTest {
     private lateinit var host: android.view.View
     private val maps = AppEntry(AppTarget("example.maps", ".Main"), "Google Maps")
     private val notes = AppEntry(AppTarget("example.notes", ".Main"), "Notes")
-    private val entries = (1..8).map { HomeShortcut("app-$it", "App $it", ShortcutIcon.entries[it], maps.target) }
+    private val entries = (1..9).map { HomeShortcut("app-$it", "App $it", ShortcutIcon.entries[it], maps.target) }
     private fun render(light: Boolean = false, large: Boolean = false, content: @Composable () -> Unit) {
         val p = LauncherPreferences(themeMode = if (light) ThemeMode.LIGHT else ThemeMode.DARK)
         rule.setContent {
@@ -49,23 +49,23 @@ class HomeCustomizationTest {
             bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
         }
     }
-    @Test fun `fresh Home has only Apps and independent Clock and Calendar actions`() {
+    @Test fun `fresh Home is empty with independent Clock and Calendar actions`() {
         var clocks = 0; var dates = 0; var apps = 0
-        render { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", { clocks++ }, {}, { apps++ }, onDate = { dates++ }) }
+        render { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", { clocks++ }, {}, onDate = { dates++ }) }
         rule.onNodeWithContentDescription("Phone").assertDoesNotExist()
         rule.onNodeWithTag("home-clock").performClick()
         rule.onNodeWithTag("home-date").performClick()
-        rule.onNodeWithContentDescription("Apps").performClick()
-        assertEquals(1, clocks); assertEquals(1, dates); assertEquals(1, apps)
+        rule.onNodeWithContentDescription("Apps").assertDoesNotExist()
+        assertEquals(1, clocks); assertEquals(1, dates)
         capture("home-apps-only")
     }
     @Test fun `nine grid entries fit three rows without scrolling and launch by stable identity`() {
         var selected = ""
         var scrollable = true
-        render(large = true) { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, { selected = it }, {},
+        render(large = true) { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, { selected = it },
             shortcuts = entries, onScrollable = { scrollable = it }) }
         val bounds = entries.map { rule.onNodeWithContentDescription(it.name).assertIsDisplayed().fetchSemanticsNode().boundsInRoot }
-        rule.onNodeWithContentDescription("Apps").assertIsDisplayed()
+        rule.onNodeWithContentDescription("Apps").assertDoesNotExist()
         assertEquals(3, bounds.map { it.top }.distinct().size)
         assertFalse(scrollable)
         rule.onNodeWithContentDescription("App 8").performClick()
@@ -74,11 +74,12 @@ class HomeCustomizationTest {
     }
     @Test @Config(qualifiers = "w320dp-h480dp-xhdpi")
     fun `compact grid fallback keeps nine minimum touch targets with a large classic clock`() {
-        render(large = true) { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {}, {},
+        render(large = true) { HomeScreen(HomeLayout.GRID, "14:03", "Fri, 30 Oct", {}, {},
             pixelClockLayout = false, textSize = HomeTextSize.LARGE, shortcuts = entries) }
-        rule.onNodeWithTag("compact-home-header").assertIsDisplayed()
+        rule.onNodeWithTag("home-clock-header").assertIsDisplayed()
+        capture("home-nine-grid-compact")
         val minimum = 48 * host.resources.displayMetrics.density
-        (entries.map { it.name } + "Apps").forEach {
+        entries.map { it.name }.forEach {
             val bounds = rule.onNodeWithContentDescription(it).assertIsDisplayed().fetchSemanticsNode().boundsInRoot
             assertTrue(bounds.height >= minimum)
             assertTrue(bounds.bottom <= host.height - 64 * host.resources.displayMetrics.density)
@@ -89,16 +90,15 @@ class HomeCustomizationTest {
     fun `large text list scrolls while Apps and corners remain reachable`() {
         var apps = 0
         var corner = 0
-        render(light = true, large = true) { HomeScreen(HomeLayout.LIST, "14:03", "Fri, 30 Oct", {}, {}, { apps++ },
+        render(light = true, large = true) { HomeScreen(HomeLayout.LIST, "14:03", "Fri, 30 Oct", {}, {},
             textSize = HomeTextSize.LARGE, shortcuts = entries,
             rightShortcut = CornerShortcut(ShortcutAction.APP, ShortcutIcon.CAMERA, maps.target), onCorner = { corner++ }) }
-        rule.onNodeWithTag("pinned-home-apps").assertIsDisplayed()
-        rule.onNodeWithTag("home-entry-App 8").performScrollTo().assertIsDisplayed()
-        rule.onNodeWithTag("compact-home-header").assertIsDisplayed()
-        capture("home-nine-list-large")
-        rule.onNodeWithTag("pinned-home-apps").performClick()
+        rule.onNodeWithTag("pinned-home-apps").assertDoesNotExist()
+        rule.onNodeWithTag("home-entry-app-9").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithTag("home-clock-header").assertIsDisplayed()
+        capture("home-nine-list-large-static")
         rule.onNodeWithTag("home-corner-RIGHT").performClick()
-        assertEquals(1, apps); assertEquals(1, corner)
+        assertEquals(1, corner)
     }
     @Test fun `changing app keeps the independently chosen name and outline icon`() {
         var draft by mutableStateOf(HomeShortcutDraft(HomeShortcut("maps", "Maps", ShortcutIcon.MAPS, maps.target), false))
@@ -141,18 +141,19 @@ class HomeCustomizationTest {
     }
     @Test fun `arrangement editor reorders in one shared list and keeps Apps reserved at the limit`() {
         var p by mutableStateOf(LauncherPreferences(homeShortcuts = entries))
-        render(light = true) { SettingsLayout("Home apps", {}) {
+        render(light = true) { SettingsLayout("Home shortcuts", {}) {
             HomeAppsSettings(p, listOf(maps), {}, { id, direction ->
                 val next = p.homeShortcuts.toMutableList(); val index = next.indexOfFirst { it.id == id }
                 next.add(index + direction, next.removeAt(index)); p = p.copy(homeShortcuts = next)
             })
         } }
-        rule.onNodeWithContentDescription("Move App 1 up").assertIsNotEnabled()
-        rule.onNodeWithContentDescription("Move App 1 down").performClick()
+        rule.onNodeWithContentDescription("Arrange App 1").performClick()
+        rule.onNodeWithText("Move up").assertIsNotEnabled()
+        rule.onNodeWithText("Move down").performClick()
         assertEquals("app-2", p.homeShortcuts.first().id)
-        rule.onNodeWithText("Add app").performScrollTo().assertIsNotEnabled()
-        rule.onNodeWithText("Always available · stays last").assertIsDisplayed()
-        capture("home-arrangement")
+        rule.onNodeWithText("Add shortcut").performScrollTo().assertIsNotEnabled()
+        rule.onNodeWithText("Always available · stays last").assertDoesNotExist()
+        capture("home-arrangement-limit")
     }
     @Test fun `removal is explicit and canceling preserves the shortcut`() {
         var removals = 0

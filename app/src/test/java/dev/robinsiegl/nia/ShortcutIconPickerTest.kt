@@ -61,7 +61,7 @@ class ShortcutIconPickerTest {
         var chosen: ShortcutIcon? = null
         var showing by mutableStateOf(true)
         render { if (showing) ShortcutIconPicker("Choose icon", ShortcutIcon.CAMERA, { showing = false }, { chosen = it; showing = false }) }
-        rule.onNodeWithText("192 icons").assertIsDisplayed()
+        rule.onNodeWithText("193 icons").assertIsDisplayed()
         rule.onNodeWithTag("selected-icon-preview").assertIsDisplayed()
         capture("icon-picker-dark")
         rule.onNodeWithTag("icon-search").performTextInput("controller")
@@ -139,7 +139,7 @@ class ShortcutIconPickerTest {
         rule.onNodeWithText("No icons found").assertIsDisplayed()
         rule.onNodeWithText("Clear search").performClick()
         rule.onNodeWithTag("shortcut-icon-grid").assertIsDisplayed()
-        rule.onNodeWithText("192 icons").assertIsDisplayed()
+        rule.onNodeWithText("193 icons").assertIsDisplayed()
     }
     @Test fun `pending icon and search survive activity state restoration without applying`() {
         var chosen: ShortcutIcon? = null

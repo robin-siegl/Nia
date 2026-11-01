@@ -61,6 +61,7 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: UnlockReve
     val selectingApp by model.selectingApp.collectAsStateWithLifecycle()
     val navigation by model.navigation.collectAsStateWithLifecycle()
     val homeDraft by model.homeDraft.collectAsStateWithLifecycle()
+    val searchAppsOnOpen by model.searchAppsOnOpen.collectAsStateWithLifecycle()
     val isDefault by model.isDefault.collectAsStateWithLifecycle()
     val storageError by model.storageError.collectAsStateWithLifecycle()
     val restore by model.restore.collectAsStateWithLifecycle()
@@ -120,14 +121,16 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: UnlockReve
                     if (saved?.setupComplete == true && (screen == Screen.Home || screen == Screen.Apps)) {
                         val (time, date) = rememberClockText()
                         HomeAppsScreen(preferences, apps, loading, time, date, drawerOpen = screen == Screen.Apps,
-                            onDrawerOpenChanged = { if (it) model.navigate(Screen.Apps) else model.back() },
+                            onDrawerOpenChanged = { if (it) model.openApps() else model.back() },
                             onClock = model::openClock, onShortcut = model::openHomeShortcut, onDate = model::openCalendar,
                             onSettings = { model.navigate(Screen.Settings) }, onApp = { model.openApp(it.target) },
                             onAppInfo = { model.showAppInfo(it.target) }, onCorner = model::openCorner,
                             contentTopInset = padding.calculateTopPadding(), unlockRequest = unlockRequest,
                             deviceLocked = deviceLocked, homeRequest = homeRequest,
                             onAssignCorner = { app, position -> model.assignCornerFromApps(position, app) },
-                            revealAllowed = revealAllowed)
+                            revealAllowed = revealAllowed, searchAppsOnOpen = searchAppsOnOpen,
+                            onAddHome = model::addHomeFromApps, onReorderHome = model::reorderHomeShortcuts,
+                            onEditHome = model::editHomeShortcut)
                     } else key(screen) {
                         when (screen) {
                             Screen.Home -> {
@@ -136,13 +139,14 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: UnlockReve
                                     onEditHome = model::editHomeShortcut, onMoveHome = model::moveHomeShortcut,
                                     onDefault = setDefault, onStart = model::finishSetup,
                                     onApps = { model.navigate(Screen.Apps) }, onImport = beginImport,
-                                    storageError = storageError,
+                                    storageError = storageError, onReorderHome = model::reorderHomeShortcuts,
                                     onRecovery = { model.navigate(Screen.SettingsDetail(SettingsSection.BACKUP)) })
                             }
                             Screen.Apps -> AppListScreen(apps, loading, preferences.searchAutofocus,
                                 onBack = model::back, onSelect = { model.openApp(it.target) },
                                 onSettings = { model.navigate(Screen.Settings) }, onInfo = { model.showAppInfo(it.target) },
                                 alphabetScrubber = preferences.alphabetScrubber,
+                                onAddHome = model::addHomeFromApps, canAddHome = preferences.homeShortcuts.size < MAX_HOME_SHORTCUTS,
                                 onAssignCorner = { app, position -> model.assignCornerFromApps(position, app) })
                             is Screen.Picker -> AppListScreen(apps, loading, false,
                                 title = screen.header.label, onBack = model::back,
@@ -170,7 +174,7 @@ fun NiaApp(model: LauncherViewModel, homeRequest: Int, unlockRequest: UnlockReve
                                 onResetAppearance = model::resetAppearance, onResetAll = model::resetAll, onOpenLink = openLink,
                                 onAssignCorner = { model.navigate(Screen.CornerPicker(it)) },
                                 onEditHome = model::editHomeShortcut, onMoveHome = model::moveHomeShortcut,
-                                updateCheck = updateCheck, onCheckUpdates = model::checkForUpdates)
+                                updateCheck = updateCheck, onCheckUpdates = model::checkForUpdates, onReorderHome = model::reorderHomeShortcuts)
                         }
                     }
                 }

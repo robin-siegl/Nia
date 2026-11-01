@@ -49,16 +49,16 @@ class HomeInputRecoveryTest {
             NiaTheme(Palette.generate(p, true)) {
                 Surface(Modifier.fillMaxSize()) {
                     // A fixed clock and plain callback counters must not accidentally refresh Home.
-                    HomeAppsScreen(p.copy(homeShortcuts = legacyHomeShortcuts()), listOf(app), false, "14:03", "Fri, 30 Oct", open, { open = it },
-                        { clocks++ }, { categories++ }, {}, {}, {}, { corners++ },
+                    HomeAppsScreen(p.copy(homeShortcuts = legacyHomeShortcuts() + appsCommand()), listOf(app), false, "14:03", "Fri, 30 Oct", open, { open = it },
+                        { clocks++ }, { if (it == "apps-command") open = true else categories++ }, {}, {}, {}, { corners++ },
                         unlockRequest = unlock, deviceLocked = locked, revealAllowed = active)
                 }
             }
         }
         music = (if (layout == HomeLayout.GRID) rule.onNodeWithContentDescription("Music")
-            else rule.onNodeWithTag("home-entry-Music")).fetchSemanticsNode().boundsInRoot.center
+            else rule.onNodeWithTag("home-entry-legacy-music")).fetchSemanticsNode().boundsInRoot.center
         appsButton = (if (layout == HomeLayout.GRID) rule.onNodeWithContentDescription("Apps")
-            else rule.onNodeWithTag("home-entry-Apps")).fetchSemanticsNode().boundsInRoot.center
+            else rule.onNodeWithTag("home-entry-apps-command")).fetchSemanticsNode().boundsInRoot.center
         clock = rule.onNodeWithTag("home-clock").fetchSemanticsNode().boundsInRoot.center
         corner = rule.onNodeWithTag("home-corner-LEFT").fetchSemanticsNode().boundsInRoot.center
         rule.mainClock.autoAdvance = false
@@ -71,6 +71,10 @@ class HomeInputRecoveryTest {
     }
 
     private fun assertHomeResponds() {
+        music = rule.onNodeWithContentDescription("Music").fetchSemanticsNode().boundsInRoot.center
+        clock = rule.onNodeWithTag("home-clock").fetchSemanticsNode().boundsInRoot.center
+        corner = rule.onNodeWithTag("home-corner-LEFT").fetchSemanticsNode().boundsInRoot.center
+        appsButton = rule.onNodeWithContentDescription("Apps").fetchSemanticsNode().boundsInRoot.center
         // Real pointer events, not semantics actions, must pass the transition blocker.
         rule.onNodeWithTag("home-apps-surface").performTouchInput { click(music) }
         assertEquals("Home stayed blocked after the reveal finished", 1, categories)
@@ -142,7 +146,7 @@ class HomeInputRecoveryTest {
         render()
         rule.onNodeWithTag("home-apps-surface").performTouchInput { click(appsButton) }
         rule.mainClock.advanceTimeBy(64)
-        assertFalse(open)
+        assertTrue(rule.onNodeWithTag("home-apps-surface").fetchSemanticsNode().config[DrawerProgress] < 1f)
         rule.runOnIdle { scale.scaleFactor = 0f; Snapshot.sendApplyNotifications() }
         rule.mainClock.advanceTimeBy(64)
         assertTrue(open)

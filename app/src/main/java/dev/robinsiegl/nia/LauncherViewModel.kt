@@ -12,12 +12,15 @@ import dev.robinsiegl.nia.model.*
 import dev.robinsiegl.nia.platform.AppRepository
 import dev.robinsiegl.nia.platform.ReleaseRepository
 import dev.robinsiegl.nia.platform.UpdateCheckException
+import dev.robinsiegl.nia.platform.FlashlightController
+import dev.robinsiegl.nia.platform.FlashlightResult
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.util.UUID
@@ -37,6 +40,8 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     val selectingApp = _selectingApp.asStateFlow()
     private val _homeDraft = MutableStateFlow<HomeShortcutDraft?>(null)
     val homeDraft = _homeDraft.asStateFlow()
+    private val _searchAppsOnOpen = MutableStateFlow(false)
+    val searchAppsOnOpen = _searchAppsOnOpen.asStateFlow()
     private val _navigation = MutableStateFlow(Navigation())
     val navigation = _navigation.asStateFlow()
     private val _isDefault = MutableStateFlow(false)
@@ -53,6 +58,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     val messages = events.receiveAsFlow()
     private var settingsObserver: Job? = null
     private val launchGate = LaunchGate()
+    private val flashlight = lazy { FlashlightController(application) }
 
     init {
         observeSettings()
@@ -75,12 +81,14 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun navigate(screen: Screen) { _navigation.update { it.push(screen) } }
+    fun navigate(screen: Screen) { _searchAppsOnOpen.value = false; _navigation.update { it.push(screen) } }
+    fun openApps(search: Boolean = false) { navigate(Screen.Apps); _searchAppsOnOpen.value = search }
     fun back() {
+        _searchAppsOnOpen.value = false
         if (_navigation.value.screen == Screen.HomeShortcutEditor) _homeDraft.value = null
         _navigation.update { it.back() }
     }
-    fun home() { _homeDraft.value = null; _navigation.value = Navigation() }
+    fun home() { _homeDraft.value = null; _searchAppsOnOpen.value = false; _navigation.value = Navigation() }
     fun refreshDefault() { _isDefault.value = repository.isDefaultHome() }
     fun homeSelectionIntent() = repository.homeSelectionIntent()
 
@@ -112,8 +120,15 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         val preferences = _saved.value?.preferences ?: return
         val existing = preferences.homeShortcuts.find { it.id == id }
         if (id != null && existing == null) return
-        if (existing == null && preferences.homeShortcuts.size >= MAX_HOME_APPS) return
+        if (existing == null && preferences.homeShortcuts.size >= MAX_HOME_SHORTCUTS) return
         _homeDraft.value = HomeShortcutDraft(existing ?: HomeShortcut(UUID.randomUUID().toString(), ""), existing == null)
+        navigate(Screen.HomeShortcutEditor)
+    }
+
+    fun addHomeFromApps(app: AppEntry) {
+        if ((_saved.value?.preferences?.homeShortcuts?.size ?: MAX_HOME_SHORTCUTS) >= MAX_HOME_SHORTCUTS) return
+        val name = app.label.take(MAX_HOME_NAME_LENGTH).trim().filterNot(Char::isISOControl).ifBlank { "App" }
+        _homeDraft.value = HomeShortcutDraft(HomeShortcut(UUID.randomUUID().toString(), name, app = app.target), true)
         navigate(Screen.HomeShortcutEditor)
     }
 
@@ -123,7 +138,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
 
     fun chooseHomeApp(app: AppEntry) {
         if (_navigation.value.screen != Screen.HomeShortcutPicker || _homeDraft.value == null) return
-        updateHomeDraft { it.copy(app = app.target, name = it.name.ifBlank { app.label.take(MAX_HOME_NAME_LENGTH).trim().filterNot(Char::isISOControl) }) }
+        updateHomeDraft { it.copy(app = app.target, command = null, name = it.name.ifBlank { app.label.take(MAX_HOME_NAME_LENGTH).trim().filterNot(Char::isISOControl) }) }
         back()
     }
 
@@ -136,7 +151,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
                 store.update { state ->
                     val entries = state.preferences.homeShortcuts
                     val next = if (draft.isNew) {
-                        require(entries.size < MAX_HOME_APPS)
+                        require(entries.size < MAX_HOME_SHORTCUTS)
                         entries + shortcut
                     } else {
                         require(entries.any { it.id == shortcut.id })
@@ -144,7 +159,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
                     }
                     state.copy(preferences = state.preferences.copy(homeShortcuts = next))
                 }
-                back()
+                if (draft.isNew && _navigation.value.stack.dropLast(1).lastOrNull() == Screen.Apps) home() else back()
             } finally { _selectingApp.value = false }
         }
     }
@@ -162,6 +177,19 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         p.copy(homeShortcuts = entries)
     }
 
+    suspend fun reorderHomeShortcuts(ids: List<String>): Boolean = viewModelScope.async {
+        try {
+            var applied = false
+            store.update { state ->
+                val next = state.preferences.reorderHome(ids)
+                applied = next.homeShortcuts.map { it.id } == ids
+                state.copy(preferences = next)
+            }
+            applied
+        } catch (e: CancellationException) { throw e }
+        catch (_: Exception) { events.send("The shortcut order could not be saved."); false }
+    }.await()
+
     private fun selectApp(transform: (LauncherPreferences) -> LauncherPreferences) {
         if (!_selectingApp.compareAndSet(false, true)) return
         perform("The app assignment could not be saved.") {
@@ -177,12 +205,12 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun chooseCornerApp(position: CornerPosition, target: AppTarget) = selectApp { p ->
-        p.withShortcut(position, p.shortcut(position).copy(action = ShortcutAction.APP, app = target))
+        p.withShortcut(position, p.shortcut(position).copy(action = ShortcutAction.APP, app = target, command = null))
     }
 
     fun assignCornerFromApps(position: CornerPosition, app: AppEntry) = perform("The shortcut could not be saved.") {
         store.update { state -> state.copy(preferences = state.preferences.withShortcut(position,
-            state.preferences.shortcut(position).copy(action = ShortcutAction.APP, app = app.target))) }
+            state.preferences.shortcut(position).copy(action = ShortcutAction.APP, app = app.target, command = null))) }
         events.send("${app.label} assigned to the ${position.label.lowercase()} corner.")
     }
 
@@ -190,6 +218,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         val shortcut = _saved.value?.preferences?.shortcut(position) ?: return
         when (shortcut.action) {
             ShortcutAction.EMPTY -> Unit
+            ShortcutAction.COMMAND -> shortcut.command?.let(::runCommand)
             ShortcutAction.APP -> launch {
                 try { repository.launch(requireNotNull(shortcut.app)); home() }
                 catch (_: RuntimeException) {
@@ -207,6 +236,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
 
     fun openHomeShortcut(id: String) {
         val shortcut = _saved.value?.preferences?.homeShortcuts?.find { it.id == id } ?: return
+        shortcut.command?.let { command -> runCommand(command); return }
         val target = shortcut.app
         if (target == null) { editHomeShortcut(id); return }
         launch { try { repository.launch(target); home() }
@@ -215,6 +245,25 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
             editHomeShortcut(id)
             events.trySend("That app is unavailable. Choose another app for ${shortcut.name}.")
         } }
+    }
+
+    private fun runCommand(command: ShortcutCommand) {
+        when (command) {
+            ShortcutCommand.OPEN_APPS -> openApps()
+            ShortcutCommand.SEARCH_APPS -> openApps(search = true)
+            ShortcutCommand.FLASHLIGHT -> perform("The flashlight is unavailable right now.") {
+                when (flashlight.value.toggle()) {
+                    FlashlightResult.CHANGED -> Unit
+                    FlashlightResult.NO_FLASH -> events.send("This device has no available flashlight.")
+                    FlashlightResult.UNAVAILABLE -> events.send("The flashlight is unavailable. Close the camera and try again.")
+                }
+            }
+        }
+    }
+
+    override fun onCleared() {
+        if (flashlight.isInitialized()) flashlight.value.close()
+        super.onCleared()
     }
 
     fun openCalendar() {

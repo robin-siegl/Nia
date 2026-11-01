@@ -47,12 +47,13 @@ class SharedHomeGestureTest {
         } }
         rule.mainClock.autoAdvance = false
     }
+    private fun collapse() = rule.onNode(SemanticsMatcher.keyIsDefined(HomeHeaderCollapse), useUnmergedTree = true).fetchSemanticsNode().config[HomeHeaderCollapse]
     private fun progress() = rule.onNodeWithTag("home-apps-surface").fetchSemanticsNode().config[DrawerProgress]
     private fun armed() = rule.onNodeWithTag("home-apps-surface").fetchSemanticsNode().config[AppsPullArmed]
     private fun dragUpAndHold() {
         rule.onNodeWithTag("home-apps-surface").performTouchInput {
             down(Offset(width * 0.5f, height * 0.65f))
-            moveTo(Offset(width * 0.5f, height * 0.30f), 300)
+            moveTo(Offset(width * 0.5f, height * 0.15f), 400)
         }
     }
     private fun release() {
@@ -64,7 +65,7 @@ class SharedHomeGestureTest {
         assertTrue(armed())
         assertFalse(open)
         assertTrue(progress() in 0.2f..0.6f)
-        assertEquals(listOf(PullCue.START, PullCue.ARMED), cues)
+        assertEquals(listOf(PullCue.ARMED), cues)
         release()
         assertTrue(open)
         assertEquals(1f, progress(), 0f)
@@ -102,21 +103,22 @@ class SharedHomeGestureTest {
         rule.mainClock.advanceTimeBy(500)
         assertFalse(open); assertTrue(cues.isEmpty())
         rule.mainClock.autoAdvance = true
-        rule.onNodeWithTag("home-entry-App 8").performScrollTo()
+        rule.onNodeWithTag("home-list").performTouchInput { swipeUp(startY = height * 0.9f, endY = height * 0.5f, durationMillis = 300) }
+        rule.onNodeWithTag("home-entry-app-8").performScrollTo()
         rule.mainClock.autoAdvance = false
-        val before = rule.onNodeWithTag("home-entry-App 8").fetchSemanticsNode().boundsInRoot
+        val before = rule.onNodeWithTag("home-entry-app-8").fetchSemanticsNode().boundsInRoot
         dragUpAndHold()
         assertTrue(armed())
         rule.onNodeWithTag("home-apps-surface").performTouchInput { cancel() }
         rule.mainClock.advanceTimeBy(500)
         assertFalse(open); assertEquals(0f, progress(), 0f)
-        assertEquals(before, rule.onNodeWithTag("home-entry-App 8").fetchSemanticsNode().boundsInRoot)
-        rule.onNodeWithTag("pinned-home-apps").performClick()
+        assertEquals(before, rule.onNodeWithTag("home-entry-app-8").fetchSemanticsNode().boundsInRoot)
+        rule.openAppsFromHome()
         rule.mainClock.advanceTimeBy(500)
         assertTrue(open)
         rule.onNodeWithText("Back").performClick()
         rule.mainClock.advanceTimeBy(500)
-        assertEquals(before, rule.onNodeWithTag("home-entry-App 8").fetchSemanticsNode().boundsInRoot)
+        assertEquals(before, rule.onNodeWithTag("home-entry-app-8").fetchSemanticsNode().boundsInRoot)
     }
     @Test fun `reversing an armed grid pull cancels and the next tap still works`() {
         render(HomeLayout.GRID)
@@ -128,24 +130,25 @@ class SharedHomeGestureTest {
         }
         rule.mainClock.advanceTimeBy(500)
         assertFalse(open); assertEquals(0f, progress(), 0f)
-        rule.onNodeWithContentDescription("Apps").performTouchInput { click() }
+        rule.openAppsFromHome()
         rule.mainClock.advanceTimeBy(500)
         assertTrue(open)
     }
     @Test fun `Android Home resets a scrolled list before its next visible frame`() {
         render(HomeLayout.LIST, populated = true)
         rule.mainClock.autoAdvance = true
-        rule.onNodeWithTag("home-entry-App 8").performScrollTo()
+        rule.onNodeWithTag("home-list").performTouchInput { swipeUp(startY = height * 0.9f, endY = height * 0.5f, durationMillis = 300) }
+        rule.onNodeWithTag("home-entry-app-8").performScrollTo()
         rule.mainClock.autoAdvance = false
-        rule.onNodeWithTag("compact-home-header").assertExists()
+        assertTrue(collapse() > 0f)
         rule.runOnIdle { homeRequest++; Snapshot.sendApplyNotifications() }
         rule.mainClock.advanceTimeBy(32)
-        rule.onNodeWithTag("compact-home-header").assertDoesNotExist()
+        assertEquals(0f, collapse(), 0f)
         rule.onNodeWithTag("home-clock").assertIsDisplayed()
     }
     @Test fun `locking with Apps open clears navigation and search before the next unlock`() {
         render(HomeLayout.LIST, populated = true)
-        rule.onNodeWithTag("pinned-home-apps").performClick()
+        rule.openAppsFromHome()
         rule.mainClock.advanceTimeBy(500)
         assertTrue(open)
         rule.onNodeWithText("Search apps").performTextInput("old query")
@@ -155,20 +158,20 @@ class SharedHomeGestureTest {
         rule.runOnIdle { locked = false; unlock = UnlockRevealRequest(); Snapshot.sendApplyNotifications() }
         rule.mainClock.advanceTimeBy(1_000)
         rule.onNodeWithTag("home-clock").assertIsDisplayed()
-        rule.onNodeWithTag("pinned-home-apps").performTouchInput { click() }
+        rule.openAppsFromHome()
         rule.mainClock.advanceTimeBy(500)
         assertTrue(open)
         rule.onNodeWithText("Clear").assertDoesNotExist()
     }
     @Test fun `Android Home also closes navigation after Apps has fully opened`() {
         render(HomeLayout.GRID)
-        rule.onNodeWithContentDescription("Apps").performClick()
+        rule.openAppsFromHome()
         rule.mainClock.advanceTimeBy(500)
         assertTrue(open)
         rule.runOnIdle { homeRequest++; Snapshot.sendApplyNotifications() }
         rule.mainClock.advanceTimeBy(64)
         assertFalse("Android Home left the drawer's external state open", open)
-        rule.onNodeWithContentDescription("Apps").performTouchInput { click() }
+        rule.openAppsFromHome()
         rule.mainClock.advanceTimeBy(500)
         assertTrue(open)
     }
@@ -176,14 +179,15 @@ class SharedHomeGestureTest {
         scale.scaleFactor = 0f
         render(HomeLayout.LIST, populated = true)
         rule.mainClock.autoAdvance = true
-        rule.onNodeWithTag("home-entry-App 8").performScrollTo()
+        rule.onNodeWithTag("home-list").performTouchInput { swipeUp(startY = height * 0.9f, endY = height * 0.5f, durationMillis = 300) }
+        rule.onNodeWithTag("home-entry-app-8").performScrollTo()
         rule.mainClock.autoAdvance = false
-        rule.onNodeWithTag("compact-home-header").assertExists()
+        assertTrue(collapse() > 0f)
         rule.runOnIdle { unlock = UnlockRevealRequest(); Snapshot.sendApplyNotifications() }
         rule.mainClock.advanceTimeBy(64)
-        rule.onNodeWithTag("compact-home-header").assertDoesNotExist()
+        assertEquals(0f, collapse(), 0f)
         rule.onNodeWithTag("home-clock").assertIsDisplayed()
-        rule.onNodeWithTag("pinned-home-apps").performTouchInput { click() }
+        rule.openAppsFromHome()
         rule.mainClock.advanceTimeBy(64)
         assertTrue(open)
     }

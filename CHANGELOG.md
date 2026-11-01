@@ -1,6 +1,14 @@
 # Changelog
 
-## 1.4.0 (unreleased)
+## 1.5.0 (unreleased)
+
+- Replace the fading Home header with one clock/date that continuously shrinks as the shortcuts move upward. Simplify the Apps pull to a chevron and one threshold haptic, and fix the large-text list handoff.
+- Remove the automatic and sticky Apps entry. Allow up to nine editable shortcuts, each opening an app or running Open Apps, Search apps or Toggle flashlight. Commands are optional on Home and in Quick corners.
+- Add long-press drag reordering on Home and in Settings → Home shortcuts, with local previews, edge scrolling, cancellation and keyboard/accessibility alternatives.
+- Add Add to Home to the redesigned app action menu, opening a prefilled shortcut editor. Preserve App info and Quick corner assignments.
+- Export backup schema 7 with validated command targets and continue importing schemas 1–6 without adding a new Apps shortcut. Preserve existing names, icons, targets, order and header assignments.
+
+## 1.4.0
 
 - Replace the hand-drawn shortcut icons with 192 bundled Material Symbols Outlined, covering nine categories. Keep existing icon IDs compatible with saved settings and backups, and use matching Material Apps/Settings icons.
 - Add one reusable icon picker for Home apps and Quick corners, with labeled tiles, name/keyword search, categories, selection preview, explicit confirmation, state restoration and a compact layout for large text or the keyboard.

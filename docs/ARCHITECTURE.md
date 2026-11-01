@@ -23,7 +23,7 @@ All paths below are relative to [app/src/main/java/dev/robinsiegl/nia](../app/sr
 | `ui/` | Compose screens, interaction and presentation state, themes applied through `NiaTheme` |
 | `model/` | Preferences, app identities/search, navigation, restore/release models, header geometry and unlock state |
 | `data/` | Preferences DataStore and strict backup serialization/migration |
-| `platform/` | Android app discovery/launching and the manual GitHub release request |
+| `platform/` | Android app discovery/launching, flashlight access and the manual GitHub release request |
 | `theme/` | Seed-color conversion, paired palette generation and contrast checks |
 
 ```mermaid
@@ -72,7 +72,7 @@ The activity requests `screenOrientation="portrait"`, covering all nia screens o
 
 [PreferencesStore.kt](../app/src/main/java/dev/robinsiegl/nia/data/PreferencesStore.kt) keeps serialized `SavedState` under the `state.v1` key in Preferences DataStore. Update it transactionally, validate the next preferences before saving, and avoid overwriting unreadable state with defaults. The recovery UI keeps restore and full reset available.
 
-[BackupCodec.kt](../app/src/main/java/dev/robinsiegl/nia/data/BackupCodec.kt) exports UTF-8 JSON with format `nia.settings`, a schema version, personal-profile scope, timestamp and preferences. The current export schema is **6**, with imports for **1–6** and a **256KiB** limit. Setup progress, searches, usage history and the full installed-app inventory are excluded. Android automatic app-data backup/transfer is disabled in favor of explicit settings files.
+[BackupCodec.kt](../app/src/main/java/dev/robinsiegl/nia/data/BackupCodec.kt) exports UTF-8 JSON with format `nia.settings`, a schema version, personal-profile scope, timestamp and preferences. The current export schema is **7**, with imports for **1–7** and a **256KiB** limit. Setup progress, searches, usage history and the full installed-app inventory are excluded. Android automatic app-data backup/transfer is disabled in favor of explicit settings files.
 
 Keep decoding strict. Validate schema, colors, enums and component identities before writing; reject unsupported profiles and arbitrary intent data. Legacy Settings corners migrate to Empty, and legacy gear icons to Star. Preserve other valid preferences through migration.
 
@@ -82,7 +82,7 @@ Reset appearance/behavior restores default preferences while retaining Home entr
 
 ### User-defined Home
 
-`LauncherPreferences.homeShortcuts` is an ordered list of zero to eight `HomeShortcut` entries. Each entry has a stable ID, user label, outline icon and nullable app target. Home, previews, onboarding and the editor use this list; Apps is generated separately and always stays last. `HomeCategory` remains only for migration and legacy glyph mapping, never for resolving active Home content.
+`LauncherPreferences.homeShortcuts` is an ordered list of zero to nine `HomeShortcut` entries. Each entry has a stable ID, user label and outline icon, and targets an app or a typed `ShortcutCommand`. Home, previews, onboarding and the editor use this list; there is no generated Apps entry. `HomeCategory` remains only for migration and legacy glyph mapping, never for resolving active Home content.
 
 `BackupCodec` converts legacy schema-1–5 backups and old stored preferences to five ordinary editable entries, preserving even unassigned categories. It seeds the independent Calendar target from the legacy Calendar assignment and preserves Clock. An absent list in old stored state triggers migration; an explicitly empty current list stays empty. A missing DataStore record uses the new empty-install defaults.
 
@@ -90,19 +90,25 @@ The ViewModel owns `HomeShortcutDraft` through app/icon picking and activity rec
 
 `ShortcutIcon` has stable serialized IDs; labels, categories and search keywords are presentation metadata. `IconCatalog` provides pure, alphabetical filtering. Home and Quick corners use the same `ShortcutIconPicker`, which owns a saveable pending selection/query/category and only calls its persistence callback on confirmation. The picker owns its dialog window, safe/IME insets and system-bar contrast; it keeps no Activity reference. Read focus, keyboard and density from inside that dialog. Opening clears the underlying editor's text focus; selecting an icon clears dialog search focus while preserving keyboard focus on a tile.
 
-The catalog and Android resource mapping are generated from `scripts/material_symbols.json`. `scripts/sync_material_symbols.py --download` deliberately imports a pinned Google Material Symbols subset; `--check` validates it offline, including its Apache 2.0 license. Gradle and the running launcher never download icons. Vector paths are unchanged; Compose applies the palette instead of Android theme tint. Keep the 27 original IDs and legacy Settings-to-Star migration. The new generic gear uses `GEAR`, so it cannot collide with the removed `SETTINGS` icon/action. Quick corners is a display-name change: `leftShortcut`/`rightShortcut` and the schema-6 structure stay unchanged.
+The catalog and Android resource mapping are generated from `scripts/material_symbols.json`. `scripts/sync_material_symbols.py --download` deliberately imports a pinned Google Material Symbols subset; `--check` validates it offline, including its Apache 2.0 license. Gradle and the running launcher never download icons. Vector paths are unchanged; Compose applies the palette instead of Android theme tint. Keep the 27 original IDs and legacy Settings-to-Star migration. The new generic gear uses `GEAR`, so it cannot collide with the removed `SETTINGS` icon/action. Quick corners retain the `leftShortcut`/`rightShortcut` keys. Schema 7 adds an optional typed command target to Home and corner entries.
 
 Restore previews compare additions/removals, names, icons, app targets, order and independent Clock/Calendar targets. An unavailable app clears its target while retaining the Home entry's identity, presentation and position. Applying still revalidates the reviewed result.
 
 ### Shared Home gesture coordination
 
-`AppsPull` owns direct finger distance and arming with hysteresis for both layouts. `DrawerMotion` owns drag/settle progress and cancellation leases. Home stays composed beneath Apps. An overflowing text list uses `ScrollState` and nested scrolling; only remaining **UserInput** drag with an active pointer at its end enters the pull. Grid and fitting/empty lists enter directly. Fling/side-effect scroll never adds pull distance.
+`HomeHeaderScroll` consumes the header's height change before content scrolls. `MorphingClockHeader` draws and transforms the same clock/date paths, with moving touch targets and no crossfade. Changing header height physically moves the content below it. The grid keeps its cell sizes while moving upward; the list uses one scroll viewport for all configured entries.
 
-The arming threshold is 112dp; reversal below 72% disarms. Emit at most one start and one armed cue per pointer gesture through `View.performHapticFeedback`, which respects the system setting without a vibration permission. A resisted preview feeds the shared drawer/header transition. Opening uses distance, while an already open drawer retains its distance/velocity dismissal behavior. Pointer termination distinguishes normal up from cancel before draggable/scrollable callbacks; cancellation must not be treated as a zero-speed release.
+`AppsPull` owns direct finger distance and arming with hysteresis. `DrawerMotion` owns drag/settle progress and cancellation leases. An upward drag first collapses the header, then scrolls a long list, then passes remaining **UserInput** distance to the Apps pull. Fling/side-effect scrolling cannot arm Apps. The arming threshold is 112dp; reversal below 72% disarms. Emit one threshold cue per gesture through `View.performHapticFeedback`, respecting the system setting without a vibration permission. Pointer termination distinguishes up from cancel.
 
-Home list offset is kept while Apps is on top. The expanded header crossfades to a compact Clock/Calendar row as the list scrolls or Apps is pulled. A weighted, non-filling scroll area keeps Apps directly after a fitting list or pinned above the corner area when it overflows; the footer is measured outside the scroll viewport so it cannot cover an app. The icon grid has three fixed columns, at most three rows and adaptive row spacing, without vertical scrolling. A short window with a large scalable clock falls back to the compact header so the grid retains minimum touch targets.
+Home remains composed beneath Apps. Preserve scroll/header state on ordinary drawer dismissal, but key fresh state to explicit Home and unlock requests before the visible reveal. Keep completion and scrollability reads subscribed in composition. Search autofocus waits until the drawer settles; the Search apps command overrides the saved autofocus preference only for that opening.
 
-Canceling or dismissing Apps restores the prior Home presentation. Explicit Home requests and new unlock request identities create a fresh Home scroll state before the visible reveal. Screen lock and Home also close the external drawer navigation, so the hidden drawer and its search cannot remain active after a reset. Keep completion/scrollability reads in composition, preserve active pointer ownership while blocking new launches, and focus search only after settling. The [device checklist](DEVICE_TESTING.md) covers physical handoff and accessibility validation.
+Keep the empty-space long-press pointer handler attached with stable keys and check its current enabled state inside the handler. Removing or rekeying it when a pull begins cancels descendant list gestures. The parent drag fallback also handles swipes that start in a header or empty space beneath a short list.
+
+`ShortcutReorderState` owns transient drag order, item bounds and the grabbed point for both Home and Settings. Stable item keys keep gestures attached while entries move across rows. Edge scrolling moves only the list, never opens Apps. Preview locally and invoke one validated order write on drop; cancel writes nothing. A changed entry set cancels the drag, and the ViewModel rejects stale IDs transactionally. Keep the write in the ViewModel scope so recreation does not interrupt an accepted drop.
+
+Measure each reorder slot outside its lifted/translated content. Publish the pointer and proposed order in one snapshot, then place the lifted item relative to its untransformed slot. Verify that its visible bounds follow the finger, as well as checking the saved order.
+
+Commands are an enum allowlist, not serialized intents. The ViewModel dispatches Open Apps, Search apps and Toggle flashlight. `FlashlightController` uses the application context and public `CameraManager` torch API, chooses a flash-capable camera, observes actual torch changes (including Quick Settings), handles unavailable resources and unregisters callbacks on cleanup. Camera enumeration and torch calls stay off the main thread; no camera session or CAMERA permission is needed. See [CameraManager](https://developer.android.com/reference/android/hardware/camera2/CameraManager#setTorchMode(java.lang.String,%20boolean)).
 
 ## Unlock and input reliability
 

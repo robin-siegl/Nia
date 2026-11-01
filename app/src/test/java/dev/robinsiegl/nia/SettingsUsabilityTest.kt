@@ -128,7 +128,7 @@ class SettingsUsabilityTest {
         render(light = true) { SettingsScreen(false, false, {}, {}, { setDefault++ }, { changeDefault++ }, p) }
         rule.onNodeWithText("Text list · Classic clock").assertIsDisplayed()
         rule.onNodeWithText("Black & white · Dark").assertIsDisplayed()
-        rule.onNodeWithText("1 app · Add, edit and arrange").assertIsDisplayed()
+        rule.onNodeWithText("1 shortcut · Apps and commands").assertIsDisplayed()
         rule.onNodeWithText("Keyboard opens with Apps").performScrollTo().assertIsDisplayed()
         capture("settings-overview-light")
         rule.onNodeWithText("Default launcher").performScrollTo().performClick()

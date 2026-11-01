@@ -1358,19 +1358,32 @@
       "category": "TECH",
       "symbol": "grid_view",
       "keywords": "apps applications grid launcher tiles"
+    },
+    {
+      "id": "FLASHLIGHT",
+      "label": "Flashlight",
+      "category": "TECH",
+      "symbol": "flashlight_on",
+      "keywords": "torch light lamp flash"
     }
   ],
   "interfaceSymbols": [
     "apps",
     "settings",
     "close",
-    "check"
+    "check",
+    "add",
+    "info",
+    "drag_indicator",
+    "south_west",
+    "south_east"
   ],
   "licenseSha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
   "resourceSha256": {
     "accessibility_new": "343cce8b8ac3f2e83cd38b2da31a086f1787f741adc0042afe24d17abc9650fc",
     "account_balance": "2413cab0a34ae435479c071688e5144c0d3a1b522c47967d4847eb94dac8bae3",
     "account_balance_wallet": "db902b865dad54d722c93bdcd9f421a72ee90e340faa825fef9ece1918f8321e",
+    "add": "4d35f94bb0edf6888a9dc251e11b1c3ad85cb78db0a76398b0ff6631509b6283",
     "alarm": "148b4dc506c72968937c359c2c9cc2dda616f0afab0843540a93ec107f6dbc47",
     "alternate_email": "814373a0fa32b27ad7c0e1a6b528923f4c700b28e5add1cecbe60a3e81c3803d",
     "apps": "cd347c037b77cef0fe6173f7de74c00159f6409ea46e2a4f6621c907690799c9",
@@ -1422,6 +1435,7 @@
     "diversity_3": "1ad69ccce021a88d30512f5c8da662ff4cfacaa493616cff67df788b7fc45d11",
     "document_scanner": "07845ea256db1302569419e7961f9d613645dde7fcebaecfefa1861cd05d8a73",
     "download": "a0d66a1a8829dbd781931f955d0a9126f9ac81dd6395fe8b40eef77c94ed5580",
+    "drag_indicator": "c61ec7657a332e880bb8df4031267ed6df54fef66c5ee7ae079622bb1323a19c",
     "draw": "792512c9a91dd7c0405f1630b69b713fdd12de784e959eaae6d30c3be23f7dc6",
     "edit_document": "61c3a24c186285d2d4c6bac5bb659f2a69e33404f54b777778f215094a05c643",
     "edit_note": "b084e36dc5871f410d15fce24a2df6a558cf5f36628f24c16039aaaaec634be7",
@@ -1435,6 +1449,7 @@
     "fingerprint": "4c9728739e7d54ce94e3979c022c331c53b271d0351a61a715b0deb44a379456",
     "fitness_center": "007f305eea00598fa96ee1054484cd2cd4b0e49d84ae9d0b7ac4e2cdb80f39f7",
     "flag": "417a06410a6fe5aac2a2386d111a779af9f04f92a99e65a705cce0227a8c6e9d",
+    "flashlight_on": "04c53cd1eda839aa1e683999e949a533d246b80609a042f701d1c303900d2855",
     "flight": "27c02c61f0f7c198908ba2d64b8b46a1f1506669e990838302f5bfad121aed13",
     "folder": "7ac0a21199437837fb5db07bc39842df01d50c7eb250dda61aaca045aa61a634",
     "folder_open": "c4f1507ea575d8a078245bbd0e9193c038a3ffaec88c6e8fb5c3f78094d0617d",
@@ -1452,6 +1467,7 @@
     "hotel": "8dd2a17ce03eee0746c4e18510a86bbe217b8dbe1d48936c70a091d6fd61a4f5",
     "hourglass_empty": "7ac1717191700e53d8b8fe43d494991b64437a1834d3a7704b336c20a9425613",
     "image": "4c6668b76b556bcd56c2c2bd6cd09ea37167dabde310b9d0aee70c7e5f9b0cd5",
+    "info": "d46b2e72ef512605723c1961b51ba75dd179ac18f4b1f92fbc014445178023a5",
     "inventory_2": "b48e76786064d8376c36b1d24bcdeca328f815f7fa97f7650af0a828cba54641",
     "key": "3ac2c0eafc4e2697556c107633f95a9de85a5d3bfdf2d907107162fe1d7f25be",
     "keyboard": "12c84af7d5b255c192888bfd58ecab9c3889c49cdb27fa053c6c76b2ce6d246f",
@@ -1527,6 +1543,8 @@
     "smart_display": "437a73940ea03819f093ca60f00ef30f66dce8e0d31688d68c673d37720108a9",
     "smartphone": "0f8ce687987fd48e8337a6b36c2b6eda2d6837d9e9beed55acafe9b5eeea5d25",
     "sms": "fc43dbc9abb85f838ba33a5613217d70babcfccb22cb2da97df9abea6e68c3ee",
+    "south_east": "5818304fe8dacba079d93f0297923a0b69264f340f2d56b3b2eb95d7136bafb4",
+    "south_west": "5b3b66d237e51ff245d0a0801f464ec243912cf57f3df1a55b9f13a6e0d31cec",
     "spa": "8c6bb90fa9e635bc6645e8f90ae47cbeab24fae27c2b7435c232804418717d6a",
     "speaker": "a3cbae3e00f14cd6bb5b96e4131fe4e2ba6fc55760c9670235c3e6fd63737433",
     "sports_basketball": "2bec41b66bf86e3b67c105d6aef1827c4701b5a4b68ea28ca62f6ae056496cf2",

@@ -21,6 +21,7 @@ fun OnboardingScreen(
     onEditHome: (String?) -> Unit, onMoveHome: (String, Int) -> Unit,
     onDefault: () -> Unit, onStart: () -> Unit, onApps: () -> Unit, onImport: () -> Unit,
     storageError: Boolean = false, onRecovery: () -> Unit = {},
+    onReorderHome: (suspend (List<String>) -> Boolean)? = null,
 ) {
     val previous = SetupStep.entries.getOrNull(step.ordinal - 1)
     val next = SetupStep.entries.getOrNull(step.ordinal + 1)
@@ -32,7 +33,8 @@ fun OnboardingScreen(
             Text("${step.ordinal + 1} of ${SetupStep.entries.size}", fontSize = 13.sp)
         }
         key(step) {
-            Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())
+            val scroll = rememberScrollState()
+            Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(scroll)
                 .padding(horizontal = 24.dp).padding(top = 12.dp, bottom = 24.dp)) {
                 if (storageError) {
                     Text("Restore your Home", fontSize = 28.sp, fontWeight = FontWeight.Light)
@@ -49,8 +51,8 @@ fun OnboardingScreen(
                         HomeSettings(preferences, onChange)
                     }
                     SetupStep.APPS -> {
-                        SetupTitle("Add your apps", "Keep Home as simple as you like. Add a few apps now, or skip this step and use Apps.")
-                        HomeAppsSettings(preferences, apps, onEditHome, onMoveHome)
+                        SetupTitle("Your shortcuts", "Add apps or commands, or leave Home empty. Swipe up on Home to open Apps at any time.")
+                        HomeAppsSettings(preferences, apps, onEditHome, onMoveHome, onReorderHome, scroll)
                     }
                     SetupStep.APPEARANCE -> {
                         SetupTitle("Your colors", "Choose black and white or pick one color for matching light and dark themes.")

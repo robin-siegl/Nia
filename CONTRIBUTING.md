@@ -51,7 +51,7 @@ Use [Device testing](docs/DEVICE_TESTING.md) for launcher selection, gestures, u
 
 ## Changing shortcut icons
 
-Use the shared picker and catalog for Home apps and Quick corners. Edit [material_symbols.json](scripts/material_symbols.json), keeping existing IDs stable, then run:
+Use the shared picker and catalog for Home shortcuts and Quick corners. Edit [material_symbols.json](scripts/material_symbols.json), keeping existing IDs stable, then run:
 
 ```sh
 python3 scripts/sync_material_symbols.py --download

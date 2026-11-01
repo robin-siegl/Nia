@@ -8,7 +8,11 @@ nia reads launchable app names and their launch targets from Android to list, se
 
 ## Settings and setup
 
-Your chosen apps, layout, colors, app-list preferences and unfinished setup step are kept in nia's private app storage. nia does not read messages, contacts, calendar events, location or notification contents.
+Your chosen apps and commands, layout, colors, app-list preferences and unfinished setup step are kept in nia's private app storage. nia does not read messages, contacts, calendar events, location or notification contents.
+
+## Local commands
+
+Open Apps and Search apps use nia's local app list. Toggle flashlight uses Android's torch control and observes its current on/off state. It does not open the camera, capture images, request camera permission or send torch state elsewhere. Android and other apps can change or make the flashlight unavailable.
 
 ## Backups
 

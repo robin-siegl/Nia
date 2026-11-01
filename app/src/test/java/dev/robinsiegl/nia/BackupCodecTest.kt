@@ -37,9 +37,9 @@ class BackupCodecTest {
         return JsonObject(root + mapOf("settings" to settings, "schemaVersion" to JsonPrimitive(version))).toString()
     }
 
-    @Test fun `schema six round trips independent home entries and header assignments`() {
+    @Test fun `schema seven round trips independent home entries and header assignments`() {
         assertEquals(p, BackupCodec.decode(exported().encodeToByteArray()))
-        assertTrue(exported().contains("\"schemaVersion\": 6"))
+        assertTrue(exported().contains("\"schemaVersion\": 7"))
     }
     @Test fun `fresh defaults and deliberately empty Home remain empty after backup and device reload`() {
         val empty = LauncherPreferences(calendar = calendar)
@@ -80,14 +80,14 @@ class BackupCodecTest {
     @Test fun `home validation enforces size stable unique identities and readable names`() {
         val entry = p.homeShortcuts.single()
         val invalid = listOf(
-            (0..8).map { entry.copy(id = "entry-$it") }, listOf(entry, entry),
+            (0..9).map { entry.copy(id = "entry-$it") }, listOf(entry, entry),
             listOf(entry.copy(id = "../file")), listOf(entry.copy(name = "")), listOf(entry.copy(name = "bad\nname")),
             listOf(entry.copy(name = "x".repeat(81))), listOf(entry.copy(name = " Leading")),
         )
         invalid.forEach { entries ->
             assertThrows(IllegalArgumentException::class.java) { PreferencesValidation.validate(p.copy(homeShortcuts = entries)) }
         }
-        val entries = (0..7).map { entry.copy(id = "entry-$it") }
+        val entries = (0..8).map { entry.copy(id = "entry-$it") }
         assertEquals(entries, BackupCodec.decode(BackupCodec.export(p.copy(homeShortcuts = entries))).homeShortcuts)
     }
     @Test fun `export contains no setup or runtime state`() {
@@ -102,7 +102,7 @@ class BackupCodecTest {
     }
     @Test fun `other files future schemas and unsupported profiles are rejected`() {
         rejected("{}"); rejected(exported().replace("nia.settings", "other.settings"))
-        rejected(exported().replace("\"schemaVersion\": 6", "\"schemaVersion\": 7"))
+        rejected(exported().replace("\"schemaVersion\": 7", "\"schemaVersion\": 8"))
         rejected(exported().replace("\"personal\"", "\"private\""))
         rejected(exported().replace("\"personal\"", "\"work\""))
     }

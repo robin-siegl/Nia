@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,6 +24,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -31,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import dev.robinsiegl.nia.model.AppEntry
 import dev.robinsiegl.nia.model.AppSearch
 import dev.robinsiegl.nia.model.CornerPosition
+import dev.robinsiegl.nia.R
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -44,6 +47,7 @@ fun AppListScreen(
     interactionEnabled: Boolean = true, gesturesEnabled: Boolean = true,
     listState: LazyListState = rememberLazyListState(), headerDragModifier: Modifier = Modifier,
     onAssignCorner: ((AppEntry, CornerPosition) -> Unit)? = null,
+    onAddHome: ((AppEntry) -> Unit)? = null, canAddHome: Boolean = true,
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     val results = remember(apps, query) { AppSearch.filter(apps, query) }
@@ -78,7 +82,7 @@ fun AppListScreen(
         } else null)
         OutlinedTextField(query, { query = it }, singleLine = true, label = { Text("Search apps") },
             readOnly = !interactionEnabled,
-            modifier = Modifier.fillMaxWidth().padding(end = 12.dp).focusRequester(focus)
+            modifier = Modifier.fillMaxWidth().padding(end = 12.dp).testTag("apps-search").focusRequester(focus)
                 .focusProperties { canFocus = interactionEnabled }.onPreviewKeyEvent { event ->
                     if (interactionEnabled && (event.key == Key.Enter || event.key == Key.NumPadEnter)) {
                         if (event.type == KeyEventType.KeyUp) submitSearch()
@@ -105,24 +109,43 @@ fun AppListScreen(
                         Column(Modifier.fillMaxWidth().combinedClickable(
                             enabled = interactionEnabled,
                             role = Role.Button, onClick = { onSelect(app) },
-                            onLongClick = if (onInfo != null || onAssignCorner != null) ({
+                            onLongClick = if (onInfo != null || onAssignCorner != null || onAddHome != null) ({
                                 focusManager.clearFocus(); keyboard?.hide(); menuApp = app
                             }) else null,
-                            onLongClickLabel = if (onInfo != null || onAssignCorner != null) "App actions" else null,
+                            onLongClickLabel = if (onInfo != null || onAssignCorner != null || onAddHome != null) "App actions" else null,
                         ).padding(vertical = 14.dp)) {
                             Text(app.label, fontSize = 22.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                             if (app.label in duplicates) Text(app.target.key, fontSize = 11.sp, maxLines = 1,
                                 overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f))
                         }
                         DropdownMenu(expanded = interactionEnabled && menuApp?.target == app.target,
-                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                            modifier = Modifier.widthIn(min = 256.dp, max = 320.dp).testTag("app-actions-menu"),
+                            shape = RoundedCornerShape(20.dp), tonalElevation = 0.dp, shadowElevation = 8.dp,
+                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.18f)),
                             onDismissRequest = { menuApp = null }) {
-                            Text(app.label, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp))
-                            if (onInfo != null) DropdownMenuItem(text = { Text("App info") }, onClick = {
+                            Column(Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
+                                SettingsDescription("App actions")
+                                Text(app.label, style = MaterialTheme.typography.titleMedium, maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
+                            }
+                            if (onAddHome != null) DropdownMenuItem(text = { Column {
+                                Text("Add to Home")
+                                if (!canAddHome) SettingsDescription("Home already has nine shortcuts")
+                            } }, enabled = canAddHome,
+                                leadingIcon = { Icon(painterResource(R.drawable.ic_material_add), null) }, onClick = {
+                                    menuApp = null; onAddHome(app)
+                                })
+                            if (onInfo != null) DropdownMenuItem(text = { Text("App info") },
+                                leadingIcon = { Icon(painterResource(R.drawable.ic_material_info), null) }, onClick = {
                                 menuApp = null; onInfo(app)
                             })
+                            if (onAssignCorner != null && (onInfo != null || onAddHome != null)) HorizontalDivider(
+                                Modifier.padding(horizontal = 12.dp, vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant)
                             if (onAssignCorner != null) CornerPosition.entries.forEach { position ->
-                                DropdownMenuItem(text = { Text("Assign to ${position.label.lowercase()} corner") }, onClick = {
+                                DropdownMenuItem(text = { Text("${position.label} quick corner") }, leadingIcon = {
+                                    Icon(painterResource(if (position == CornerPosition.LEFT) R.drawable.ic_material_south_west
+                                        else R.drawable.ic_material_south_east), null)
+                                }, onClick = {
                                     menuApp = null; onAssignCorner(app, position)
                                 })
                             }

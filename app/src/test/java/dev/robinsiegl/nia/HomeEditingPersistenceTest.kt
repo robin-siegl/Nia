@@ -66,8 +66,8 @@ class HomeEditingPersistenceTest {
             model.back()
             assertNull(model.homeDraft.value)
             assertEquals(entries, model.saved.value!!.preferences.homeShortcuts)
-            model.updatePreferences { it.copy(homeShortcuts = (1..8).map { i -> HomeShortcut("app-$i", "App $i", app = maps.target) }) }
-            await(model) { it.homeShortcuts.size == 8 }
+            model.updatePreferences { it.copy(homeShortcuts = (1..9).map { i -> HomeShortcut("app-$i", "App $i", app = maps.target) }) }
+            await(model) { it.homeShortcuts.size == 9 }
             model.editHomeShortcut()
             assertNull(model.homeDraft.value)
             model.updatePreferences { it.copy(homeShortcuts = emptyList()) }
