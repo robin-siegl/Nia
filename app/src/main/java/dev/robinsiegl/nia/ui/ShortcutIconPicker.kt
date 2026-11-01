@@ -18,6 +18,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -48,27 +49,33 @@ internal fun ShortcutIconPicker(title: String, selected: ShortcutIcon, onDismiss
     val results = remember(query, category) { IconCatalog.search(query, category) }
     val grid = rememberLazyGridState()
     val scope = rememberCoroutineScope()
-    val focus = LocalFocusManager.current
-    val keyboard = LocalSoftwareKeyboardController.current
-    val density = LocalDensity.current
-    val imeVisible = WindowInsets.ime.getBottom(density) > 0
-    fun changeQuery(value: String) {
-        query = value
-        // Search always covers the complete collection, even after browsing a category.
-        category = null
-        scope.launch { grid.scrollToItem(0) }
-    }
-    fun changeCategory(value: IconCategory?) {
-        category = value; query = ""; categoryMenu = false
-        focus.clearFocus(); keyboard?.hide()
-        scope.launch { grid.scrollToItem(0) }
-    }
-    fun choose(icon: ShortcutIcon) {
-        pending = icon
-        focus.clearFocus(); keyboard?.hide()
-    }
+    val parentFocus = LocalFocusManager.current
+    // Enter browsing without an editor behind the dialog keeping its input session active.
+    LaunchedEffect(parentFocus) { parentFocus.clearFocus() }
     Dialog(onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+        val focus = LocalFocusManager.current
+        val keyboard = LocalSoftwareKeyboardController.current
+        val density = LocalDensity.current
+        val imeVisible = WindowInsets.ime.getBottom(density) > 0
+        var searchFocused by remember { mutableStateOf(false) }
+        fun changeQuery(value: String) {
+            query = value
+            // Search always covers the complete collection, even after browsing a category.
+            category = null
+            scope.launch { grid.scrollToItem(0) }
+        }
+        fun changeCategory(value: IconCategory?) {
+            category = value; query = ""; categoryMenu = false
+            if (searchFocused) focus.clearFocus()
+            keyboard?.hide()
+            scope.launch { grid.scrollToItem(0) }
+        }
+        fun choose(icon: ShortcutIcon) {
+            pending = icon
+            if (searchFocused) focus.clearFocus()
+            keyboard?.hide()
+        }
         val dialogView = LocalView.current
         val dialogWindow = (dialogView.parent as? DialogWindowProvider)?.window
         val lightBars = MaterialTheme.colorScheme.background.luminance() > 0.5f
@@ -115,7 +122,7 @@ internal fun ShortcutIconPicker(title: String, selected: ShortcutIcon, onDismiss
                                 Icon(painterResource(R.drawable.ic_material_close), "Clear icon search")
                             }
                         }) else null,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).testTag("icon-search"))
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).onFocusChanged { searchFocused = it.isFocused }.testTag("icon-search"))
                     if (showCategories) {
                         if (compact) Row(Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(top = 8.dp),
                             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {

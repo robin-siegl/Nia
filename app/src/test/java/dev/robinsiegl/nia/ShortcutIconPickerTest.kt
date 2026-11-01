@@ -1,15 +1,19 @@
 package dev.robinsiegl.nia
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Surface
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.StateRestorationTester
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.unit.Density
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.activity.ComponentActivity
+import android.content.res.Configuration
 import dev.robinsiegl.nia.model.*
 import dev.robinsiegl.nia.theme.Palette
 import dev.robinsiegl.nia.ui.*
@@ -25,17 +29,21 @@ import java.io.File
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35], qualifiers = "w412dp-h892dp-xhdpi")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
+@OptIn(ExperimentalTestApi::class)
 class ShortcutIconPickerTest {
-    @get:Rule val rule = createComposeRule()
+    @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
     private lateinit var host: android.view.View
+    @Suppress("DEPRECATION")
     private fun render(light: Boolean = false, large: Boolean = false, content: @Composable () -> Unit) {
         val p = LauncherPreferences(themeMode = if (light) ThemeMode.LIGHT else ThemeMode.DARK)
+        if (large) {
+            val resources = rule.activity.resources
+            resources.updateConfiguration(Configuration(resources.configuration).apply { fontScale = 2f }, resources.displayMetrics)
+        }
         rule.setContent {
             host = LocalView.current
             NiaTheme(Palette.generate(p, false)) {
-                CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, if (large) 2f else 1f)) {
-                    Surface(Modifier.fillMaxSize(), content = content)
-                }
+                Surface(Modifier.fillMaxSize(), content = content)
             }
         }
     }
@@ -58,11 +66,46 @@ class ShortcutIconPickerTest {
         capture("icon-picker-dark")
         rule.onNodeWithTag("icon-search").performTextInput("controller")
         rule.onNodeWithContentDescription("Gaming").performClick().assertIsSelected()
+        rule.onNodeWithTag("icon-search").assertIsNotFocused()
         assertNull(chosen)
         capture("icon-picker-selection")
         rule.onNodeWithText("Use icon").performClick()
         assertEquals(ShortcutIcon.GAMING, chosen)
         rule.onNodeWithTag("shortcut-icon-picker").assertDoesNotExist()
+    }
+    @Test fun `opening the picker clears the underlying editor without changing its text`() {
+        var showing by mutableStateOf(false)
+        var name by mutableStateOf("")
+        render {
+            Column {
+                OutlinedTextField(name, { name = it }, modifier = Modifier.testTag("parent-name"))
+                Button(onClick = { showing = true }) { Text("Open picker") }
+            }
+            if (showing) ShortcutIconPicker("Choose icon", ShortcutIcon.STAR, { showing = false }, { showing = false })
+        }
+        rule.onNodeWithTag("parent-name").performTextInput("Maps")
+        rule.onNodeWithTag("parent-name").assertIsFocused()
+        rule.onNodeWithText("Open picker").performClick()
+        rule.onNodeWithTag("parent-name").assertIsNotFocused()
+        rule.onNodeWithTag("icon-search").assertIsNotFocused()
+        rule.onNodeWithContentDescription("Close icon picker").performClick()
+        rule.onNodeWithTag("parent-name").assertIsNotFocused()
+        assertEquals("Maps", name)
+    }
+    @Test fun `keyboard selection retains tile focus until the user confirms`() {
+        var chosen: ShortcutIcon? = null
+        render { ShortcutIconPicker("Choose icon", ShortcutIcon.CAMERA, {}, { chosen = it }) }
+        rule.onNodeWithTag("icon-search").performTextInput("controller")
+        val tile = rule.onNodeWithContentDescription("Gaming")
+        val dialogView = (tile.fetchSemanticsNode().root as ViewRootForTest).view
+        // Enable keyboard navigation in the dialog's window, rather than the editor behind it.
+        rule.runOnIdle { assertTrue(dialogView.requestFocusFromTouch()) }
+        tile.performSemanticsAction(SemanticsActions.RequestFocus) { it() }
+        tile.assertIsFocused().performKeyInput { pressKey(Key.Enter) }
+        tile.assertIsFocused().assertIsSelected()
+        assertNull(chosen)
+        rule.onNodeWithText("Use icon").performClick()
+        assertEquals(ShortcutIcon.GAMING, chosen)
     }
     @Test fun `cancel discards a preview and reopening starts from the saved choice`() {
         var chosen: ShortcutIcon? = null
