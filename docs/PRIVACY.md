@@ -14,7 +14,9 @@ Your chosen apps and commands, layout, colors, app-list preferences and unfinish
 
 Open Apps and Search apps use nia's local app list. Toggle flashlight uses Android's torch control and observes its current on/off state. It does not open the camera, capture images, request camera permission or send torch state elsewhere. Android and other apps can change or make the flashlight unavailable.
 
-Start a timer opens a compatible Clock app through Android. That app handles the duration you enter, countdown, alerts and cancellation under its own settings. nia does not run a timer in the background or record timer history. Android's normal Set alarm permission allows this handoff; nia does not request exact-alarm access or a runtime permission prompt for it.
+Set an alarm and Start a timer open a compatible Clock app through Android. Preset timer supplies the duration saved for that shortcut and starts it in Clock. That app handles timing, alerts and cancellation under its own settings. nia does not run a timer in the background or record timer history. Android's normal Set alarm permission allows this handoff; nia does not request exact-alarm access or a runtime permission prompt for it.
+
+Sound controls opens Android's volume panel or sound settings. Android handles any changes there. Toggle theme changes nia's saved Light/Dark preference only; it does not change Android's system theme. Preset durations stay in nia's local settings and explicit backups.
 
 ## Backups
 

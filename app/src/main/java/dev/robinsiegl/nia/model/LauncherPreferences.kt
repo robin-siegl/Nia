@@ -22,6 +22,7 @@ data class CornerShortcut(
     val icon: ShortcutIcon = ShortcutIcon.STAR,
     val app: AppTarget? = null,
     val command: ShortcutCommand? = null,
+    val timerMinutes: Int? = null,
 )
 
 @Serializable
@@ -42,13 +43,15 @@ data class HomeShortcut(
     val icon: ShortcutIcon = ShortcutIcon.STAR,
     val app: AppTarget? = null,
     val command: ShortcutCommand? = null,
+    val timerMinutes: Int? = null,
 )
 
 enum class HeaderTarget(val label: String) { CLOCK("Clock"), CALENDAR("Calendar") }
 
 data class HomeShortcutDraft(val shortcut: HomeShortcut, val isNew: Boolean) {
     val canSave: Boolean get() = PreferencesValidation.isHomeName(shortcut.name.trim()) &&
-        !(shortcut.app != null && shortcut.command != null) && (!isNew || shortcut.app != null || shortcut.command != null)
+        !(shortcut.app != null && shortcut.command != null) && validTimerOptions(shortcut.command, shortcut.timerMinutes) &&
+        (!isNew || shortcut.app != null || shortcut.command != null)
 }
 
 /** Only used when converting a pre-1.4 setup. New installations start with no Home shortcuts. */
@@ -103,6 +106,7 @@ object PreferencesValidation {
             require(it.id.matches(Regex("[A-Za-z0-9_-]{1,80}"))) { "The settings file contains an invalid shortcut ID." }
             require(isHomeName(it.name)) { "Shortcut names must contain 1–80 characters without line breaks." }
             require(it.app == null || it.command == null) { "Choose an app or a command for each shortcut." }
+            require(validTimerOptions(it.command, it.timerMinutes)) { "Only preset timers can have a duration, from 1 to 1,440 minutes." }
         }
         val shortcuts = listOf(preferences.leftShortcut, preferences.rightShortcut)
         shortcuts.forEach {
@@ -111,6 +115,7 @@ object PreferencesValidation {
                 ShortcutAction.APP -> it.app != null && it.command == null
                 ShortcutAction.COMMAND -> it.app == null && it.command != null
             }) { "A corner must be empty, open an app, or run a command." }
+            require(validTimerOptions(it.command, it.timerMinutes)) { "Only preset timers can have a duration, from 1 to 1,440 minutes." }
         }
         (preferences.homeShortcuts.mapNotNull { it.app } + listOfNotNull(preferences.clock, preferences.calendar) + shortcuts.mapNotNull { it.app }).forEach { target ->
             require(target.packageName.length <= 255 && packagePattern.matches(target.packageName)) {

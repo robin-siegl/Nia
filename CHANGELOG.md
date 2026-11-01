@@ -5,9 +5,10 @@
 - Replace the fading Home header with one clock/date that continuously shrinks as the shortcuts move upward. Simplify the Apps pull to a chevron and one threshold haptic, and fix the large-text list handoff.
 - Remove the automatic and sticky Apps entry. Allow up to nine editable shortcuts, each opening an app or running Open Apps, Search apps or Toggle flashlight. Commands are optional on Home and in Quick corners.
 - Add Start a timer on Home and in Quick corners. Open a compatible Clock app's timer setup through Android, leaving duration selection, timing, alerts and cancellation to that app. Handle missing apps and duplicate taps without adding a nia timer service.
+- Add Set an alarm, configurable Preset timer, Toggle theme and Sound controls to the shared command picker. Presets offer 5, 15 and 25 minutes or a custom 1–1,440 minutes, independently on Home and in either corner. Clock owns alarms/timers; Android owns sound controls. Theme toggling changes nia's Light/Dark choice without changing Android's theme.
 - Add long-press drag reordering on Home and in Settings → Home shortcuts, with local previews, edge scrolling, cancellation and keyboard/accessibility alternatives.
 - Add Add to Home to the redesigned app action menu, opening a prefilled shortcut editor. Preserve App info and Quick corner assignments.
-- Export backup schema 7 with validated command targets and continue importing schemas 1–6 without adding a new Apps shortcut. Preserve existing names, icons, targets, order and header assignments.
+- Export backup schema 8 with validated command targets and preset durations, and continue importing schemas 1–7 without adding a new Apps shortcut. Preserve existing names, icons, targets, order and header assignments.
 
 ## 1.4.0
 

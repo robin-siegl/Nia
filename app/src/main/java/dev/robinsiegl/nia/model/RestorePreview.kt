@@ -37,8 +37,8 @@ data class RestorePreview(
                 if (entry == null) return "Unavailable · ${target.key}"
                 return if (apps.count { it.label == entry.label } > 1) "${entry.label} · ${target.key}" else "${entry.label} · ${target.packageName}"
             }
-            fun actionName(target: Pair<AppTarget?, ShortcutCommand?>, empty: String): String =
-                target.second?.label ?: appName(target.first, empty)
+            fun actionName(target: Triple<AppTarget?, ShortcutCommand?, Int?>, empty: String): String =
+                target.second?.displayName(target.third) ?: appName(target.first, empty)
             val changes = buildList {
                 fun <T> change(section: String, label: String, before: T, after: T, display: (T) -> String) {
                     if (before != after) add(RestoreChange(section, label, display(before), display(after)))
@@ -58,7 +58,7 @@ data class RestorePreview(
                 val beforeHome = current.homeShortcuts.associateBy { it.id }
                 val afterHome = restored.homeShortcuts.associateBy { it.id }
                 fun describe(shortcut: HomeShortcut?) = shortcut?.let {
-                    "${it.name} · ${it.icon.label} icon · ${actionName(it.app to it.command, "Choose an action")}" } ?: "Not on Home"
+                    "${it.name} · ${it.icon.label} icon · ${actionName(Triple(it.app, it.command, it.timerMinutes), "Choose an action")}" } ?: "Not on Home"
                 (beforeHome.keys + afterHome.keys).forEach { id ->
                     val before = beforeHome[id]
                     val after = afterHome[id]
@@ -67,7 +67,8 @@ data class RestorePreview(
                     } else {
                         change("Home shortcuts", "${before.name} · Name", before.name, after.name) { it }
                         change("Home shortcuts", "${after.name} · Icon", before.icon, after.icon) { it.label }
-                        change("Home shortcuts", "${after.name} · Action", before.app to before.command, after.app to after.command) { actionName(it, "Choose an action") }
+                        change("Home shortcuts", "${after.name} · Action", Triple(before.app, before.command, before.timerMinutes),
+                            Triple(after.app, after.command, after.timerMinutes)) { actionName(it, "Choose an action") }
                     }
                 }
                 if (current.homeShortcuts.map { it.id } != restored.homeShortcuts.map { it.id }) {
@@ -79,7 +80,8 @@ data class RestorePreview(
                 CornerPosition.entries.forEach { position ->
                     val before = current.shortcut(position)
                     val after = restored.shortcut(position)
-                    change("Quick corners", "${position.label} shortcut", before.app to before.command, after.app to after.command) { actionName(it, "Empty") }
+                    change("Quick corners", "${position.label} shortcut", Triple(before.app, before.command, before.timerMinutes),
+                        Triple(after.app, after.command, after.timerMinutes)) { actionName(it, "Empty") }
                     change("Quick corners", "${position.label} icon", before.icon, after.icon) { it.label }
                 }
             }

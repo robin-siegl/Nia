@@ -1,6 +1,7 @@
 package dev.robinsiegl.nia
 
 import android.app.Application
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.SystemClock
 import androidx.lifecycle.AndroidViewModel
@@ -138,7 +139,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
 
     fun chooseHomeApp(app: AppEntry) {
         if (_navigation.value.screen != Screen.HomeShortcutPicker || _homeDraft.value == null) return
-        updateHomeDraft { it.copy(app = app.target, command = null, name = it.name.ifBlank { app.label.take(MAX_HOME_NAME_LENGTH).trim().filterNot(Char::isISOControl) }) }
+        updateHomeDraft { it.copy(app = app.target, command = null, timerMinutes = null, name = it.name.ifBlank { app.label.take(MAX_HOME_NAME_LENGTH).trim().filterNot(Char::isISOControl) }) }
         back()
     }
 
@@ -205,12 +206,12 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun chooseCornerApp(position: CornerPosition, target: AppTarget) = selectApp { p ->
-        p.withShortcut(position, p.shortcut(position).copy(action = ShortcutAction.APP, app = target, command = null))
+        p.withShortcut(position, p.shortcut(position).copy(action = ShortcutAction.APP, app = target, command = null, timerMinutes = null))
     }
 
     fun assignCornerFromApps(position: CornerPosition, app: AppEntry) = perform("The shortcut could not be saved.") {
         store.update { state -> state.copy(preferences = state.preferences.withShortcut(position,
-            state.preferences.shortcut(position).copy(action = ShortcutAction.APP, app = app.target, command = null))) }
+            state.preferences.shortcut(position).copy(action = ShortcutAction.APP, app = app.target, command = null, timerMinutes = null))) }
         events.send("${app.label} assigned to the ${position.label.lowercase()} corner.")
     }
 
@@ -218,7 +219,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         val shortcut = _saved.value?.preferences?.shortcut(position) ?: return
         when (shortcut.action) {
             ShortcutAction.EMPTY -> Unit
-            ShortcutAction.COMMAND -> shortcut.command?.let(::runCommand)
+            ShortcutAction.COMMAND -> shortcut.command?.let { runCommand(it, shortcut.timerMinutes) }
             ShortcutAction.APP -> launch {
                 try { repository.launch(requireNotNull(shortcut.app)); home() }
                 catch (_: RuntimeException) {
@@ -236,7 +237,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
 
     fun openHomeShortcut(id: String) {
         val shortcut = _saved.value?.preferences?.homeShortcuts?.find { it.id == id } ?: return
-        shortcut.command?.let { command -> runCommand(command); return }
+        shortcut.command?.let { command -> runCommand(command, shortcut.timerMinutes); return }
         val target = shortcut.app
         if (target == null) { editHomeShortcut(id); return }
         launch { try { repository.launch(target); home() }
@@ -247,16 +248,20 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         } }
     }
 
-    private fun runCommand(command: ShortcutCommand) {
+    private fun runCommand(command: ShortcutCommand, timerMinutes: Int?) {
         when (command) {
             ShortcutCommand.OPEN_APPS -> openApps()
             ShortcutCommand.SEARCH_APPS -> openApps(search = true)
-            ShortcutCommand.START_TIMER -> launch {
-                try { repository.startTimer(); home() }
-                catch (_: RuntimeException) {
-                    launchGate.reset()
-                    events.trySend("No timer app could be opened. Install or enable a Clock app and try again.")
-                }
+            ShortcutCommand.START_TIMER, ShortcutCommand.PRESET_TIMER -> launchCommand(
+                "No timer app could be opened. Install or enable a Clock app and try again.") {
+                repository.startTimer(if (command == ShortcutCommand.PRESET_TIMER) requireNotNull(timerMinutes) else null)
+            }
+            ShortcutCommand.SET_ALARM -> launchCommand("No alarm app could be opened. Install or enable a Clock app and try again.", repository::setAlarm)
+            ShortcutCommand.SOUND_CONTROLS -> launchCommand("Sound controls could not be opened on this device.", repository::openSoundControls)
+            ShortcutCommand.TOGGLE_THEME -> {
+                val systemDark = getApplication<Application>().resources.configuration.uiMode and
+                    Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+                updatePreferences { it.copy(themeMode = it.themeMode.toggled(systemDark)) }
             }
             ShortcutCommand.FLASHLIGHT -> perform("The flashlight is unavailable right now.") {
                 when (flashlight.value.toggle()) {
@@ -266,6 +271,11 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
                 }
             }
         }
+    }
+
+    private fun launchCommand(error: String, action: () -> Unit) = launch {
+        try { action(); home() }
+        catch (_: RuntimeException) { launchGate.reset(); events.trySend(error) }
     }
 
     override fun onCleared() {

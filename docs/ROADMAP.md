@@ -13,7 +13,7 @@ Version 1.4.0 is published. Prepare this Home interaction and command update as 
 | Arrangement | Long-press drag on Home and in Settings → Home shortcuts, edge scrolling for long lists, and accessible alternatives |
 | Home content | Zero to nine editable app/command shortcuts; no automatic, reserved or sticky Apps entry |
 | App menu | Add to Home with a prefilled editor, App info and either Quick corner |
-| Commands | Optional Open Apps, Search apps, Toggle flashlight and Start a timer on Home or in a Quick corner |
+| Commands | Optional Open Apps, Search apps, Toggle flashlight, Start a timer, Set an alarm, Preset timer, Toggle theme and Sound controls on Home or in a Quick corner |
 
 ### Opening Apps from Home
 
@@ -31,13 +31,13 @@ Keep one saved order across layouts. Preview a drag locally, save one validated 
 
 App-list Add to Home opens a draft with the app already assigned. Save applies the shortcut; Back discards it. Names and outline icons remain independent of the chosen app or command. The shared picker includes 193 bundled Material Symbols.
 
-Commands are a typed allowlist, not arbitrary intents or scripts. Open Apps follows the normal keyboard preference; Search apps overrides it for that opening only. Toggle flashlight uses Android's public torch API and actual torch callbacks, handles unavailable hardware/camera resources and adds no camera permission or camera session. Start a timer hands duration selection and all timer behavior to a compatible Clock app through Android's timer action; nia adds no timer service. Extra commands such as an appearance switch can be considered after feedback.
+Commands are a typed allowlist, not arbitrary intents or scripts. Open Apps follows the normal keyboard preference; Search apps overrides it for that opening only. Toggle flashlight uses Android's public torch API and actual torch callbacks, handles unavailable hardware/camera resources and adds no camera permission or camera session. Start a timer hands duration selection and all timer behavior to a compatible Clock app through Android's timer action; nia adds no timer service. Set an alarm uses Clock's editor. Preset timers start a saved 1–1,440-minute duration in Clock, with shared 5/15/25-minute choices and a custom field. Toggle theme flips nia's visible Light/Dark choice and overrides System until Appearance selects it again. Sound controls opens Android's volume panel, falling back to sound settings if needed.
 
 ### Compatibility
 
 Existing names, icons, app assignments, order, header targets and Quick corners survive the update. Removing the previously implicit Apps entry must not synthesize a new configured command. Fresh setup may leave Home empty; explain swipe-up during setup.
 
-Schema **7** adds command targets. Continue importing schemas **1–6**, including legacy Home and Settings-corner migrations, while rejecting command fields disguised as old schemas. Restore previews describe actual app/command changes and list only the configured order. Appearance reset preserves shortcut content; full reset returns to optional setup.
+Schema **8** adds command targets and preset durations. Continue importing schemas **1–7**, including legacy Home and Settings-corner migrations, while rejecting command fields disguised as old schemas. Restore previews describe actual app/command changes and list only the configured order. Appearance reset preserves shortcut content; full reset returns to optional setup.
 
 ### Before publication
 
@@ -50,6 +50,7 @@ Run the automated checks and inspect native light/dark, intermediate-scroll and 
 - Add to Home from filtered Apps, draft cancellation, full-Home feedback, command changes and search focus only after settling.
 - Flashlight toggling, changes from Quick Settings, a busy camera, unavailable hardware and normal callback cleanup.
 - Start a timer from Home and both corners, choose a duration in Clock, return to nia and verify that Clock rings and cancels normally. Check missing/disabled timer apps and retry without a blocked shortcut.
+- Set an alarm in Clock, run independent preset timers, cancel duration edits, toggle nia's theme from System/Light/Dark and change volume through Android's panel. Check persistence, restore previews, large text and keyboard insets.
 - Unlock, Battery Saver, Quick Settings interruption, Android Home and ordinary app returns without replaying unlock effects.
 
 Keep physical-phone results separate from Robolectric simulations. The [design](DESIGN.md) and [architecture](ARCHITECTURE.md) guides own lasting product and implementation rules.

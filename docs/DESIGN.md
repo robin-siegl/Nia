@@ -33,7 +33,9 @@ Keep the rest of Home open. Folders, widgets, badges and feeds remain outside th
 
 Swipe up and an optional Open Apps command open the same drawer. Search apps opens it with search focused after settling. Expose Open Apps through Home accessibility actions when no visible command is configured. Pulling down dismisses it only when its list is already at the top. Back dismisses the keyboard before closing Apps; Android Home returns to a clean Home without an old query or keyboard. App selectors keep selection simple; app action menus belong in the full app list.
 
-Start a timer opens a compatible Clock app's timer setup. Let the user choose the duration and manage the timer there; keep nia free of a second timer interface, countdown or alarm service. Use the same command picker and editable outline icon on Home and in Quick corners.
+Set an alarm and Start a timer open a compatible Clock app's setup. Preset timer starts a saved duration in Clock and shows its UI. Share one full-screen duration picker between Home and Quick corners, with 5/15/25-minute choices and custom whole minutes from 1 to 1,440. Apply only through Use duration or the keyboard's Done action; Cancel leaves the shortcut unchanged. Keep custom names/icons, updating a generated preset name when its duration changes. Clock owns countdowns, ringing and cancellation.
+
+Toggle theme switches nia to the opposite visible Light/Dark theme. Explain that this overrides System; users can select System again in Appearance. Preserve the seed color and pure-black setting. Sound controls opens Android's volume panel, with Android sound settings as a fallback. Keep these commands in the same picker and leave system controls to Android.
 
 ## Color and typography
 
@@ -124,7 +126,7 @@ Provide at least 48dp touch targets, meaningful spoken labels for icon-only acti
 
 Review real Compose renders in monochrome and color light/dark themes, plus a narrow screen with large text. Use the [device checklist](DEVICE_TESTING.md) for TalkBack, keyboard and system gestures. Do not present a mockup or native test render as a physical-phone result.
 
-Reference captures: [nine-entry grid](screenshots/home-nine-grid.png), [large-text list](screenshots/home-nine-list-large.png), [header mid-scroll](screenshots/home-scroll-mid.png), [drag preview](screenshots/home-drag-preview.png), [Home shortcut editor](screenshots/home-shortcut-editor.png), [command picker](screenshots/shortcut-command-picker.png), [Settings](screenshots/settings-overview.png), [app actions](screenshots/app-actions.png), [icon picker](screenshots/shortcut-icons.png), [light picker](screenshots/icon-picker-light.png), [large-text picker](screenshots/icon-picker-large-text.png) and [restore preview](screenshots/restore-preview.png).
+Reference captures: [nine-entry grid](screenshots/home-nine-grid.png), [large-text list](screenshots/home-nine-list-large.png), [header mid-scroll](screenshots/home-scroll-mid.png), [drag preview](screenshots/home-drag-preview.png), [Home shortcut editor](screenshots/home-shortcut-editor.png), [command picker](screenshots/shortcut-command-picker.png), [timer duration](screenshots/timer-duration-picker.png), [Settings](screenshots/settings-overview.png), [app actions](screenshots/app-actions.png), [icon picker](screenshots/shortcut-icons.png), [light picker](screenshots/icon-picker-light.png), [large-text picker](screenshots/icon-picker-large-text.png) and [restore preview](screenshots/restore-preview.png).
 
 ### Android guidance
 

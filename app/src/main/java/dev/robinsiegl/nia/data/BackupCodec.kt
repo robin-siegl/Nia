@@ -21,7 +21,7 @@ class BackupException(message: String) : IllegalArgumentException(message)
 
 object BackupCodec {
     const val MAX_BYTES = 256 * 1024
-    private const val CURRENT_VERSION = 7
+    private const val CURRENT_VERSION = 8
     val json = Json { encodeDefaults = true; prettyPrint = true; explicitNulls = false }
 
     fun export(preferences: LauncherPreferences, exportedAt: String = Instant.now().toString()): ByteArray {
@@ -45,7 +45,9 @@ object BackupCodec {
             if (root["profile"]?.jsonPrimitive?.content != "personal") {
                 throw BackupException("This version of nia supports personal-profile backups only.")
             }
+            validateTimerTypes(root.getValue("settings").jsonObject)
             if (version <= 6) validateLegacyTargets(root.getValue("settings").jsonObject)
+            if (version <= 7) validateLegacyTimerOptions(root.getValue("settings").jsonObject)
             val compatible = if (version <= 5) JsonObject(root + ("settings" to migrateHome(migrateSettings(root.getValue("settings").jsonObject)))) else root
             val backup = json.decodeFromJsonElement<SettingsBackup>(compatible)
             PreferencesValidation.validate(backup.settings)
@@ -61,6 +63,7 @@ object BackupCodec {
     fun decodeState(text: String): SavedState {
         val root = json.parseToJsonElement(text).jsonObject
         val preferences = root["preferences"]?.jsonObject ?: JsonObject(emptyMap())
+        validateTimerTypes(preferences)
         val migrated = migrateSettings(preferences).let { if ("homeShortcuts" in it) it else migrateHome(it) }
         val compatible = JsonObject(root + ("preferences" to migrated))
         return json.decodeFromJsonElement(compatible)
@@ -86,6 +89,23 @@ object BackupCodec {
                 require("command" !in corner && corner["action"]?.jsonPrimitive?.content != "COMMAND")
             }
         }
+    }
+
+    private fun validateLegacyTimerOptions(settings: JsonObject) {
+        settings["homeShortcuts"]?.jsonArray?.forEach { require("timerMinutes" !in it.jsonObject) }
+        listOf("leftShortcut", "rightShortcut").forEach { key ->
+            settings[key]?.jsonObject?.let { require("timerMinutes" !in it) }
+        }
+    }
+
+    private fun validateTimerTypes(settings: JsonObject) {
+        fun check(shortcut: JsonObject) {
+            shortcut["timerMinutes"]?.takeIf { it != JsonNull }?.jsonPrimitive?.let {
+                require(!it.isString && it.intOrNull != null)
+            }
+        }
+        settings["homeShortcuts"]?.jsonArray?.forEach { check(it.jsonObject) }
+        listOf("leftShortcut", "rightShortcut").forEach { key -> settings[key]?.jsonObject?.let(::check) }
     }
 
     private fun migrateSettings(settings: JsonObject): JsonObject = JsonObject(settings.mapValues { (key, value) ->

@@ -40,7 +40,7 @@ internal fun HomeAppsSettings(
                         preferences.motionMode == MotionMode.REDUCED, onEdit = { onEdit(shortcut.id) })
                         .testTag("home-editor-row-${shortcut.id}"), verticalAlignment = Alignment.CenterVertically) {
                         SettingsAction(shortcut.name, apps.find { it.target == shortcut.app }?.label ?:
-                            shortcut.command?.label ?: if (shortcut.app == null) "Choose an action" else "App unavailable", { onEdit(shortcut.id) },
+                            shortcut.command?.displayName(shortcut.timerMinutes) ?: if (shortcut.app == null) "Choose an action" else "App unavailable", { onEdit(shortcut.id) },
                             modifier = Modifier.weight(1f), enabled = reorder.draggingId == null, showChevron = false,
                             leading = { ShortcutGlyph(shortcut.icon, Modifier.size(24.dp)) })
                         Box {
@@ -73,6 +73,7 @@ internal fun HomeShortcutEditorScreen(
 ) {
     var choosingIcon by rememberSaveable { mutableStateOf(false) }
     var choosingCommand by rememberSaveable { mutableStateOf(false) }
+    var choosingDuration by rememberSaveable { mutableStateOf(false) }
     var removing by rememberSaveable { mutableStateOf(false) }
     BackHandler { if (!saving) onBack() }
     val shortcut = draft.shortcut
@@ -84,6 +85,8 @@ internal fun HomeShortcutEditorScreen(
         if (shortcut.command != null) SettingsAction("Command", shortcut.command.label, { choosingCommand = true }, enabled = !saving)
         else SettingsAction("Opens", apps.find { it.target == shortcut.app }?.label ?:
             if (shortcut.app == null) "Choose an app" else "App unavailable", onChooseApp, enabled = !saving)
+        if (shortcut.command == ShortcutCommand.PRESET_TIMER) SettingsAction("Duration", timerDurationDescription(shortcut.timerMinutes ?: DEFAULT_TIMER_MINUTES),
+            { choosingDuration = true }, enabled = !saving)
         SectionLabel("On Home")
         OutlinedTextField(value = shortcut.name, onValueChange = { value ->
             if (value.length <= MAX_HOME_NAME_LENGTH && value.none { it.isISOControl() }) onChange { it.copy(name = value) }
@@ -98,9 +101,12 @@ internal fun HomeShortcutEditorScreen(
             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Remove from Home") }
     }
     if (choosingCommand) ShortcutCommandPicker(shortcut.command, { choosingCommand = false }) { command ->
-        onChange { it.copy(app = null, command = command,
-            name = it.name.ifBlank { command.defaultName }, icon = if (it.name.isBlank()) command.icon else it.icon) }
+        onChange { it.withCommand(command) }
         choosingCommand = false
+    }
+    if (choosingDuration && shortcut.command == ShortcutCommand.PRESET_TIMER) TimerDurationPicker(
+        shortcut.timerMinutes ?: DEFAULT_TIMER_MINUTES, { choosingDuration = false }) { minutes ->
+        onChange { it.withTimerDuration(minutes) }; choosingDuration = false
     }
     if (choosingIcon) ShortcutIconPicker("Shortcut icon", shortcut.icon, { choosingIcon = false }) { icon ->
         onChange { it.copy(icon = icon) }; choosingIcon = false

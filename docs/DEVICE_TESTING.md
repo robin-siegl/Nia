@@ -73,6 +73,9 @@ The primary phone is reported to run Android 17. Record what is actually install
 - Open Apps and Search apps from Home and both corners. Search apps focuses only after settling and does not change Keyboard on open. A later ordinary opening follows the saved preference.
 - Toggle flashlight repeatedly and change its state through Quick Settings between taps. Test a busy camera, absent flash and process/activity recreation. Report unavailable hardware without crashing; add no camera permission prompt or camera session.
 - Start a timer from Home and either Quick corner. Open the Clock app's duration entry without a preset or automatic countdown, choose a duration there, then return Home. Let Clock ring and cancel the timer there, including after nia is stopped. Try multiple compatible Clock apps, a disabled/missing handler and an immediate retry after failure. Keep existing assignments and show a useful error if no app can open. No exact-alarm access or runtime permission prompt should appear in nia.
+- Set an alarm from Home and both corners: Clock shows time entry, with no preset alarm time. Start several preset timers using 5/15/25 minutes and custom values, including 1 minute and 24 hours. Verify each corner's independent duration, cancellation in the shared picker, and Clock's timer alerts after nia is stopped.
+- Toggle nia's theme from System in both Android light/dark modes, then repeat from explicit Light/Dark. Preserve the seed and pure-black setting, persist through restart and reselect System in Appearance. Android's theme must stay unchanged.
+- Open Sound controls and change volume in Android's panel, then return to nia. Check the sound-settings fallback where the panel is unavailable, and a useful error plus immediate retry if both cannot open.
 - Export and restore mixed app/command shortcuts and corners. Preview command changes, preserve names/icons/order, and reject unknown command IDs, simultaneous app/command targets and command fields disguised as old schema versions.
 
 ## Icon picker
@@ -87,7 +90,7 @@ The primary phone is reported to run Android 17. Record what is actually install
 
 - Reboot and force-stop/reopen nia. Verify layout, text size, app choices, corners, animations, colors and app-list preferences persist.
 - Save a backup, change settings, then restore it. Preview each changed current/backup value and omit unchanged entries. Cancel first and confirm nothing changes; reopen and apply.
-- Import supported schema 1–7 backups. Check defaults for older fields, Settings-corner migration and current exports with custom corners and Reduced animations.
+- Import supported schema 1–8 backups. Check that schema 7 commands still import without preset parameters and that duration-only changes appear in the restore preview. Check defaults for older fields, Settings-corner migration and current exports with custom corners and Reduced animations.
 - Cancel file selection. Try malformed, oversized, unsupported-version and unsupported-profile files. Keep existing settings intact.
 - Restore a backup containing unavailable apps. List the affected assignments and clear only those targets while retaining Home names/icons/order and restoring valid settings.
 - Remove an app while its restore preview is open. Restore must refresh the preview and require another review. Rapid duplicate Restore taps must not apply twice.
