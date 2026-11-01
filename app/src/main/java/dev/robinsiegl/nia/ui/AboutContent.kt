@@ -25,12 +25,15 @@ internal object ProjectLinks {
 
 @Composable
 internal fun AboutContent(onOpenLink: (String) -> Unit, updateCheck: UpdateCheck = UpdateCheck.Idle,
-    onCheckUpdates: () -> Unit = {}) {
-    Text("nia", fontSize = 48.sp, fontWeight = FontWeight.Light)
+    onCheckUpdates: () -> Unit = {}, installedVersion: String = BuildConfig.VERSION_NAME) {
+    val devBuild = installedVersion.substringAfter('-', "").startsWith("dev")
+    Text(if (devBuild) "nia Dev" else "nia", fontSize = 48.sp, fontWeight = FontWeight.Light)
     Text("A quieter way home.", fontSize = 20.sp, modifier = Modifier.padding(top = 4.dp))
-    Text("Version ${BuildConfig.VERSION_NAME}", fontSize = 14.sp, modifier = Modifier.padding(top = 16.dp))
+    Text("Version $installedVersion", fontSize = 14.sp, modifier = Modifier.padding(top = 16.dp))
+    if (devBuild) SettingsDescription("Dev builds come from GitHub Actions. Public releases install separately as nia.",
+        Modifier.padding(top = 12.dp))
     SectionLabel("Updates")
-    UpdateContent(updateCheck, onCheckUpdates, onOpenLink)
+    UpdateContent(updateCheck, onCheckUpdates, onOpenLink, installedVersion)
     SectionLabel("Privacy")
     Text("No accounts, ads or analytics.", fontSize = 16.sp)
     SettingsDescription("Your app list and preferences stay on your device. You choose where to save backup files.",
@@ -58,6 +61,7 @@ internal fun UpdateContent(state: UpdateCheck, onCheck: () -> Unit, onOpenLink: 
             val local = ReleaseVersion.parse(installedVersion.removeSuffix("-debug"))
             val latest = state.release
             Text(when {
+                installedVersion.substringAfter('-', "").startsWith("dev") -> "Latest public release: ${latest.version}. You’re using a dev build."
                 local == null -> "Latest release: ${latest.version}"
                 latest.version > local -> "Update available: ${latest.version}"
                 latest.version == local -> "You’re up to date. Latest release: ${latest.version}"

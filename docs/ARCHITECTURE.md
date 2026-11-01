@@ -152,7 +152,15 @@ The Pixel clock/weather component is not a supported public launcher widget: `Sm
 
 Follow [CONTRIBUTING.md](../CONTRIBUTING.md) for commands and [DEVICE_TESTING.md](DEVICE_TESTING.md) for device checks. Use pure model tests for search, validation and state rules, and native Compose interaction tests for UI behavior. Keep fixed-clock pointer regressions for Home input recovery and inject motion duration scale into Compose's test effect context when exercising animation settings.
 
-The standard CI jobs are Unit and UI tests, Android lint and Debug APK. Production adds version validation, a minified signed release, signature verification and optional publication. `gradle.properties` owns the version; see [Releasing](RELEASING.md#version-policy). Preserve application IDs, signing identity, migrations and license assets unless a change explicitly requires otherwise.
+The standard CI jobs are Unit and UI tests, Android lint, Debug APK and Dev APK validation. The last builds/lints an unsigned optimized dev variant without signing secrets. Production adds version validation, a minified signed release, signature verification and optional publication. `gradle.properties` owns the version; see [Releasing](RELEASING.md#version-policy). Preserve application IDs, signing identity, migrations and license assets unless a change explicitly requires otherwise.
+
+### Dev downloads
+
+The manual Dev APK workflow pins the selected branch's source commit, reuses CI checks, restores the existing signing secrets and builds `dev`. This build type inherits release optimization and signing, with a `.dev` application ID and `nia Dev` label. Android isolates its settings from production; explicit settings backups can transfer configuration.
+
+`dev_build.py` reuses production's version/code validation without its publication/tag gate. It requires a manual dispatch from a repository branch, verifies the checked-out commit and derives a dev-only run/attempt/commit suffix. The base Android code stays committed, allowing repeated builds at the same code. Production still requires `main` and an unreleased version.
+
+The packaging step verifies the APK's app ID, version/code, label, non-debuggable flag and signature before assembling a fresh artifact directory. It records only public build provenance and checksums. Upload follows successful checks and keystore cleanup; downloads expire after 30 days. No release/tag write permission is granted. About distinguishes this channel from public release downloads. See [Dev APK](RELEASING.md#trigger-a-dev-build) for usage and device checks.
 
 ### Primary references
 

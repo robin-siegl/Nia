@@ -91,6 +91,8 @@ Keep the overview short and show useful current choices. Group related controls 
 
 Keep product copy calm and useful. Avoid blame, urgency, engagement prompts and promises about behavior the app cannot verify. Error messages should explain the next available action without hiding Home or Apps.
 
+Dev installations use the **nia Dev** app label and About heading. Show the version's build identity in About for issue reports, and explain that public update downloads install as regular nia. Keep development details out of the normal Home and production About experience.
+
 ## Motion and input
 
 Animate transitions to explain where content moves. Keep Home mounted beneath the Apps drawer and keep the clock/date stationary during shortcut reveals.

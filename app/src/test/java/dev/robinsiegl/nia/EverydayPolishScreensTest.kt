@@ -51,6 +51,7 @@ class EverydayPolishScreensTest {
         File("build/reports/screenshots/$name.png").apply { parentFile?.mkdirs() }.outputStream().use {
             bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
         }
+        bitmap
     }
 
     @Test fun `long press offers app actions without launching or opening info immediately`() {
@@ -106,6 +107,48 @@ class EverydayPolishScreensTest {
         rule.onNodeWithText("You’re up to date. Latest release: 1.3.0").assertIsDisplayed()
         rule.onNodeWithText("Download 1.3.0 APK").assertDoesNotExist()
         rule.onNodeWithText("View release on GitHub").assertIsDisplayed()
+    }
+
+    @Test fun `About identifies dev builds and keeps public downloads separate from the dev channel`() {
+        var checks = 0
+        var opened: String? = null
+        render { SettingsLayout("About nia", {}) {
+            AboutContent({ opened = it }, UpdateCheck.Result(release), { checks++ }, "1.5.0-dev.42.1+aaaaaaa")
+        } }
+        rule.onNodeWithText("nia Dev").assertIsDisplayed()
+        rule.onNodeWithText("Version 1.5.0-dev.42.1+aaaaaaa").assertIsDisplayed()
+        rule.onNodeWithText("Dev builds come from GitHub Actions. Public releases install separately as nia.").assertIsDisplayed()
+        rule.onNodeWithText("Latest public release: 1.3.0. You’re using a dev build.").assertIsDisplayed()
+        rule.onNodeWithText("You’re up to date", substring = true).assertDoesNotExist()
+        assertEquals(0, checks)
+        capture("about-dev")
+        rule.onNodeWithText("Download 1.3.0 APK").performScrollTo().performClick()
+        assertEquals(release.apkUrl, opened)
+        rule.onNodeWithText("Check again").performScrollTo().performClick()
+        assertEquals(1, checks)
+    }
+
+    @Test @Config(qualifiers = "w320dp-h600dp-xhdpi")
+    fun `dev identity and update controls remain accessible in a light theme at large text`() {
+        var checks = 0
+        render {
+            val density = LocalDensity.current
+            CompositionLocalProvider(LocalDensity provides Density(density.density, 2f)) {
+                NiaTheme(Palette.generate(LauncherPreferences(themeMode = ThemeMode.LIGHT), false)) {
+                    Surface(Modifier.fillMaxSize()) {
+                        SettingsLayout("About nia", {}) {
+                            AboutContent({}, onCheckUpdates = { checks++ }, installedVersion = "1.5.0-dev.42.1+aaaaaaa")
+                        }
+                    }
+                }
+            }
+        }
+        rule.onNodeWithText("nia Dev").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithText("Version 1.5.0-dev.42.1+aaaaaaa").performScrollTo().assertIsDisplayed()
+        val image = capture("about-dev-large-light")
+        assertEquals(android.graphics.Color.WHITE, image.getPixel(image.width - 10, image.height / 2))
+        rule.onNodeWithText("Check for updates").performScrollTo().assertIsDisplayed().performClick()
+        assertEquals(1, checks)
     }
 
     @Test fun `failed check offers retry and a browser fallback`() {

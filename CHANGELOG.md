@@ -2,6 +2,7 @@
 
 ## 1.5.0 (unreleased)
 
+- Add a manual Dev APK action with branch selection, a separate nia Dev installation, stable signing and production-style optimization. Verify checks, app identity and signature before offering a 30-day download with checksum and source/build information. Repeated dev builds retain the committed base version and create no release or tag.
 - Replace the fading Home header with one clock/date that continuously shrinks as the shortcuts move upward. Simplify the Apps pull to a chevron and one threshold haptic, and fix the large-text list handoff.
 - Remove the automatic and sticky Apps entry. Allow up to nine editable shortcuts, each opening an app or running Open Apps, Search apps or Toggle flashlight. Commands are optional on Home and in Quick corners.
 - Add Start a timer on Home and in Quick corners. Open a compatible Clock app's timer setup through Android, leaving duration selection, timing, alerts and cancellation to that app. Handle missing apps and duplicate taps without adding a nia timer service.

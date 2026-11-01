@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Restore the four Android signing secrets used by the production workflow."""
+"""Restore the four Android signing secrets used by signed APK workflows."""
 import base64
 import binascii
 import os
@@ -39,7 +39,7 @@ def main():
         output.write("NIA_KEYSTORE_PATH=" + str(path) + "\n")
         for secret_name, variable in SIGNING_FIELDS.items():
             output.write(variable + "=" + os.environ[secret_name] + "\n")
-    print("Release signing configured.")
+    print("APK signing configured.")
 
 
 if __name__ == "__main__":

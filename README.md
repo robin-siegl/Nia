@@ -84,6 +84,8 @@ Home, search, settings and backups work offline. nia has no accounts, ads or ana
 
 nia is built with Kotlin and Jetpack Compose. Start with [Contributing](CONTRIBUTING.md) for local builds and checks, [Releasing](docs/RELEASING.md) to create a signed APK through GitHub Actions, or the [roadmap](docs/ROADMAP.md) for future work.
 
+To test changes without a local build, run **[Actions → Dev APK](https://github.com/robin-siegl/Nia/actions/workflows/dev.yml)**, choose a branch and download the APK bundle from the successful run. **nia Dev** installs alongside nia with its own settings. See the [dev build instructions](docs/RELEASING.md#trigger-a-dev-build).
+
 The [design guide](docs/DESIGN.md) describes nia's visual and interaction principles. The [architecture guide](docs/ARCHITECTURE.md) explains its state, data and Android integration. Coding-agent instructions and development skills start in [AGENTS.md](AGENTS.md).
 
 A source license has not yet been specified. Dependencies, bundled fonts and Material Symbols retain their own licenses; see [third-party notices](THIRD_PARTY_NOTICES.md).

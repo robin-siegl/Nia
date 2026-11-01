@@ -1,0 +1,84 @@
+name: Dev APK
+run-name: "nia Dev from ${{ github.ref_name }} (#${{ github.run_number }}.${{ github.run_attempt }})"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nia-dev-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  metadata:
+    name: Identify dev build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.metadata.outputs.version }}
+      build_id: ${{ steps.metadata.outputs.build_id }}
+      commit_short: ${{ steps.metadata.outputs.commit_short }}
+      artifact_name: ${{ steps.metadata.outputs.artifact_name }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+      - name: Read the committed version and source
+        id: metadata
+        run: python3 scripts/dev_build.py metadata
+
+  checks:
+    name: Dev checks
+    needs: metadata
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    name: Signed dev APK
+    needs: [metadata, checks]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      NIA_DEV_BUILD_ID: ${{ needs.metadata.outputs.build_id }}
+      NIA_DEV_COMMIT: ${{ needs.metadata.outputs.commit_short }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 12700392
+          log-accepted-android-sdk-licenses: false
+          packages: platform-tools platforms;android-36 build-tools;36.0.0
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Configure APK signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: python3 scripts/prepare_signing.py
+      - name: Build and lint nia Dev
+        run: ./gradlew :app:assembleDev :app:lintDev --stacktrace
+      - name: Verify APK identity and signature
+        run: python3 scripts/dev_build.py package
+      - name: Remove temporary signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/nia-release.p12"
+      - name: Upload dev download
+        id: download
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ needs.metadata.outputs.artifact_name }}
+          path: dist/dev/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Download instructions
+        env:
+          NIA_DEV_ARTIFACT_URL: ${{ steps.download.outputs.artifact-url }}
+        run: python3 scripts/dev_build.py summary

@@ -1,13 +1,14 @@
 # Releasing nia
 
-The **Production APK** GitHub Action builds the version committed in `gradle.properties`. It produces a signed APK and checksum, with optional publication as a GitHub release.
+Use **Dev APK** to test a branch through a downloadable build, or **Production APK** to prepare a public release. Both use the base version committed in `gradle.properties` and the same existing signing secrets.
 
-If nia's four signing secrets are already configured, go straight to [Trigger a production build](#trigger-a-production-build). No local Android build or manual Git tag is needed.
+If nia's four signing secrets are already configured, go straight to [Trigger a dev build](#trigger-a-dev-build) or [Trigger a production build](#trigger-a-production-build). No local Android build or manual Git tag is needed.
 
 ## Contents
 
 - [One-time signing setup](#one-time-signing-setup)
 - [Version policy](#version-policy)
+- [Trigger a dev build](#trigger-a-dev-build)
 - [Trigger a production build](#trigger-a-production-build)
 - [Local signed release](#local-signed-release)
 - [Before publishing](#before-publishing)
@@ -90,6 +91,40 @@ python3 scripts/release_version.py
 
 The validator checks the version/code pair and rejects versions at or below the latest stable `vMAJOR.MINOR.PATCH` tag. It does not edit files or bump anything. The production workflow also requires `main`. See [AGENTS.md](../AGENTS.md) for the agent workflow.
 
+Dev builds validate the same committed version/code pair but allow any branch in this repository and versions that have already been released. Running or retrying a dev build never changes `gradle.properties` or advances the release version.
+
+## Trigger a dev build
+
+1. Push the changes you want to test to a branch in this repository.
+2. Open **[Actions → Dev APK → Run workflow](https://github.com/robin-siegl/Nia/actions/workflows/dev.yml)** and select that branch.
+3. Select **Run workflow**. Tests, lint and build validation run before the signed download is prepared.
+4. After the run succeeds, use **Download the APK bundle** in its summary, or select the `nia-VERSION-dev-RUN.ATTEMPT-COMMIT` entry under **Artifacts**.
+5. Extract the ZIP on your phone and install the APK. Select **nia Dev** as your Home app while testing; select **nia** again to return to the regular launcher.
+
+You must be signed into GitHub to download an artifact. Downloads expire after **30 days**. This workflow creates neither a tag nor a GitHub release, and its token has read-only repository access. Branch selection becomes available once the workflow is on `main`; choose a branch that contains the dev workflow and build configuration.
+
+### Installation and settings
+
+**nia Dev** uses `dev.robinsiegl.nia.dev`, so it can sit alongside the normal launcher. Its settings and setup progress are independent. Export a backup from nia and import it into nia Dev to copy your current layout, colors and assignments. Changing the default Home app does not uninstall either app.
+
+Each dev download uses the existing signing secrets, so a newer dev APK updates the same installation and retains its settings. The app inherits production minification/resource shrinking and is not debuggable. CI validates an unsigned dev package; the manual workflow is the signed download channel.
+
+For example, a base version of `1.5.0`, workflow run `42`, attempt `1` and commit `aea9190` produce:
+
+- APK: `nia-1.5.0-dev-42.1-aea9190.apk`
+- Installed version/About: `1.5.0-dev.42.1+aea9190`
+- Android version code: `1005000`, taken from Gradle.
+
+Repeat builds can update the same Android version code. A branch with a lower base code cannot replace a newer dev installation; see Troubleshooting below. The production version keeps its exact committed name and code.
+
+### Download contents and verification
+
+The bundle contains the signed APK, `SHA256SUMS.txt` and `BUILD_INFO.json`. Build information records the app/version, full source commit, branch, workflow run, APK checksum and public signing-certificate fingerprint. It contains no keystore or signing credentials.
+
+Before upload, the workflow verifies the signature and rejects an APK with the wrong app ID, version, label or debuggable flag. The summary links directly to that run's artifact and source commit. About identifies dev builds and explains that its update links point to public production releases.
+
+See the [native About example](screenshots/about-dev.png) for the dev identity and update wording.
+
 ## Trigger a production build
 
 1. Commit the prepared version and changes to `main`.
@@ -126,6 +161,8 @@ Keep the application ID and production key stable. Debug APKs have a separate ID
 - **Wrong password or alias:** Use credentials from the same keystore. The alias need not match the app name.
 - **No public download:** Enable **publish_release**, wait for success, then open Releases. Artifact-only builds appear in the workflow run.
 - **Version already exists or is too old:** Prepare a newer version and matching code, commit it to `main`, and rerun. Existing tags are never replaced.
+- **Older dev APK will not install:** Android blocks a lower version code. Use a branch with the same or newer base version, or uninstall only nia Dev after exporting its settings, then install and restore. Regular nia is a separate installation.
+- **Dev download expired:** Run Dev APK again for a new 30-day artifact. Dev builds can reuse an already-released base version.
 - **Code mismatch:** Apply the formula in the version policy and update both properties together.
 - **Failure before tag creation:** Fix the failure and retry the same prepared version if no tag was created.
 - **Tag created but publication failed:** Use that run's verified APK/checksum artifact to finish publishing the existing tag. Keep it on its original commit; do not rebuild a different APK under that version.
