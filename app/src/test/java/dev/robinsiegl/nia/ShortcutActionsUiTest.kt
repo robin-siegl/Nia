@@ -95,6 +95,22 @@ class ShortcutActionsUiTest {
         assertEquals(original, draft.shortcut)
         rule.onNodeWithText("Opens").assertIsDisplayed()
     }
+    @Test fun `a new timer shortcut uses the shared command picker and keeps its default name and icon`() {
+        var draft by mutableStateOf(HomeShortcutDraft(HomeShortcut("timer", ""), true))
+        var saved: HomeShortcut? = null
+        render(light = true) { HomeShortcutEditorScreen(draft, emptyList(), false,
+            { draft = draft.copy(shortcut = it(draft.shortcut)) }, {}, { saved = draft.shortcut }, {}, {}) }
+        rule.onNodeWithText("Command").performClick()
+        rule.onNodeWithText("Start a timer").performScrollTo().performClick()
+        assertNull(saved)
+        assertEquals(ShortcutCommand.START_TIMER, draft.shortcut.command)
+        assertEquals("Timer", draft.shortcut.name)
+        assertEquals(ShortcutIcon.TIMER, draft.shortcut.icon)
+        assertNull(draft.shortcut.app)
+        capture("timer-shortcut-editor")
+        rule.onNodeWithText("Save").performScrollTo().performClick()
+        assertEquals(draft.shortcut, saved)
+    }
     @Test fun `Quick corners can choose the same commands and icon picker without changing Home`() {
         val home = listOf(HomeShortcut("notes", "Notes", app = notes.target))
         var p by mutableStateOf(LauncherPreferences(homeShortcuts = home))
@@ -126,8 +142,8 @@ class ShortcutActionsUiTest {
             ShortcutCommandPicker(ShortcutCommand.OPEN_APPS, {}, { chosen = it })
         }
         rule.onNode(hasText("Open Apps") and isSelectable()).assertIsSelected()
-        rule.onNodeWithText("Toggle flashlight").performScrollTo().assertIsDisplayed().performClick()
-        assertEquals(ShortcutCommand.FLASHLIGHT, chosen)
+        rule.onNodeWithText("Start a timer").performScrollTo().assertIsDisplayed().performClick()
+        assertEquals(ShortcutCommand.START_TIMER, chosen)
         capture("shortcut-command-picker-large")
     }
 }

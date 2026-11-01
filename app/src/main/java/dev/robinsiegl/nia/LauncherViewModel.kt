@@ -251,6 +251,13 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         when (command) {
             ShortcutCommand.OPEN_APPS -> openApps()
             ShortcutCommand.SEARCH_APPS -> openApps(search = true)
+            ShortcutCommand.START_TIMER -> launch {
+                try { repository.startTimer(); home() }
+                catch (_: RuntimeException) {
+                    launchGate.reset()
+                    events.trySend("No timer app could be opened. Install or enable a Clock app and try again.")
+                }
+            }
             ShortcutCommand.FLASHLIGHT -> perform("The flashlight is unavailable right now.") {
                 when (flashlight.value.toggle()) {
                     FlashlightResult.CHANGED -> Unit
