@@ -29,7 +29,7 @@ Choose from **193 Material Symbols** with searchable names, keywords and categor
 
 ## All your apps, a swipe away
 
-Swipe up to open an alphabetical list of app names. When your shortcuts fit, the clock shrinks and Apps appears together. Long lists first shrink the header and scroll through your shortcuts before handing off to Apps. A small chevron and one light haptic mark the deliberate pull. The icon grid stays on one screen. Search by name, initials or words in any order, or enable A–Z navigation to jump through the list.
+Swipe up to open an alphabetical list of app names. When your shortcuts fit, the clock shrinks as Apps appears, then expands again as you return Home. Long lists first shrink the header and scroll through your shortcuts before handing off to Apps. A small chevron and one light haptic mark the deliberate pull. The icon grid stays on one screen. Search by name, initials or words in any order, or enable A–Z navigation to jump through the list.
 
 You can have the keyboard open automatically when Apps is ready. Prefer a visible shortcut? Add **Open Apps** or **Search apps** wherever you want; neither is added automatically. When a search finds just one app, press Enter to open it. Touch and hold an app name to add it to Home, open App info or assign it to a Quick corner.
 

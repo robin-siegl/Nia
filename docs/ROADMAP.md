@@ -6,7 +6,7 @@ Home content belongs to the user. Keep customization simple, preserve existing c
 
 Version 1.5.0 is published. Prepare the fitting-Home gesture fix as **1.5.1 / 1005001**. Publish only when the user requests it after validation.
 
-Make grids, short lists and empty Home reveal Apps at the same time as the header contracts. Preserve the header/list/pull sequence for overflowing Home, choosing it once per gesture. Cancel restores the previous fitting-Home offset; settled opening retains compaction. Validate actual pointer input, reversals, layout/Home resets and Reduced/disabled animations before testing on the Pixel.
+Make grids, short lists and empty Home reveal Apps at the same time as the header contracts. Preserve the header/list/pull sequence for overflowing Home, choosing it once per gesture. Cancel and returning from Apps restore the previous fitting-Home header and offset; overflowing Home keeps its scroll position. Validate actual pointer input, reversals, layout/Home resets and Reduced/disabled animations before testing on the Pixel.
 
 ## Home interaction rules
 
@@ -25,7 +25,7 @@ Make grids, short lists and empty Home reveal Apps at the same time as the heade
 2. A long list then scrolls its configured entries. An optional Apps command is an ordinary entry and scrolls with everything else; it may be renamed, moved or removed.
 3. For overflowing Home, dragging beyond the end begins the resisted drawer preview. Fitting Home uses that preview from its first upward drag. Show only a small chevron. Crossing the 112dp threshold gives one light haptic and arms opening; reversing below 72% disarms without another cue.
 4. Release armed to open. Release early, reverse or cancel to close the preview. Momentum alone cannot arm or open Apps. A configured Open Apps command opens directly; Search apps additionally focuses search after settling.
-5. Closing Apps preserves the Home position. Android Home and a new unlock restore the expanded header before the shortcut reveal. Keep unlock behavior separate from scroll-driven header movement.
+5. Closing Apps re-expands the header for fitting Home and preserves the scroll/header position for overflowing Home. Android Home and a new unlock restore the expanded header before the shortcut reveal. Keep unlock behavior separate from scroll-driven header movement.
 
 The grid remains three columns and at most three rows, with no extra page or independent grid scroll. Header contraction moves it as a unit. The list scrolls every configured entry. Both layouts support an empty Home and expose Open Apps as an accessibility action, alongside swipe-up.
 

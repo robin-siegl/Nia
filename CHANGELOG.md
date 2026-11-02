@@ -2,7 +2,7 @@
 
 ## 1.5.1 (unreleased)
 
-- Reveal Apps while the clock/date header shrinks when Home fits, removing the header-only stage in grids, short lists and empty Home. Reverse or cancel smoothly without changing the original Home position; successful opening keeps the compact header.
+- Reveal Apps while the clock/date header shrinks when Home fits, removing the header-only stage in grids, short lists and empty Home. Reverse or cancel smoothly without changing the original Home position, and expand the header again when returning from Apps.
 - Preserve header-first scrolling for overflowing lists and keep that sequence fixed throughout each gesture, including when contraction removes the overflow. Retain distance-based opening, one haptic cue, reordering and reduced/disabled-animation input recovery.
 
 ## 1.5.0

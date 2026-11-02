@@ -16,10 +16,9 @@ internal class HomeHeaderScroll {
     fun fractionWithPull(pullFraction: Float): Float =
         if (pulling) fraction + (1f - fraction) * pullFraction.coerceIn(0f, 1f) else fraction
 
-    /** Save compaction on opening; cancellation returns to the unchanged scroll offset. */
+    /** Keep fitting Home coupled while Apps is open so dismissal expands it along the same path. */
     fun finishPull(open: Boolean) {
-        if (pulling && open) offset = range
-        pulling = false
+        if (!open) pulling = false
     }
 
     fun updateRange(value: Float) { range = value.coerceAtLeast(0f); offset = offset.coerceIn(0f, range) }

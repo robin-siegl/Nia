@@ -109,8 +109,9 @@ class FittingHomeGestureTest {
     @Test fun `a fitting list does the same through child scrolling at large text in light mode`() =
         assertReversal(HomeLayout.LIST, large = true, light = true)
 
-    private fun assertOpen(layout: HomeLayout) {
-        render(layout)
+    private fun assertOpen(layout: HomeLayout, large: Boolean = false, light: Boolean = false,
+        motion: MotionMode = MotionMode.SYSTEM) {
+        render(layout, large = large, light = light, motion = motion)
         val first = entry().fetchSemanticsNode().boundsInRoot
         val clock = rule.onNodeWithTag("home-clock").fetchSemanticsNode().boundsInRoot
         partial(); assertConcurrent()
@@ -123,18 +124,70 @@ class FittingHomeGestureTest {
         rule.mainClock.advanceTimeBy(500)
         assertTrue(open); assertEquals(1f, progress(), 0f); assertEquals(1f, header(), 0f)
         rule.onNodeWithText("Back").performClick()
+        if (scale.scaleFactor > 0f) {
+            rule.mainClock.advanceTimeBy(if (motion == MotionMode.REDUCED) 64 else 128)
+            assertTrue("Header did not expand with drawer dismissal", header() > 0f && header() < 1f)
+            capture("home-fit-${layout.name.lowercase()}-return${if (light) "-light" else ""}${if (motion == MotionMode.REDUCED) "-reduced" else ""}")
+        }
         rule.mainClock.advanceTimeBy(500)
         assertFalse(open)
-        assertEquals(1f, header(), 0f)
-        assertTrue(entry().fetchSemanticsNode().boundsInRoot.top < first.top)
-        assertTrue(rule.onNodeWithTag("home-clock").fetchSemanticsNode().boundsInRoot.width < clock.width)
+        assertEquals(0f, header(), 0f)
+        assertEquals(first, entry().fetchSemanticsNode().boundsInRoot)
+        assertEquals(clock, rule.onNodeWithTag("home-clock").fetchSemanticsNode().boundsInRoot)
         rule.onAllNodesWithTag("home-clock").assertCountEquals(1)
         rule.onAllNodesWithTag("home-date").assertCountEquals(1)
         entry().performTouchInput { click() }
         assertEquals(1, launches)
     }
-    @Test fun `armed grid release commits compact Home and closing Apps retains its position`() = assertOpen(HomeLayout.GRID)
-    @Test fun `armed list release commits compact Home and closing Apps retains its position`() = assertOpen(HomeLayout.LIST)
+    @Test fun `returning from Apps re-expands a fitting grid and restores its original positions`() = assertOpen(HomeLayout.GRID)
+    @Test fun `returning from Apps re-expands a fitting list and restores its original positions`() = assertOpen(HomeLayout.LIST)
+    @Test fun `returning restores the large-text fitting list in a light theme`() = assertOpen(HomeLayout.LIST, large = true, light = true)
+    @Test fun `reduced motion re-expands fitting Home and releases input`() = assertOpen(HomeLayout.GRID, motion = MotionMode.REDUCED)
+    @Test fun `disabled animations restore fitting Home immediately after returning`() {
+        scale.scaleFactor = 0f
+        assertOpen(HomeLayout.LIST)
+    }
+
+    private fun dismissBySwipe(layout: HomeLayout, cancelDismissal: Boolean) {
+        render(layout)
+        val first = entry().fetchSemanticsNode().boundsInRoot
+        root().performTouchInput { swipeUp() }
+        rule.mainClock.advanceTimeBy(500)
+        assertTrue(open); assertEquals(1f, header(), 0f)
+        val title = rule.onNodeWithText("Apps").fetchSemanticsNode().boundsInRoot.center
+        val height = root().fetchSemanticsNode().boundsInRoot.height
+        root().performTouchInput { down(title); moveBy(Offset(0f, height * 0.85f), 400) }
+        rule.mainClock.advanceTimeBy(32)
+        assertTrue("Header stayed compact during swipe-down dismissal", header() > 0f && header() < 1f)
+        if (cancelDismissal) {
+            root().performTouchInput { cancel() }
+            rule.mainClock.advanceTimeBy(500)
+            assertTrue(open); assertEquals(1f, header(), 0f)
+            rule.onNodeWithText("Back").performClick()
+        } else root().performTouchInput { up() }
+        rule.mainClock.advanceTimeBy(500)
+        assertFalse(open); assertEquals(0f, header(), 0f)
+        assertEquals(first, entry().fetchSemanticsNode().boundsInRoot)
+        assertEquals(listOf(PullCue.ARMED), cues)
+        entry().performTouchInput { click() }; assertEquals(1, launches)
+    }
+    @Test fun `swiping Apps down re-expands fitting Home with the same transition`() = dismissBySwipe(HomeLayout.GRID, cancelDismissal = false)
+    @Test fun `canceling a dismissal keeps the list header coupled for the next return`() = dismissBySwipe(HomeLayout.LIST, cancelDismissal = true)
+
+    @Test fun `an empty Home re-expands and can open Apps again without a clock tick`() {
+        render(HomeLayout.LIST, count = 0)
+        val clock = rule.onNodeWithTag("home-clock").fetchSemanticsNode().boundsInRoot
+        root().performTouchInput { swipeUp() }
+        rule.mainClock.advanceTimeBy(500)
+        assertTrue(open)
+        rule.onNodeWithText("Back").performClick()
+        rule.mainClock.advanceTimeBy(500)
+        assertEquals(0f, header(), 0f)
+        assertEquals(clock, rule.onNodeWithTag("home-clock").fetchSemanticsNode().boundsInRoot)
+        rule.openAppsFromHome()
+        rule.mainClock.advanceTimeBy(500)
+        assertTrue(open)
+    }
 
     @Test fun `canceling an armed grid pull restores the header through intermediate animation frames`() {
         render(HomeLayout.GRID)
