@@ -2,14 +2,18 @@
 
 Home content belongs to the user. Keep customization simple, preserve existing choices and keep the full app list quiet. These are priorities, not promised release dates.
 
-## 1.5.0 in preparation
+## 1.5.1 in preparation
 
-Version 1.4.0 is published. Prepare this Home interaction and command update as **1.5.0 / 1005000**. Publish only when the user requests it after validation.
+Version 1.5.0 is published. Prepare the fitting-Home gesture fix as **1.5.1 / 1005001**. Publish only when the user requests it after validation.
 
-| Area | Intended result |
+Make grids, short lists and empty Home reveal Apps at the same time as the header contracts. Preserve the header/list/pull sequence for overflowing Home, choosing it once per gesture. Cancel and returning from Apps restore the previous fitting-Home header and offset; overflowing Home keeps its scroll position. Validate actual pointer input, reversals, layout/Home resets and Reduced/disabled animations before testing on the Pixel.
+
+## Home interaction rules
+
+| Area | Expected behavior |
 | --- | --- |
 | Home motion | One clock/date continuously shrinks while the shortcuts move upward in grid and list |
-| Apps gesture | Header movement, then list scrolling, then a deliberate pull; no instruction text or progress ring, and one threshold haptic |
+| Apps gesture | Fitting Home contracts its header with the Apps pull; overflowing Home contracts, scrolls, then pulls; one threshold haptic |
 | Arrangement | Long-press drag on Home and in Settings → Home shortcuts, edge scrolling for long lists, and accessible alternatives |
 | Home content | Zero to nine editable app/command shortcuts; no automatic, reserved or sticky Apps entry |
 | App menu | Add to Home with a prefilled editor, App info and either Quick corner |
@@ -17,11 +21,11 @@ Version 1.4.0 is published. Prepare this Home interaction and command update as 
 
 ### Opening Apps from Home
 
-1. Start with the expanded header. An upward drag consumes its height change and moves the shortcuts upward by the same amount. Draw the same clock/date throughout; do not crossfade a second header into place.
+1. At the start of a swipe, check whether Home needs scrolling. When it fits, contract the header and begin revealing Apps together. When it overflows, consume the header's height change first. Draw the same clock/date throughout and move shortcuts with its height; do not crossfade a second header into place.
 2. A long list then scrolls its configured entries. An optional Apps command is an ordinary entry and scrolls with everything else; it may be renamed, moved or removed.
-3. Dragging beyond the end begins the resisted drawer preview. Show only a small chevron. Crossing the 112dp threshold gives one light haptic and arms opening; reversing below 72% disarms without another cue.
+3. For overflowing Home, dragging beyond the end begins the resisted drawer preview. Fitting Home uses that preview from its first upward drag. Show only a small chevron. Crossing the 112dp threshold gives one light haptic and arms opening; reversing below 72% disarms without another cue.
 4. Release armed to open. Release early, reverse or cancel to close the preview. Momentum alone cannot arm or open Apps. A configured Open Apps command opens directly; Search apps additionally focuses search after settling.
-5. Closing Apps preserves the Home position. Android Home and a new unlock restore the expanded header before the shortcut reveal. Keep unlock behavior separate from scroll-driven header movement.
+5. Closing Apps re-expands the header for fitting Home and preserves the scroll/header position for overflowing Home. Android Home and a new unlock restore the expanded header before the shortcut reveal. Keep unlock behavior separate from scroll-driven header movement.
 
 The grid remains three columns and at most three rows, with no extra page or independent grid scroll. Header contraction moves it as a unit. The list scrolls every configured entry. Both layouts support an empty Home and expose Open Apps as an accessibility action, alongside swipe-up.
 
@@ -37,7 +41,7 @@ Commands are a typed allowlist, not arbitrary intents or scripts. Open Apps foll
 
 Existing names, icons, app assignments, order, header targets and Quick corners survive the update. Removing the previously implicit Apps entry must not synthesize a new configured command. Fresh setup may leave Home empty; explain swipe-up during setup.
 
-Schema **8** adds command targets and preset durations. Continue importing schemas **1–7**, including legacy Home and Settings-corner migrations, while rejecting command fields disguised as old schemas. Restore previews describe actual app/command changes and list only the configured order. Appearance reset preserves shortcut content; full reset returns to optional setup.
+Continue exporting schema **8** and importing schemas **1–8**, including legacy Home and Settings-corner migrations, while rejecting command fields disguised as old schemas. Restore previews describe actual app/command changes and list only the configured order. Appearance reset preserves shortcut content; full reset returns to optional setup.
 
 ### Before publication
 
@@ -45,7 +49,8 @@ Use the manual [Dev APK action](RELEASING.md#trigger-a-dev-build) for signed bra
 
 Run the automated checks and inspect native light/dark, intermediate-scroll and large-text renders. Then complete the relevant [Pixel checklist](DEVICE_TESTING.md), recording the actual OS build:
 
-- Signed upgrade from 1.4.x, restart, old/current backup restores and an intentionally empty Home.
+- Signed upgrade from 1.5.0 and older 1.4.x, restart, old/current backup restores and an intentionally empty Home.
+- Short swipes in grids, fitting lists and empty Home: Apps and the header move together before compaction completes. Reverse/cancel, check restored positions and tap immediately afterward.
 - Zero, one and nine entries in both layouts, both clock styles, maximum text/display scaling, commands and both corners.
 - The reported eight-app-plus-optional-Apps-command list case: scroll all entries, continue into the drawer, reverse/cancel and repeat with haptics off or animations disabled.
 - Real drags across grid rows, list and Settings edge scrolling, canceled drags, accessible arrangement and immediate taps/swipes afterward.

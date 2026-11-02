@@ -1,6 +1,11 @@
 # Changelog
 
-## 1.5.0 (unreleased)
+## 1.5.1 (unreleased)
+
+- Reveal Apps while the clock/date header shrinks when Home fits, removing the header-only stage in grids, short lists and empty Home. Reverse or cancel smoothly without changing the original Home position, and expand the header again when returning from Apps.
+- Preserve header-first scrolling for overflowing lists and keep that sequence fixed throughout each gesture, including when contraction removes the overflow. Retain distance-based opening, one haptic cue, reordering and reduced/disabled-animation input recovery.
+
+## 1.5.0
 
 - Add a manual Dev APK action with branch selection, a separate nia Dev installation, stable signing and production-style optimization. Verify checks, app identity and signature before offering a 30-day download with checksum and source/build information. Repeated dev builds retain the committed base version and create no release or tag.
 - Replace the fading Home header with one clock/date that continuously shrinks as the shortcuts move upward. Simplify the Apps pull to a chevron and one threshold haptic, and fix the large-text list handoff.

@@ -26,6 +26,8 @@ The primary phone is reported to run Android 17. Record what is actually install
 
 ## Installation, setup and Home
 
+- On fitting grids, short lists and empty Home, start a small upward swipe: Apps must appear while the header is still shrinking. Test swipes from shortcuts, the clock and empty space; reverse/cancel and verify the original header/shortcut positions and immediate taps. Open Apps fully, return by Back or swipe-down and check that the header expands again. Cancel a dismissal, then return once more.
+- On overflowing lists, verify header-first contraction, scrolling through every entry, then the Apps pull. Include a list whose small overflow disappears while the header contracts: that gesture must keep its original sequence, while the next swipe uses the current viewport.
 - Install and open nia. Complete setup, choose nia in Android's Home dialog, and verify the Home gesture returns to it.
 - Test all four setup stages, Back, Skip setup, Restore and All apps. Your shortcuts can skip to an empty Home, without inserting the old five categories. Select an app mid-setup, close/reopen nia, and check the stage and assignments remain.
 - Change the default launcher from nia Settings, both when nia is default and when it is not. The system chooser must remain available.

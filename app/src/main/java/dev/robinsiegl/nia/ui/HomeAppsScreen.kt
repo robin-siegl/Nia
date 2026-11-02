@@ -52,11 +52,13 @@ private class PointerTermination {
     var active = false
     var releasedNormally = false
     var startedOpen = false
+    var homeFits = true
 }
 
 internal val DrawerProgress = SemanticsPropertyKey<Float>("DrawerProgress")
 internal val AppsPullArmed = SemanticsPropertyKey<Boolean>("AppsPullArmed")
 internal val DrawerSettling = SemanticsPropertyKey<Boolean>("DrawerSettling")
+internal val HomeHeaderProgress = SemanticsPropertyKey<Float>("HomeHeaderProgress")
 
 internal fun drawerShouldOpen(progress: Float, velocityY: Float, velocityThreshold: Float): Boolean = when {
     velocityY < -velocityThreshold -> true
@@ -138,6 +140,8 @@ internal fun HomeAppsScreen(
     // Reset before the first unlock/Home frame; keep the offset while Apps is temporarily on top.
     val homeScroll = key(homeRequest, unlockRequest) { rememberScrollState() }
     val homeHeader = key(homeRequest, unlockRequest) { remember { HomeHeaderScroll() } }
+    val homeScrollNow by rememberUpdatedState(homeScroll)
+    val layoutNow by rememberUpdatedState(preferences.layout)
     val view = LocalView.current
     val cueNow by rememberUpdatedState(onPullCue)
     val externalOpen by rememberUpdatedState(drawerOpen)
@@ -155,7 +159,10 @@ internal fun HomeAppsScreen(
     var travel by remember { mutableFloatStateOf(1f) }
     val keyboard = LocalSoftwareKeyboardController.current
     val focus = LocalFocusManager.current
-    fun moved(open: Boolean) { if (externalOpen != open) onChanged(open) }
+    fun moved(open: Boolean) {
+        homeHeader.finishPull(open)
+        if (externalOpen != open) onChanged(open)
+    }
     fun request(open: Boolean) {
         if (!open) { focus.clearFocus(); keyboard?.hide() }
         pull.reset()
@@ -165,6 +172,7 @@ internal fun HomeAppsScreen(
         if (!state.dragging) { focus.clearFocus(); keyboard?.hide() }
         if (!externalOpen && !state.targetOpen) {
             if (!state.dragging && delta >= 0f) return 0f
+            if (pointer.homeFits) homeHeader.beginPull()
             val consumed = pull.drag(delta, pullThreshold) { cue ->
                 cueNow?.invoke(cue)
                 view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
@@ -175,6 +183,7 @@ internal fun HomeAppsScreen(
         return state.drag(delta, travel)
     }
     fun dragHome(delta: Float): Float {
+        if (pointer.homeFits && (delta < 0f || state.dragging)) return drag(delta)
         var remaining = delta
         if (pull.active) remaining -= drag(remaining)
         if (preferences.layout == HomeLayout.LIST && remaining > 0 && homeScroll.value > 0) {
@@ -196,18 +205,18 @@ internal fun HomeAppsScreen(
     LaunchedEffect(drawerOpen) {
         if (drawerOpen != state.targetOpen) {
             if (drawerOpen) request(true)
-            else { focus.clearFocus(); keyboard?.hide(); pull.reset(); state.snapClosed() }
+            else { focus.clearFocus(); keyboard?.hide(); pull.reset(); homeHeader.finishPull(false); state.snapClosed() }
         }
     }
     var handledHome by remember { mutableIntStateOf(homeRequest) }
     LaunchedEffect(deviceLocked, unlockRequest) {
         if (deviceLocked || unlockRequest?.pending == true) {
-            focus.clearFocus(); keyboard?.hide(); pull.reset(); state.snapClosed(); moved(false)
+            focus.clearFocus(); keyboard?.hide(); pull.reset(); homeHeader.finishPull(false); state.snapClosed(); moved(false)
         }
     }
     LaunchedEffect(homeRequest) {
         if (handledHome != homeRequest) {
-            handledHome = homeRequest; focus.clearFocus(); keyboard?.hide(); pull.reset(); state.snapClosed(); moved(false)
+            handledHome = homeRequest; focus.clearFocus(); keyboard?.hide(); pull.reset(); homeHeader.finishPull(false); state.snapClosed(); moved(false)
         }
     }
     val connection = remember(state, listState, homeHeader, homeScroll, pullThreshold, velocityThreshold) {
@@ -215,6 +224,9 @@ internal fun HomeAppsScreen(
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 if (state.settling || lockedNow || reorderingNow) return Offset.Zero
                 if (!externalOpen && !state.targetOpen && !state.dragging) {
+                    if (source == NestedScrollSource.UserInput && pointer.active && pointer.homeFits && available.y < 0f) {
+                        return Offset(0f, drag(available.y))
+                    }
                     if (available.y < 0 || homeScroll.value == 0) return Offset(0f, homeHeader.consume(available.y))
                 }
                 if (source == NestedScrollSource.UserInput && pointer.active &&
@@ -245,6 +257,8 @@ internal fun HomeAppsScreen(
     val showDrawer by remember { derivedStateOf { state.progress > 0f || state.settling } }
     val homeReady = atHome && !deviceLocked && shortcutsReady
     val appsReady = atApps && !deviceLocked
+    // Read the projection in composition so cancel/settle frames update Home without a clock tick.
+    val headerProgress = homeHeader.fractionWithPull(state.progress / AppsPull.ARMED_PREVIEW)
     val homeDrag = rememberDraggableState { dragHome(it) }
     val headerDrag = rememberDraggableState { drag(it) }
     BackHandler(enabled = showDrawer && !appsReady) { request(false) }
@@ -255,6 +269,8 @@ internal fun HomeAppsScreen(
                 pointer.active = true
                 pointer.releasedNormally = false
                 pointer.startedOpen = externalOpen
+                // Keep the route for the whole gesture: contraction can remove list overflow.
+                pointer.homeFits = layoutNow == HomeLayout.GRID || homeScrollNow.maxValue == 0
                 try {
                     do {
                         // Observe termination before draggable/scrollable handles the same up event.
@@ -275,6 +291,7 @@ internal fun HomeAppsScreen(
         this[AppsPullArmed] = pull.armed
         this[DrawerProgress] = state.progress
         this[DrawerSettling] = state.settling
+        this[HomeHeaderProgress] = headerProgress
         customActions = if (homeReady && !reordering) listOf(
             CustomAccessibilityAction("Open Apps") { request(true); true },
             CustomAccessibilityAction("Open nia settings") { onSettings(); true },
@@ -298,7 +315,7 @@ internal fun HomeAppsScreen(
                 onRevealReady = { shortcutsReady = it }, revealAllowed = revealAllowed,
                 shortcuts = preferences.homeShortcuts, onDate = onDate, scroll = homeScroll,
                 gesturesEnabled = !state.settling && !externalOpen && !deviceLocked && shortcutsReady,
-                headerCollapse = homeHeader.fraction, onHeaderRange = homeHeader::updateRange,
+                headerCollapse = headerProgress, onHeaderRange = homeHeader::updateRange,
                 onReorder = onReorderHome, onReorderActive = { reordering = it }, onEditShortcut = onEditHome)
         }
         if (showDrawer || drawerOpen) {

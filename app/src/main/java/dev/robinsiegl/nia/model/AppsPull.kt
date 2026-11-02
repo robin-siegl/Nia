@@ -7,12 +7,16 @@ internal enum class PullCue { ARMED }
 /** Direct finger distance only. Momentum never calls this state machine. */
 @Stable
 internal class AppsPull {
+    companion object {
+        private const val PREVIEW_LIMIT = 0.6f
+        const val ARMED_PREVIEW = PREVIEW_LIMIT / 2f
+    }
     var distance by mutableFloatStateOf(0f)
         private set
     var armed by mutableStateOf(false)
         private set
     val active: Boolean get() = distance > 0f
-    val preview: Float get() = 0.6f * distance / (threshold + distance)
+    val preview: Float get() = PREVIEW_LIMIT * distance / (threshold + distance)
     private var threshold = 1f
     private var announcedArm = false
 
