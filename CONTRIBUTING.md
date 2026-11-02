@@ -8,6 +8,12 @@ Read the [design guide](docs/DESIGN.md) and [architecture guide](docs/ARCHITECTU
 
 A source license has not yet been selected. This guide describes the development workflow; it does not grant additional rights to the source. Preserve third-party copyright and license notices.
 
+## Report a bug or suggest a feature
+
+Search existing [issues](https://github.com/robin-siegl/Nia/issues) first, then choose **Bug report** or **Feature request** when opening an issue. For bugs, include your nia version or APK filename, build type, phone/Android version, steps and expected/actual behavior. Add layout, text size, Battery Saver or wake/unlock details when they seem relevant. Screenshots and logs are optional; remove personal information before posting.
+
+For ideas, explain the task or frustration and the behavior you would like. Check the [roadmap](docs/ROADMAP.md) for current priorities. The issue chooser also links to installation and usage help. The forms become available after they are merged onto the default branch.
+
 ## Local setup
 
 Install a full **JDK 17**, **Android SDK Platform 36** and **Build Tools 36.0.0**, through Android Studio or `sdkmanager`. Set `ANDROID_HOME`, or create an untracked `local.properties` containing `sdk.dir` for your SDK location.
@@ -89,8 +95,33 @@ This validates the version; it does not bump it. GitHub's production workflow bu
 
 ## Prepare a review
 
+Work on a branch and open a pull request against `main`. Keep it up to date with `main`, let all required checks pass and resolve review conversations before merging. A second person's approval is optional so the solo maintainer can merge their own changes.
+
 Explain the problem, resulting behavior and checks performed. Include a native screenshot for visible changes and note any remaining device-specific validation. Keep unrelated formatting and dependency updates separate.
 
 Update the guide that owns a changed rule or boundary, then link to it from other docs. Add current decisions to the design or architecture guide; use the changelog for release history. Keep upstream license files intact.
 
 Never commit keystores, passwords, local SDK paths or build outputs. Publishing an APK is a separate, manually triggered step described in [Releasing](docs/RELEASING.md).
+
+## Main branch protection
+
+[main.json](.github/rulesets/main.json) defines the **Protect main** branch ruleset:
+
+| Rule | Requirement |
+| --- | --- |
+| Target | Exactly `main`; active enforcement |
+| Changes | Pull requests with all review conversations resolved; zero required approving reviews |
+| Checks | Unit and UI tests, Android lint, Debug APK and Dev APK validation, from GitHub Actions |
+| Freshness | Branch must be up to date with `main` before merging |
+| History | Force pushes and branch deletion blocked |
+| Bypasses | None; maintainers and admins use the same PR workflow |
+
+The JSON is a reusable configuration, not automatic enforcement. A repository admin must create the live rule in GitHub's repository **Settings → Rulesets**, importing this file or applying the same options. Check for an existing **Protect main** rule before creating one; update it rather than adding a duplicate.
+
+Alternatively, an admin with an already-authorized GitHub CLI session can create the rule from a checkout:
+
+```sh
+gh api --method POST repos/robin-siegl/Nia/rulesets --input .github/rulesets/main.json
+```
+
+Verify that the live rule is **Active**, targets `main` and lists all four required checks. If a CI job name changes, update both this configuration and the live rule so merging does not wait for a check that no longer exists. The standard Checks workflow runs on every pull request, including documentation changes. Leave Production APK and Dev APK publication workflows outside the required-check list because they are manually triggered.

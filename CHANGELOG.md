@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.3 (unreleased)
+
+- Add guided bug reports and feature requests, with links to installation and usage help.
+- Define main-branch protection requiring pull requests, the four GitHub Actions checks, an up-to-date branch and resolved review conversations. Include a reusable ruleset configuration and admin setup instructions, with force pushes and branch deletion blocked and no review-approval requirement for the solo maintainer.
+
 ## 1.5.2 (unreleased)
 
 - Adopt the approved two-part lowercase n mark, with a matching outlined wordmark and a reusable brand kit containing SVG masters, light/dark artwork, transparent PNGs, app-icon exports and usage guidance.

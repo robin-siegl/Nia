@@ -1,0 +1,71 @@
+name: Bug report
+description: Report something in nia that is not working as expected.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve nia. Please check existing issues before reporting a bug.
+        Issues are public, so remove personal information from screenshots and logs.
+  - type: input
+    id: version
+    attributes:
+      label: nia version
+      description: Find it in Settings → About nia, or paste the APK filename. Write “unknown” if you cannot check.
+      placeholder: 1.5.3, or the full dev APK filename
+    validations:
+      required: true
+  - type: dropdown
+    id: build
+    attributes:
+      label: Build type
+      options:
+        - GitHub release (nia)
+        - Dev APK (nia Dev)
+        - Local or debug build
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Phone and Android version
+      placeholder: Pixel 10 Pro, Android 17
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What did you do before the problem appeared? Mention if it happens only sometimes.
+      placeholder: |
+        1. Open…
+        2. Swipe or tap…
+        3. The problem appears when…
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened?
+      placeholder: Describe what you saw, including any error message.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      placeholder: Describe how you expected nia to behave.
+    validations:
+      required: true
+  - type: textarea
+    id: conditions
+    attributes:
+      label: Relevant settings or conditions
+      description: Optional. Include anything that seems related; you do not need to check every setting.
+      placeholder: Grid or list layout, text/display size, Battery Saver, animation settings, or how you woke and unlocked the phone.
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Screenshots, recordings or logs
+      description: Optional. Attach files here and remove personal information first.
