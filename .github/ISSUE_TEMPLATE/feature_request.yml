@@ -1,0 +1,30 @@
+name: Feature request
+description: Suggest an improvement to nia's everyday experience.
+labels: [feature]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        nia aims to make everyday tasks easy to reach while reducing visual clutter.
+        Please check existing issues and the [roadmap](https://github.com/robin-siegl/Nia/blob/main/docs/ROADMAP.md) before suggesting a change.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would this help you do?
+      description: Describe the task or frustration, with an example of when it happens.
+      placeholder: When I…, I would like to…
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: How should it work?
+      description: Describe the behavior you would like to see.
+      placeholder: I would expect nia to…
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Alternatives or examples
+      description: Optional. Add other approaches, sketches or examples that help explain the idea. Remove personal information from attachments.

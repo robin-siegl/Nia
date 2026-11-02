@@ -2,15 +2,15 @@
 
 nia is a Kotlin/Jetpack Compose Android launcher. Follow these instructions for changes anywhere in this repository.
 
-## Active release: 1.5.2
+## Active release: 1.5.3
 
-Version 1.5.1 has been published. Prepare the approved branding and app-icon update as **1.5.2 / 1005002**. Keep that version through this change set; do not publish or trigger Production APK until the user requests it. See the [1.5.2 plan](docs/ROADMAP.md#152-branding-in-preparation).
+The 1.5.2 branding update is on main. Prepare issue forms and the main-branch protection configuration as **1.5.3 / 1005003**. Keep that version through this change set; do not publish or trigger Production APK until the user requests it. See the [1.5.3 plan](docs/ROADMAP.md#153-repository-maintenance).
 
 ## Read the relevant guidance
 
 - Read [DESIGN.md](docs/DESIGN.md) for product, UI, copy, accessibility and motion changes.
 - Read [ARCHITECTURE.md](docs/ARCHITECTURE.md) for code, state, data, lifecycle and platform changes.
-- Follow [CONTRIBUTING.md](CONTRIBUTING.md) for setup and validation.
+- Follow [CONTRIBUTING.md](CONTRIBUTING.md) for setup, validation and the protected-main workflow. Keep the checked-in ruleset and live GitHub settings aligned when changing CI checks; committing the JSON does not activate or update protection.
 
 Use the repository skills below. If your agent does not discover skills automatically, open the linked `SKILL.md` and follow it directly.
 

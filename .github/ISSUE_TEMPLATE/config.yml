@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Installation and APK builds
+    url: https://github.com/robin-siegl/Nia/blob/main/docs/RELEASING.md
+    about: Find release downloads, installation steps and instructions for test builds.
+  - name: Using nia
+    url: https://github.com/robin-siegl/Nia#readme
+    about: Read about Home, app search, shortcuts and settings.

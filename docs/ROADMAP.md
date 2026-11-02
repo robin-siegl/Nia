@@ -2,11 +2,13 @@
 
 Home content belongs to the user. Keep customization simple, preserve existing choices and keep the full app list quiet. These are priorities, not promised release dates.
 
-## 1.5.2 branding in preparation
+## 1.5.3 repository maintenance
 
-Version 1.5.1 is published. Prepare the approved branding as **1.5.2 / 1005002**. Publish only when the user requests it after validation.
+Prepare **1.5.3 / 1005003** with guided bug/feature issue forms and a reproducible main-branch protection ruleset. Require PRs, the four existing GitHub Actions checks, an up-to-date branch and resolved conversations; block force pushes and deletion without requiring another reviewer for solo-maintainer changes. Repository admins apply the ruleset separately from merging its JSON; see [Contributing](../CONTRIBUTING.md#main-branch-protection). Publish only when the user requests it.
 
-Use the approved two-part lowercase n as the shared vector master for the Android icon, About/setup and repository artwork. Include light/dark marks, an outlined wordmark, horizontal logos, PNG exports and a concise [brand kit](../branding/README.md). Validate adaptive/monochrome resources, native rendering and export consistency before Pixel testing.
+## 1.5.2 branding on main
+
+The approved two-part lowercase n is the shared vector master for the Android icon, About/setup and repository artwork. The [brand kit](../branding/README.md) includes light/dark marks, an outlined wordmark, horizontal logos, PNG exports and usage guidance. Adaptive/monochrome resources, native renders and export consistency have automated validation; physical Pixel checks remain part of release testing.
 
 ## 1.5.1 fitting Home gestures
 
