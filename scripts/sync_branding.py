@@ -4,6 +4,7 @@
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 import sys
 import xml.etree.ElementTree as ET
@@ -52,6 +53,20 @@ def app_art(foreground=PAPER, background=BLACK):
             f'{mark(foreground)}</g>')
 
 
+def android_path(data):
+    """Keep native path data compact; the SVG master retains its full precision."""
+    def number(match):
+        value = match.group()
+        negative = value.startswith("-")
+        whole, _, fraction = value.lstrip("-").partition(".")
+        tenths = int(whole) * 10 + int((fraction + "0")[0])
+        if (fraction + "00")[1] >= "5":
+            tenths += 1
+        sign = "-" if negative and tenths else ""
+        return sign + str(tenths // 10) + ("." + str(tenths % 10) if tenths % 10 else "")
+    return re.sub(r"-?\d+(?:\.\d+)?", number, data)
+
+
 def generated_text():
     output = {}
     for tone, color in (("dark", INK), ("light", PAPER)):
@@ -80,7 +95,7 @@ def generated_text():
 
     android = "http://schemas.android.com/apk/res/android"
     entries = ET.parse(BRAND / "source/nia-mark.svg").getroot().findall(f"{{{NS}}}path")
-    android_paths = "\n".join(f'    <path android:fillColor="{PAPER}" android:pathData="{p.attrib["d"]}" />'
+    android_paths = "\n".join(f'    <path android:fillColor="{PAPER}" android:pathData="{android_path(p.attrib["d"])}" />'
                                for p in entries)
     output["app/src/main/res/drawable/ic_nia_mark.xml"] = (
         f'<vector xmlns:android="{android}" android:width="48dp" android:height="48dp" '
@@ -92,13 +107,13 @@ def generated_text():
         f'  <group android:scaleX="{ADAPTIVE_SCALE}" android:scaleY="{ADAPTIVE_SCALE}" '
         f'android:translateX="{54 - 500 * ADAPTIVE_SCALE:g}" android:translateY="{54 - 500 * ADAPTIVE_SCALE:g}">\n'
         f'{android_paths}\n  </group>\n</vector>\n')
-    for qualifier, monochrome in (("mipmap-anydpi-v26", False), ("mipmap-anydpi-v33", True)):
-        output[f"app/src/main/res/{qualifier}/ic_nia.xml"] = (
-            f'<adaptive-icon xmlns:android="{android}">\n'
-            '  <background android:drawable="@color/nia_icon_background" />\n'
-            '  <foreground android:drawable="@drawable/ic_nia_foreground" />\n'
-            + ('  <monochrome android:drawable="@drawable/ic_nia_foreground" />\n' if monochrome else '')
-            + '</adaptive-icon>\n')
+    # minSdk 29 supports adaptive icons; older parsers ignore the monochrome layer.
+    output["app/src/main/res/mipmap-anydpi/ic_nia.xml"] = (
+        f'<adaptive-icon xmlns:android="{android}">\n'
+        '  <background android:drawable="@color/nia_icon_background" />\n'
+        '  <foreground android:drawable="@drawable/ic_nia_foreground" />\n'
+        '  <monochrome android:drawable="@drawable/ic_nia_foreground" />\n'
+        '</adaptive-icon>\n')
     output["app/src/main/res/values/branding.xml"] = (
         '<resources>\n  <color name="nia_icon_background">#000000</color>\n</resources>\n')
     return output

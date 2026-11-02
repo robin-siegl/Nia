@@ -6,10 +6,9 @@
     "branding/source/nia-wordmark.svg": "ddefbdc9ce0108389e008172d5264a233bae7bbb187110775bc8a7c004c77cb6"
   },
   "files": {
-    "app/src/main/res/drawable/ic_nia_foreground.xml": "a3410a7307ed793c348454f3d28c86189bb9eeb685747325366d40a9d1f5dfd8",
-    "app/src/main/res/drawable/ic_nia_mark.xml": "4e52bde5189d1383aeb5bf171e21fd19cee23dd6446f780f7848acb72152a210",
-    "app/src/main/res/mipmap-anydpi-v26/ic_nia.xml": "1ab08d44e621d8715fa6148946b31b6504c7bf473d6905e42a0b74f8a584f222",
-    "app/src/main/res/mipmap-anydpi-v33/ic_nia.xml": "33f67e9897f60723d928562acc277cf3caf9913ef2e3ffcf54a8e5ae167289d9",
+    "app/src/main/res/drawable/ic_nia_foreground.xml": "4c5026fc022f87b40677282d5ed1ef601413c965f28b4c7fac3683a6b493037e",
+    "app/src/main/res/drawable/ic_nia_mark.xml": "a1880a4d35cbe0e9f3e3814e5f0f197d9a4672bc5a9f04e1dc5d3b765e9cb473",
+    "app/src/main/res/mipmap-anydpi/ic_nia.xml": "33f67e9897f60723d928562acc277cf3caf9913ef2e3ffcf54a8e5ae167289d9",
     "app/src/main/res/values/branding.xml": "ed0559807385e1336e371a80bc677235498222035a77936ac3c59289369c172a",
     "branding/png/nia-app-icon-1024.png": "77317b707fda7a07657ef154836b5ad04e349cb3f7b904c10d6b7bde21815f7f",
     "branding/png/nia-app-icon-512.png": "73ab3839b2ef32d1f32111050c2b4ae418757772bc3d14b87ab77223cc3452cd",

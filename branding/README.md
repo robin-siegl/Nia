@@ -36,7 +36,7 @@ The wordmark is outlined artwork with no font dependency. In the app, keep the n
 
 The app uses native vectors generated from the [mark master](source/nia-mark.svg). Foreground and background remain separate. Android owns the outer icon mask, so the foreground contains no circular border or shadow.
 
-The foreground is a 108dp layer. Its two paths sit inside the central safe area, with a maximum 33dp radius from the center. The API 26 resource supplies foreground/background; API 33 adds the same foreground as a monochrome alpha layer. Both manifest icon attributes point to this adaptive resource. Production, Dev and Debug retain their existing application IDs and labels.
+The foreground is a 108dp layer. Its two paths sit inside the central safe area, with a maximum 33dp radius from the center. One adaptive resource supplies foreground/background and the same foreground as a monochrome alpha layer for API 33+. Older Android versions ignore that optional layer. Both manifest icon attributes point to this adaptive resource. Production, Dev and Debug retain their existing application IDs and labels.
 
 See [Android's adaptive icon guidance](https://developer.android.com/develop/ui/compose/system/icon_design_adaptive) and the [device checks](../docs/DEVICE_TESTING.md#branding-and-app-icons).
 
@@ -44,7 +44,7 @@ Native Android resource renders: [API 29](../docs/screenshots/app-icon-api-29.pn
 
 ## Edit and regenerate
 
-The two editable masters are [nia-mark.svg](source/nia-mark.svg) and [nia-wordmark.svg](source/nia-wordmark.svg). The mark preserves the approved refined concept as two filled paths. Edit these masters for geometry rather than individual exports or Android paths. The generator owns the fixed export palette and Android placement.
+The two editable masters are [nia-mark.svg](source/nia-mark.svg) and [nia-wordmark.svg](source/nia-wordmark.svg). The mark preserves the approved refined concept as two filled paths. Edit these masters for geometry rather than individual exports or Android paths. The generator owns the fixed export palette and Android placement. Android paths use compact coordinate precision; SVG masters retain their full precision.
 
 Regeneration needs Python, a local Cairo runtime and the optional export dependency:
 

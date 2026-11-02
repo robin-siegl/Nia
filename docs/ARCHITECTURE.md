@@ -47,7 +47,7 @@ Most model logic is independent of Android. `UnlockSession` deliberately uses Co
 
 The [brand kit](../branding/README.md) owns two SVG masters. `scripts/sync_branding.py` generates the Android vectors, adaptive icon XML, SVG/PNG exports and checksum manifest. Its offline check runs in CI; neither Gradle nor the app needs the optional PNG-rendering toolchain.
 
-The manifest uses `@mipmap/ic_nia`. API 26 foreground/background resources cover the app's minimum API 29; an API 33 variant adds the foreground as its monochrome alpha layer. Android supplies the outer mask and themed tint. About and setup use the shared `NiaBrandMark` vector with the active foreground and retain accessible app-name text. Branding introduces no saved state or backup migration.
+The manifest uses `@mipmap/ic_nia`. The single adaptive resource works from the app's minimum API 29 and includes a monochrome alpha layer used by API 33+; older Android versions ignore that optional tag. Android supplies the outer mask and themed tint. About and setup use the shared `NiaBrandMark` vector with the active foreground and retain accessible app-name text. Branding introduces no saved state or backup migration.
 
 ## State lifetimes
 
