@@ -3,7 +3,7 @@
 ## 1.5.2 (unreleased)
 
 - Adopt the approved two-part lowercase n mark, with a matching outlined wordmark and a reusable brand kit containing SVG masters, light/dark artwork, transparent PNGs, app-icon exports and usage guidance.
-- Replace the old app icon with native adaptive foreground/background layers and a monochrome layer for themed icons. Use the same mark in About and setup, tinted to nia's current foreground.
+- Replace the old app icon with native adaptive foreground/background layers and a monochrome layer for themed icons. Give the icon mark a little more space around its edges. Use the same mark in About and setup, tinted to nia's current foreground.
 - Add an offline CI check for the shared branding exports and Android resources. Keep existing application IDs, signing identities, settings and launcher behavior.
 
 ## 1.5.1

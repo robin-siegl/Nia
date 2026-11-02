@@ -16,7 +16,7 @@ NS = "http://www.w3.org/2000/svg"
 INK = "#171717"
 PAPER = "#E6E6E6"
 BLACK = "#000000"
-ADAPTIVE_SCALE = 0.066
+ADAPTIVE_SCALE = 0.063
 
 
 def paths(name):
@@ -45,7 +45,7 @@ def lockup(color):
 
 
 def app_art(foreground=PAPER, background=BLACK):
-    # The 108dp layer's 52.8dp mark appears within Android's 72dp masked viewport.
+    # The 108dp layer's 50.4dp mark appears within Android's 72dp masked viewport.
     scale = 1000 * ADAPTIVE_SCALE / 72
     offset = 500 * (1 - scale)
     return (f'<rect width="1000" height="1000" fill="{background}" />\n'
