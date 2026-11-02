@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 240" fill="#171717" role="img" aria-labelledby="title">
+  <title id="title">nia wordmark</title>
+  <path d="M20 195 V137 C20 96 53 64 95 64 C137 64 170 96 170 137 V195 A15 15 0 0 1 140 195 V137 C140 112 120 94 95 94 C70 94 50 112 50 137 V195 A15 15 0 0 1 20 195 Z" />
+  <path d="M220 95 A15 15 0 0 1 250 95 V195 A15 15 0 0 1 220 195 Z M220 32 A15 15 0 1 0 250 32 A15 15 0 1 0 220 32 Z" />
+  <path fill-rule="evenodd" d="M433 137 A73 73 0 1 0 287 137 A73 73 0 1 0 433 137 Z M403 137 A43 43 0 1 0 317 137 A43 43 0 1 0 403 137 Z" />
+  <path d="M403 137 V195 A15 15 0 0 0 433 195 V137 Z" />
+</svg>

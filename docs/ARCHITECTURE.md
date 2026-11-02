@@ -5,6 +5,7 @@ nia is a single-activity Kotlin/Jetpack Compose app with a small custom navigati
 ## Contents
 
 - [Code map and data flow](#code-map-and-data-flow)
+- [Brand resources](#brand-resources)
 - [State lifetimes](#state-lifetimes)
 - [Discovery, launching and navigation](#discovery-launching-and-navigation)
 - [Preferences and backups](#preferences-and-backups)
@@ -41,6 +42,12 @@ flowchart TD
 `NiaApp` collects flows with `collectAsStateWithLifecycle`, connects screen callbacks and owns activity-result launchers for file selection and the Home chooser. `LauncherViewModel` currently extends `AndroidViewModel` and creates its dependencies from the application context. Keep Activity/View references out of it. Prefer explicit dependency injection when changing these boundaries, without introducing a framework or extra layers for a small isolated change.
 
 Most model logic is independent of Android. `UnlockSession` deliberately uses Compose observable state so the retained session can drive effects. UI functions receive values and callbacks; persistence, package queries and networking stay outside screen composables. Blocking work uses I/O dispatchers, and cancellation is propagated.
+
+## Brand resources
+
+The [brand kit](../branding/README.md) owns two SVG masters. `scripts/sync_branding.py` generates the Android vectors, adaptive icon XML, SVG/PNG exports and checksum manifest. Its offline check runs in CI; neither Gradle nor the app needs the optional PNG-rendering toolchain.
+
+The manifest uses `@mipmap/ic_nia`. API 26 foreground/background resources cover the app's minimum API 29; an API 33 variant adds the foreground as its monochrome alpha layer. Android supplies the outer mask and themed tint. About and setup use the shared `NiaBrandMark` vector with the active foreground and retain accessible app-name text. Branding introduces no saved state or backup migration.
 
 ## State lifetimes
 

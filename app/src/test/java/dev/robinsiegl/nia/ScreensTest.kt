@@ -368,6 +368,22 @@ class ScreensTest {
         assertEquals(ProjectLinks.NOTICES, opened)
     }
 
+    @Test @Config(qualifiers = "w320dp-h600dp-xhdpi")
+    fun `About branding reflows with large text and keeps update and project actions reachable`() {
+        val preferences = LauncherPreferences(themeMode = ThemeMode.LIGHT)
+        var opened = ""
+        render(preferences) {
+            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 2f)) {
+                detail(SettingsSection.ABOUT, preferences, onOpenLink = { opened = it })
+            }
+        }
+        rule.onAllNodesWithText("nia").assertCountEquals(1)
+        screenshot("about-nia-light-large")
+        rule.onNodeWithText("Check for updates").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithText("View on GitHub").performScrollTo().performClick()
+        assertEquals(ProjectLinks.REPOSITORY, opened)
+    }
+
     @Test fun `backup page keeps full reset behind explicit confirmation`() {
         var resets = 0
         render { detail(SettingsSection.BACKUP, onResetAll = { resets++ }) }

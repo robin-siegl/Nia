@@ -1,10 +1,15 @@
 # nia
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="branding/svg/nia-lockup-light.svg" />
+  <img src="branding/svg/nia-lockup-dark.svg" width="360" alt="nia: a balanced lowercase n mark and wordmark" />
+</picture>
+
 **A quieter way home.**
 
 nia is a minimalist Android launcher with your chosen shortcuts, a clock and date, and a searchable app list. Keep the apps you reach for close, with a little more space around everything else.
 
-[Download nia](https://github.com/robin-siegl/Nia/releases/latest) · [Changelog](CHANGELOG.md) · [Privacy](docs/PRIVACY.md)
+[Download nia](https://github.com/robin-siegl/Nia/releases/latest) · [Changelog](CHANGELOG.md) · [Privacy](docs/PRIVACY.md) · [Brand kit](branding/README.md)
 
 <p>
   <img src="docs/screenshots/home-oled-grid.png" width="220" alt="nia Home with simple outline shortcuts on a pure black background" />

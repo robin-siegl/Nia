@@ -2,11 +2,15 @@
 
 Home content belongs to the user. Keep customization simple, preserve existing choices and keep the full app list quiet. These are priorities, not promised release dates.
 
-## 1.5.1 in preparation
+## 1.5.2 branding in preparation
 
-Version 1.5.0 is published. Prepare the fitting-Home gesture fix as **1.5.1 / 1005001**. Publish only when the user requests it after validation.
+Version 1.5.1 is published. Prepare the approved branding as **1.5.2 / 1005002**. Publish only when the user requests it after validation.
 
-Make grids, short lists and empty Home reveal Apps at the same time as the header contracts. Preserve the header/list/pull sequence for overflowing Home, choosing it once per gesture. Cancel and returning from Apps restore the previous fitting-Home header and offset; overflowing Home keeps its scroll position. Validate actual pointer input, reversals, layout/Home resets and Reduced/disabled animations before testing on the Pixel.
+Use the approved two-part lowercase n as the shared vector master for the Android icon, About/setup and repository artwork. Include light/dark marks, an outlined wordmark, horizontal logos, PNG exports and a concise [brand kit](../branding/README.md). Validate adaptive/monochrome resources, native rendering and export consistency before Pixel testing.
+
+## 1.5.1 fitting Home gestures
+
+Grids, short lists and empty Home reveal Apps at the same time as the header contracts. Returning from Apps expands the fitting Home header again. Overflowing Home keeps the header/list/pull sequence and its scroll position. Pointer cancellation, reversals, layout/Home resets and reduced/disabled animations have native test coverage; the primary-device gesture was also confirmed by the user before merging.
 
 ## Home interaction rules
 

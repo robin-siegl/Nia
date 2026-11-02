@@ -10,6 +10,14 @@ Use this checklist for the Pixel 10 Pro first, and record other devices separate
 - Check the nia Dev label and About version/run/commit, including large text and both themes. Public-release links should clearly identify their separate channel.
 - Test the optimized dev build's Home, search, gestures and unlock behavior. Record actual phone results separately from automated package/signature checks.
 
+## Branding and app icons
+
+- Install the new APK over the matching existing production or Dev installation. Confirm the new two-part n appears in Android's app-info screen and Home-app chooser, and that names, saved settings and default Home selection survive.
+- In a launcher that displays app icons, inspect the circle and any available alternative masks. Both components and their gap should remain visible, without clipping, an extra border or a second background plate.
+- Enable and disable Android's themed icons. Check light and dark wallpaper themes; the monochrome silhouette should match the normal icon, with the whole mark tinted together.
+- Check About and setup in nia's monochrome and colored light/dark themes, including large text. The mark uses the current foreground; the app name remains readable and actions stay reachable by scrolling.
+- Record actual Pixel/OS results separately from the API 29/35 native icon renders and the illustrative [mask previews](../branding/previews/icon-masks.png).
+
 ## Record the test environment
 
 | Field | Record |
