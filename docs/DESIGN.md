@@ -6,6 +6,7 @@ nia gives everyday tasks a predictable place and keeps other apps available in a
 
 - [Home and navigation](#home-and-navigation)
 - [Color and typography](#color-and-typography)
+- [Branding](#branding)
 - [Pixel-style header](#pixel-style-header)
 - [Settings and language](#settings-and-language)
 - [Motion and input](#motion-and-input)
@@ -27,7 +28,7 @@ Home is user-defined. Every shortcut can be added, removed, renamed, assigned an
 
 Use **Settings → Home shortcuts** for editing, and long-press drag to arrange entries there or directly on Home. Grid/list share one order. The optional Apps command is an ordinary movable entry. App-list Add to Home opens a prefilled editor. The fresh-install **Your shortcuts** step can add apps or commands or leave Home empty. Upgrades retain existing choices and do not repeat completed setup.
 
-Legacy categories migrate into ordinary editable shortcuts. See [1.5.1 validation](ROADMAP.md#151-in-preparation) for the current gesture fix and device checks.
+Legacy categories migrate into ordinary editable shortcuts. See the [Home interaction rules](ROADMAP.md#home-interaction-rules) for gesture behavior and device checks.
 
 Keep the rest of Home open. Folders, widgets, badges and feeds remain outside this design. Settings cannot be assigned to a corner. Custom Home labels do not rename apps in the full app list.
 
@@ -59,6 +60,12 @@ Shortcut glyphs use the bundled **Material Symbols Outlined**, with unfilled pat
 The icon picker is a reusable full-screen dialog. Search covers names, category words and synonyms across the entire catalog; selecting a category starts a browse view. Keep search, Close and confirmation available while results scroll. Use a category menu and larger cells at large text sizes, and simplify controls when the keyboard reduces the available height.
 
 Respect system text scaling in controls and app names. The calibrated Pixel-style header keeps fixed proportions at rest; offer the existing scalable clock layout when that treatment is unsuitable.
+
+## Branding
+
+Use the approved two-part lowercase n and the assets in the [brand kit](../branding/README.md). Preserve the master outline and negative space across all sizes and color variants. The Android app icon uses the mark alone on pure black, with separate adaptive layers and a monochrome layer for system tinting.
+
+About and setup show the shared `NiaBrandMark` alongside readable, scalable app-name text. Tint the mark with the current foreground. Use the outlined wordmark for repository artwork; keep normal app controls and Home focused on their existing content.
 
 ## Pixel-style header
 

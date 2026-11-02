@@ -7,6 +7,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,7 +28,11 @@ internal object ProjectLinks {
 internal fun AboutContent(onOpenLink: (String) -> Unit, updateCheck: UpdateCheck = UpdateCheck.Idle,
     onCheckUpdates: () -> Unit = {}, installedVersion: String = BuildConfig.VERSION_NAME) {
     val devBuild = installedVersion.substringAfter('-', "").startsWith("dev")
-    Text(if (devBuild) "nia Dev" else "nia", fontSize = 48.sp, fontWeight = FontWeight.Light)
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        NiaBrandMark(Modifier.size(56.dp))
+        Text(if (devBuild) "nia Dev" else "nia", fontSize = 48.sp, fontWeight = FontWeight.Light,
+            modifier = Modifier.weight(1f))
+    }
     Text("A quieter way home.", fontSize = 20.sp, modifier = Modifier.padding(top = 4.dp))
     Text("Version $installedVersion", fontSize = 14.sp, modifier = Modifier.padding(top = 16.dp))
     if (devBuild) SettingsDescription("Dev builds come from GitHub Actions. Public releases install separately as nia.",

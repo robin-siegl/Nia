@@ -62,6 +62,18 @@ python3 scripts/sync_material_symbols.py --check
 
 The import uses the pinned Google source revision and generates the Kotlin catalog/resource mapping and bundled XML vectors. Commit those outputs together with the manifest and license. `--check` works offline and runs in CI; normal builds never download icons. Do not hand-edit generated files or reuse the legacy `SETTINGS` ID. See [third-party notices](THIRD_PARTY_NOTICES.md#shortcut-and-interface-icons).
 
+## Changing branding
+
+Use the [brand kit](branding/README.md) for the canonical mark, wordmark, colors, exports and usage rules. Edit its two SVG masters, then regenerate the brand assets and Android resources together:
+
+```sh
+python3 -m pip install -r scripts/branding-requirements.txt
+python3 scripts/sync_branding.py
+python3 scripts/sync_branding.py --check
+```
+
+Regeneration also needs a local Cairo runtime. Normal Android builds and the offline CI check do not need those export dependencies. Review icon masks, themed tints and native About/setup renders before committing the generated files. Follow the [physical icon checks](docs/DEVICE_TESTING.md#branding-and-app-icons) for Pixel behavior.
+
 ## Versions and changelog
 
 Bump both `nia.versionName` and `nia.versionCode` in `gradle.properties` once for each completed change set, including documentation and skill changes. Choose the version according to the [version policy](docs/RELEASING.md#version-policy), and add a concise entry to [CHANGELOG.md](CHANGELOG.md).

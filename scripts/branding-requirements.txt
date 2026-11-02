@@ -1,0 +1,2 @@
+# Optional tooling for regenerating the committed PNG exports; not an app dependency.
+CairoSVG==2.9.1

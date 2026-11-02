@@ -1,0 +1,31 @@
+{
+  "format": "nia.branding",
+  "version": 1,
+  "sources": {
+    "branding/source/nia-mark.svg": "9e544887559a22077940e8bb029b3e4eb8213ba160ac23268e0dbc9b5b1a8601",
+    "branding/source/nia-wordmark.svg": "ddefbdc9ce0108389e008172d5264a233bae7bbb187110775bc8a7c004c77cb6"
+  },
+  "files": {
+    "app/src/main/res/drawable/ic_nia_foreground.xml": "b05af11df19b27be3539f21bf69433f6d38b63e2501fe37452063b08a968a91b",
+    "app/src/main/res/drawable/ic_nia_mark.xml": "a1880a4d35cbe0e9f3e3814e5f0f197d9a4672bc5a9f04e1dc5d3b765e9cb473",
+    "app/src/main/res/mipmap-anydpi/ic_nia.xml": "33f67e9897f60723d928562acc277cf3caf9913ef2e3ffcf54a8e5ae167289d9",
+    "app/src/main/res/values/branding.xml": "ed0559807385e1336e371a80bc677235498222035a77936ac3c59289369c172a",
+    "branding/png/nia-app-icon-1024.png": "11f7a8e9a72b61cc540f0912385194800b16f4c6ee7ff3caeaf7c3591691c010",
+    "branding/png/nia-app-icon-512.png": "591d25e3738a9e3de3c5cc513d9e36b342f35b4a69c18982f07e5b38fa8f211d",
+    "branding/png/nia-lockup-dark-1600.png": "f8d79cf3d502baa4bed3539b432599ac47ba89c6cd3ef32dddf10c9df53d040d",
+    "branding/png/nia-lockup-light-1600.png": "b711916506bd6b77918601f060378d0f09dc0fcc96b694c53b3611b283aed6ed",
+    "branding/png/nia-mark-dark-1024.png": "f5aa836e4cb64e858973acc04fbd56755607f9c421bbe5872272375e28156b34",
+    "branding/png/nia-mark-light-1024.png": "d01a110509f6b3d752ddd8fa9bb9d17c50d278fe5770d3b1a966659032d4040d",
+    "branding/png/nia-wordmark-dark-1200.png": "7de3b1e005923c7608872a2bf8696ca039162b88c7671b1db82f7fd50ea422bb",
+    "branding/png/nia-wordmark-light-1200.png": "bd689a6eff1888bd580033c1204433f3e7dc0a622f3110e49474b0b07f29e7ce",
+    "branding/previews/icon-masks.png": "dfcbb5af336c95114e45fb33073767315551de665b2aa16458b760fda9666992",
+    "branding/previews/icon-masks.svg": "5dae5882a5ffea8d0311a7fba109b57044a3316a045c623e7a2d284ce6079206",
+    "branding/svg/nia-app-icon.svg": "cc76fe6f041de57b64580996671a3ec9af19982b5bcd3ccec723da713d285b28",
+    "branding/svg/nia-lockup-dark.svg": "8c51befd19310278eadbecb2a74c6562ce7ed60e9633736724fff89e1514dc6d",
+    "branding/svg/nia-lockup-light.svg": "87a30a80e096d69d4adb56f4b5028969740e0ce54c66d84bbb6e13b11efb1448",
+    "branding/svg/nia-mark-dark.svg": "ef99a16b969aea8216e3ae471eb3f7f55ae42756ada446ca64c937ba599817b4",
+    "branding/svg/nia-mark-light.svg": "5002fdc5721d8ca8493e0abc26e57f82c643c164094958af79ccbbd687b3c4b7",
+    "branding/svg/nia-wordmark-dark.svg": "87dfb7cfda1de2a9d03e893188ad50345e5f58d4f5ecbe8462cd11d7ac60cb0b",
+    "branding/svg/nia-wordmark-light.svg": "568565af907c7fa285e84c785c3e8f75418a9c6cc12c3518da21c3ab11bf493f"
+  }
+}

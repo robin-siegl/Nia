@@ -29,7 +29,10 @@ fun OnboardingScreen(
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text("nia", fontSize = 32.sp, fontWeight = FontWeight.Light)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                NiaBrandMark(Modifier.size(32.dp))
+                Text("nia", fontSize = 32.sp, fontWeight = FontWeight.Light)
+            }
             Text("${step.ordinal + 1} of ${SetupStep.entries.size}", fontSize = 13.sp)
         }
         key(step) {

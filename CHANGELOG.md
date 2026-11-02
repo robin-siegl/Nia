@@ -1,6 +1,12 @@
 # Changelog
 
-## 1.5.1 (unreleased)
+## 1.5.2 (unreleased)
+
+- Adopt the approved two-part lowercase n mark, with a matching outlined wordmark and a reusable brand kit containing SVG masters, light/dark artwork, transparent PNGs, app-icon exports and usage guidance.
+- Replace the old app icon with native adaptive foreground/background layers and a monochrome layer for themed icons. Give the icon mark a little more space around its edges. Use the same mark in About and setup, tinted to nia's current foreground.
+- Add an offline CI check for the shared branding exports and Android resources. Keep existing application IDs, signing identities, settings and launcher behavior.
+
+## 1.5.1
 
 - Reveal Apps while the clock/date header shrinks when Home fits, removing the header-only stage in grids, short lists and empty Home. Reverse or cancel smoothly without changing the original Home position, and expand the header again when returning from Apps.
 - Preserve header-first scrolling for overflowing lists and keep that sequence fixed throughout each gesture, including when contraction removes the overflow. Retain distance-based opening, one haptic cue, reordering and reduced/disabled-animation input recovery.

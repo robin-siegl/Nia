@@ -2,9 +2,9 @@
 
 nia is a Kotlin/Jetpack Compose Android launcher. Follow these instructions for changes anywhere in this repository.
 
-## Active release: 1.5.1
+## Active release: 1.5.2
 
-Version 1.5.0 has been published. Prepare the fitting-Home gesture fix as **1.5.1 / 1005001**. Keep that version through this change set; do not publish or trigger Production APK until the user requests it. See the [1.5.1 plan](docs/ROADMAP.md#151-in-preparation).
+Version 1.5.1 has been published. Prepare the approved branding and app-icon update as **1.5.2 / 1005002**. Keep that version through this change set; do not publish or trigger Production APK until the user requests it. See the [1.5.2 plan](docs/ROADMAP.md#152-branding-in-preparation).
 
 ## Read the relevant guidance
 
@@ -33,6 +33,8 @@ Use Clock for alarm/timer setup and preset execution, and Android's volume panel
 Use the shared Material Symbols catalog and icon picker for Home apps and Quick corners. Preserve serialized icon IDs and the legacy Settings migration; verify bundled resources with `python3 scripts/sync_material_symbols.py --check`. The import/generation workflow is in CONTRIBUTING.md.
 
 Keep the personal-profile scope, offline core and manual-only update checks. Preserve exact OLED black, matched themes, accessible controls and Android's animation preferences. See the guides for the full behavior and known device limitations.
+
+Use the approved two-part mark and outlined wordmark from the [brand kit](branding/README.md). Keep the SVG masters canonical and generate Android resources and exports together with `python3 scripts/sync_branding.py`. Run `--check` offline before handing off changes. Keep the app name accessible and scalable in UI, and preserve Android's adaptive mask and monochrome icon support.
 
 ## Bump the version for every completed change set
 
