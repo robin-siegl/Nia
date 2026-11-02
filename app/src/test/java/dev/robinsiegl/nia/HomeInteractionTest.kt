@@ -68,7 +68,7 @@ class HomeInteractionTest {
         }
         rule.mainClock.autoAdvance = false
     }
-    private fun collapse() = rule.onNode(SemanticsMatcher.keyIsDefined(HomeHeaderCollapse), useUnmergedTree = true).fetchSemanticsNode().config[HomeHeaderCollapse]
+    private fun collapse() = root().fetchSemanticsNode().config[HomeHeaderProgress]
     private fun progress() = rule.onNodeWithTag("home-apps-surface").fetchSemanticsNode().config[DrawerProgress]
     private fun root() = rule.onNodeWithTag("home-apps-surface")
     private fun bounds(id: String) = rule.onNodeWithTag("home-entry-$id").fetchSemanticsNode().boundsInRoot
@@ -89,10 +89,9 @@ class HomeInteractionTest {
         root().performTouchInput { down(Offset(width * 0.5f, height * 0.75f)); moveBy(Offset(0f, -120f), 300) }
         rule.mainClock.advanceTimeBy(32)
         assertTrue(collapse() in 0.05f..0.95f)
-        assertTrue(bounds("app-1").top < first.top)
-        assertTrue(rule.onNodeWithTag("home-clock").fetchSemanticsNode().boundsInRoot.width < clock.width)
-        rule.onAllNodesWithTag("home-clock").assertCountEquals(1)
-        rule.onAllNodesWithTag("home-date").assertCountEquals(1)
+        assertTrue("A fitting grid must reveal Apps before its header is compact", progress() > 0f)
+        // Home remains rendered but is hidden from accessibility while Apps is appearing.
+        rule.onNodeWithTag("home-entry-app-1").assertDoesNotExist()
         assertTrue(cues.isEmpty())
         capture("home-scroll-mid")
         root().performTouchInput { moveBy(Offset(0f, -200f), 300) }
@@ -104,6 +103,11 @@ class HomeInteractionTest {
         root().performTouchInput { cancel() }
         rule.mainClock.advanceTimeBy(500)
         assertEquals(0f, progress(), 0f)
+        assertEquals(0f, collapse(), 0f)
+        assertEquals(first, bounds("app-1"))
+        assertEquals(clock, rule.onNodeWithTag("home-clock").fetchSemanticsNode().boundsInRoot)
+        rule.onAllNodesWithTag("home-clock").assertCountEquals(1)
+        rule.onAllNodesWithTag("home-date").assertCountEquals(1)
     }
     @Test @Config(qualifiers = "w320dp-h600dp-xhdpi")
     fun `eight apps plus an optional Apps command scroll together at maximum text then open the drawer`() {

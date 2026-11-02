@@ -2,9 +2,9 @@
 
 nia is a Kotlin/Jetpack Compose Android launcher. Follow these instructions for changes anywhere in this repository.
 
-## Active release: 1.5.0
+## Active release: 1.5.1
 
-Version 1.4.0 has been published. Prepare the agreed Home interaction, command and dev-build updates as **1.5.0 / 1005000**. Keep that version through the agreed change set; do not publish or trigger Production APK until the user requests it. See the [1.5.0 plan](docs/ROADMAP.md#150-in-preparation).
+Version 1.5.0 has been published. Prepare the fitting-Home gesture fix as **1.5.1 / 1005001**. Keep that version through this change set; do not publish or trigger Production APK until the user requests it. See the [1.5.1 plan](docs/ROADMAP.md#151-in-preparation).
 
 ## Read the relevant guidance
 
@@ -24,7 +24,7 @@ Use the repository skills below. If your agent does not discover skills automati
 
 Allow zero to nine editable Home shortcuts. Every entry can open an app or one of the supported nia commands; its name, icon and order are independent. There is no reserved, automatic or sticky Apps entry. Open Apps and Search apps are optional commands, and swipe-up remains available on an empty Home. Quick corners support Empty, App and Command. Keep Clock/Calendar header targets independent, and keep nia Settings out of the configurable command catalog; Settings remains reachable through Apps and an empty-space long press.
 
-Use one continuously transformed clock/date header. Changing its height must move the shortcuts upward in both layouts; do not crossfade between duplicate clocks. The grid keeps three columns and at most three rows. A long list scrolls all configured entries, including any optional Apps command, before handing off to the drawer. Show no pull instructions or progress ring, and emit only one threshold haptic per gesture. Ordinary flings cannot arm Apps. Respect Android's haptics and animation preferences, cancellation and input recovery.
+Use one continuously transformed clock/date header. Changing its height must move the shortcuts upward in both layouts; do not crossfade between duplicate clocks. The grid keeps three columns and at most three rows. When Home fits, morph the header together with the Apps pull from the first drag; cancel restores the original offset and successful opening retains compaction. An overflowing list contracts the header and scrolls all configured entries, including any optional Apps command, before handing off to the drawer. Choose the route at pointer-down and retain it through that gesture. Show no pull instructions or progress ring, and emit only one threshold haptic per gesture. Ordinary flings cannot arm Apps. Respect Android's haptics and animation preferences, cancellation and input recovery.
 
 Support long-press dragging on Home and in Settings → Home shortcuts, including auto-scroll in long lists. Preview locally, commit one validated order on drop, and write nothing on cancel. Keep keyboard/TalkBack alternatives. App-list long presses offer Add to Home, App info and Quick corner assignments; assignment pickers have no action menu. Commands are a typed allowlist, never arbitrary intents or executable text. Use the public torch API, observe actual state, handle unavailable hardware and release callbacks; do not add camera, accessibility, overlay or battery-exemption permissions for these features.
 

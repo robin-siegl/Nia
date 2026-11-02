@@ -27,7 +27,7 @@ Home is user-defined. Every shortcut can be added, removed, renamed, assigned an
 
 Use **Settings → Home shortcuts** for editing, and long-press drag to arrange entries there or directly on Home. Grid/list share one order. The optional Apps command is an ordinary movable entry. App-list Add to Home opens a prefilled editor. The fresh-install **Your shortcuts** step can add apps or commands or leave Home empty. Upgrades retain existing choices and do not repeat completed setup.
 
-Legacy categories migrate into ordinary editable shortcuts. See [1.5.0 validation](ROADMAP.md#150-in-preparation) for the remaining device checks.
+Legacy categories migrate into ordinary editable shortcuts. See [1.5.1 validation](ROADMAP.md#151-in-preparation) for the current gesture fix and device checks.
 
 Keep the rest of Home open. Folders, widgets, badges and feeds remain outside this design. Settings cannot be assigned to a corner. Custom Home labels do not rename apps in the full app list.
 
@@ -112,7 +112,9 @@ Delay search autofocus until the drawer settles. Block accidental launches durin
 
 Keep text at the selected size. Transform the same clock/date continuously as the header contracts; do not fade between expanded and compact copies. Its changing height moves the shortcuts upward in both layouts. The header remains expanded and stationary for unlock reveals.
 
-Consume header movement first, then an overflowing list's scroll, then the resisted Apps pull. The list includes every configured entry, including an optional Apps command. A grid moves as a unit with the header. Show a small chevron during the pull, with no instruction text or progress ring. Give one light haptic when opening is armed; do not buzz at the start or again on reversal. Release armed to open and reverse or release early to cancel. A fling alone cannot arm or open Apps.
+When Home fits, start the resisted Apps preview and header contraction together. Both follow the same drag and settle/reverse together on cancellation, restoring the original Home offset. A successful opening retains the compact header when Apps closes. For an overflowing list, consume header movement first, then the list's scroll, then the Apps pull. Choose the sequence at the start of each gesture so a growing viewport does not switch it halfway through.
+
+The list includes every configured entry, including an optional Apps command. A grid moves as a unit with the header. Show a small chevron during the pull, with no instruction text or progress ring. Give one light haptic when opening is armed; do not buzz at the start or again on reversal. Release armed to open and reverse or release early to cancel. A fling alone cannot arm or open Apps.
 
 Keep direct user movement responsive to the finger and respect Reduced/disabled animations when settling. Closing Apps preserves the Home position; Android Home and fresh unlocks restore the expanded header. See the [gesture sequence](ROADMAP.md#opening-apps-from-home).
 
@@ -128,7 +130,7 @@ Provide at least 48dp touch targets, meaningful spoken labels for icon-only acti
 
 Review real Compose renders in monochrome and color light/dark themes, plus a narrow screen with large text. Use the [device checklist](DEVICE_TESTING.md) for TalkBack, keyboard and system gestures. Do not present a mockup or native test render as a physical-phone result.
 
-Reference captures: [nine-entry grid](screenshots/home-nine-grid.png), [large-text list](screenshots/home-nine-list-large.png), [header mid-scroll](screenshots/home-scroll-mid.png), [drag preview](screenshots/home-drag-preview.png), [Home shortcut editor](screenshots/home-shortcut-editor.png), [command picker](screenshots/shortcut-command-picker.png), [timer duration](screenshots/timer-duration-picker.png), [Settings](screenshots/settings-overview.png), [app actions](screenshots/app-actions.png), [icon picker](screenshots/shortcut-icons.png), [light picker](screenshots/icon-picker-light.png), [large-text picker](screenshots/icon-picker-large-text.png) and [restore preview](screenshots/restore-preview.png).
+Reference captures: [nine-entry grid](screenshots/home-nine-grid.png), [large-text list](screenshots/home-nine-list-large.png), [header and Apps mid-pull](screenshots/home-scroll-mid.png), [fitting list mid-pull](screenshots/home-fit-list-pull.png), [drag preview](screenshots/home-drag-preview.png), [Home shortcut editor](screenshots/home-shortcut-editor.png), [command picker](screenshots/shortcut-command-picker.png), [timer duration](screenshots/timer-duration-picker.png), [Settings](screenshots/settings-overview.png), [app actions](screenshots/app-actions.png), [icon picker](screenshots/shortcut-icons.png), [light picker](screenshots/icon-picker-light.png), [large-text picker](screenshots/icon-picker-large-text.png) and [restore preview](screenshots/restore-preview.png).
 
 ### Android guidance
 

@@ -25,4 +25,35 @@ class HomeHeaderScrollTest {
         assertEquals(0f, header.fraction, 0f)
         assertEquals(0f, header.consume(-100f), 0f)
     }
+
+    @Test fun `a fitting Home previews with the drawer and rolls back to its original offset`() {
+        val header = HomeHeaderScroll()
+        header.updateRange(100f); header.consume(-20f)
+        header.beginPull()
+        assertEquals(0.2f, header.fractionWithPull(0f), 0.001f)
+        assertEquals(0.6f, header.fractionWithPull(0.5f), 0.001f)
+        assertEquals(1f, header.fractionWithPull(2f), 0f)
+        assertEquals(20f, header.offset, 0f)
+        // Reversal follows the same path, without committing a new scroll position.
+        assertEquals(0.4f, header.fractionWithPull(0.25f), 0.001f)
+        header.finishPull(false)
+        assertEquals(0.2f, header.fractionWithPull(1f), 0.001f)
+        assertEquals(20f, header.offset, 0f)
+    }
+
+    @Test fun `opening saves compact Home while resizing and cancellation remain bounded`() {
+        val header = HomeHeaderScroll()
+        header.updateRange(100f); header.beginPull()
+        assertEquals(0.5f, header.fractionWithPull(0.5f), 0f)
+        header.updateRange(40f)
+        assertEquals(0.5f, header.fractionWithPull(0.5f), 0f)
+        header.finishPull(true)
+        assertEquals(40f, header.offset, 0f)
+        assertEquals(1f, header.fractionWithPull(0f), 0f)
+        header.finishPull(false)
+        assertEquals(1f, header.fraction, 0f)
+        header.beginPull(); header.updateRange(0f); header.finishPull(false)
+        assertEquals(0f, header.offset, 0f)
+        assertEquals(0f, header.fractionWithPull(1f), 0f)
+    }
 }
