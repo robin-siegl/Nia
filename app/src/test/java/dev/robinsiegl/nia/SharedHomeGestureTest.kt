@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import dev.robinsiegl.nia.model.*
 import dev.robinsiegl.nia.theme.Palette
 import dev.robinsiegl.nia.ui.*
@@ -61,8 +62,15 @@ class SharedHomeGestureTest {
         rule.mainClock.advanceTimeBy(500)
     }
     private fun assertArmedRelease() {
-        dragUpAndHold()
-        assertTrue(armed())
+        rule.onNodeWithTag("home-apps-surface").performTouchInput {
+            // Measure 104 dp of drawer pull after the drag recognizer consumes touch slop.
+            val distance = 104.dp.toPx() + viewConfiguration.touchSlop
+            val start = Offset(width * 0.5f, height * 0.65f)
+            down(start)
+            moveTo(start - Offset(0f, distance), 300)
+        }
+        rule.mainClock.advanceTimeByFrame()
+        assertTrue("The short pull should arm Apps (preview: ${progress()})", armed())
         assertFalse(open)
         assertTrue(progress() in 0.2f..0.6f)
         assertEquals(listOf(PullCue.ARMED), cues)
@@ -70,11 +78,11 @@ class SharedHomeGestureTest {
         assertTrue(open)
         assertEquals(1f, progress(), 0f)
     }
-    @Test fun `grid uses resisted pull and opens only on armed release`() {
+    @Test fun `short grid pull previews Apps and opens on release`() {
         render(HomeLayout.GRID, populated = true)
         assertArmedRelease()
     }
-    @Test fun `Apps-only list uses the same pull cues and release threshold`() {
+    @Test fun `short fitting list pull previews Apps and opens on release`() {
         render(HomeLayout.LIST)
         assertArmedRelease()
     }
