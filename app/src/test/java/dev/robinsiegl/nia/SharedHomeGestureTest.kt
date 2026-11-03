@@ -62,13 +62,15 @@ class SharedHomeGestureTest {
         rule.mainClock.advanceTimeBy(500)
     }
     private fun assertArmedRelease() {
-        val distance = with(rule.density) { 108.dp.toPx() }
         rule.onNodeWithTag("home-apps-surface").performTouchInput {
+            // Measure 104 dp of drawer pull after the drag recognizer consumes touch slop.
+            val distance = 104.dp.toPx() + viewConfiguration.touchSlop
             val start = Offset(width * 0.5f, height * 0.65f)
             down(start)
             moveTo(start - Offset(0f, distance), 300)
         }
-        assertTrue(armed())
+        rule.mainClock.advanceTimeByFrame()
+        assertTrue("The short pull should arm Apps (preview: ${progress()})", armed())
         assertFalse(open)
         assertTrue(progress() in 0.2f..0.6f)
         assertEquals(listOf(PullCue.ARMED), cues)
