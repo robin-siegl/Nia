@@ -37,6 +37,9 @@ import dev.robinsiegl.nia.model.*
 
 internal val HomeHeaderCollapse = SemanticsPropertyKey<Float>("HomeHeaderCollapse")
 
+private const val SHORTCUT_FADE_MILLIS = 300
+private const val SHORTCUT_STAGGER_MILLIS = 20
+
 @Composable
 fun HomeScreen(
     layout: HomeLayout, time: String, date: String,
@@ -57,6 +60,7 @@ fun HomeScreen(
     val density = LocalDensity.current
     val reduced = motionMode == MotionMode.REDUCED
     val rows = (if (layout == HomeLayout.GRID) (shortcuts.size + 2) / 3 else shortcuts.size).coerceAtLeast(1)
+    val revealDurationMillis = SHORTCUT_FADE_MILLIS + rows * SHORTCUT_STAGGER_MILLIS
     val reorder = rememberShortcutReorder(shortcuts, onReorder, onReorderActive,
         autoScroll = if (layout == HomeLayout.LIST) ({ delta -> scroll.scrollBy(delta) }) else null)
     val entries = remember(shortcuts, reorder.preview) { reorder.ordered(shortcuts) }
@@ -68,7 +72,7 @@ fun HomeScreen(
             reorder.cancel(); reveal.snapTo(0f); scroll.scrollTo(0)
             if (revealAllowed) {
                 withFrameNanos { }
-                reveal.animateTo(1f, tween(if (reduced) 120 else 360 + rows * 24,
+                reveal.animateTo(1f, tween(if (reduced) 120 else revealDurationMillis,
                     delayMillis = if (reduced) 0 else 120, easing = LinearEasing))
                 unlockRequest.consume()
             }
@@ -121,7 +125,7 @@ fun HomeScreen(
                                 Box(Modifier.fillMaxSize()
                                     .reorderShortcut(shortcut, reorder, lookahead, enabled && onReorder != null, reduced,
                                         onEdit = onEditShortcut?.let { { it(shortcut.id) } })
-                                    .revealRow(reveal.asState(), index / 3, rows, reduced)
+                                    .revealRow(reveal.asState(), index / 3, revealDurationMillis, reduced)
                                     .shortcutButton(canLaunch, reduced) { onShortcut(shortcut.id) }
                                     .testTag("home-entry-${shortcut.id}").semantics { contentDescription = shortcut.name },
                                     contentAlignment = Alignment.Center) {
@@ -140,7 +144,7 @@ fun HomeScreen(
                                     modifier = Modifier.fillMaxWidth().heightIn(min = (60 * textSize.scale).dp)
                                         .reorderShortcut(shortcut, reorder, lookahead, enabled && onReorder != null, reduced,
                                             onEdit = onEditShortcut?.let { { it(shortcut.id) } })
-                                        .revealRow(reveal.asState(), index, rows, reduced)
+                                        .revealRow(reveal.asState(), index, revealDurationMillis, reduced)
                                         .shortcutButton(canLaunch, reduced) { onShortcut(shortcut.id) }
                                         .padding(vertical = 8.dp).wrapContentHeight(Alignment.CenterVertically)
                                         .testTag("home-entry-${shortcut.id}").semantics { contentDescription = shortcut.name })
@@ -156,7 +160,7 @@ fun HomeScreen(
             if (shortcut.action != ShortcutAction.EMPTY) Box(Modifier.align(
                 if (position == CornerPosition.LEFT) AbsoluteAlignment.BottomLeft else AbsoluteAlignment.BottomRight)
                 .padding(horizontal = 16.dp, vertical = 16.dp).size(48.dp)
-                .revealRow(reveal.asState(), rows, rows, reduced).testTag("home-corner-" + position.name)
+                .revealRow(reveal.asState(), rows, revealDurationMillis, reduced).testTag("home-corner-" + position.name)
                 .shortcutButton(canLaunch, reduced) { onCorner(position) }
                 .semantics { contentDescription = cornerLabel(position) }, contentAlignment = Alignment.Center) {
                 ShortcutGlyph(shortcut.icon, Modifier.size(24.dp))
@@ -182,8 +186,11 @@ private fun ShortcutGrid(cell: Dp, rowGap: Dp, modifier: Modifier, content: @Com
     }
 }
 
-private fun Modifier.revealRow(progress: State<Float>, index: Int, rows: Int, reduced: Boolean): Modifier = graphicsLayer {
-    val fraction = if (reduced) progress.value else ((progress.value * (360 + rows * 24) - index * 24) / 360f).coerceIn(0f, 1f)
+private fun Modifier.revealRow(progress: State<Float>, index: Int, durationMillis: Int, reduced: Boolean): Modifier = graphicsLayer {
+    val fraction = if (reduced) progress.value else {
+        val elapsedMillis = progress.value * durationMillis
+        ((elapsedMillis - index * SHORTCUT_STAGGER_MILLIS) / SHORTCUT_FADE_MILLIS).coerceIn(0f, 1f)
+    }
     val eased = FastOutSlowInEasing.transform(fraction)
     alpha = eased
     translationY = if (reduced) 0f else 16.dp.toPx() * (1f - eased)

@@ -151,7 +151,7 @@ internal fun HomeAppsScreen(
     val lockedNow by rememberUpdatedState(deviceLocked)
     val density = LocalDensity.current
     val velocityThreshold = with(density) { 700.dp.toPx() }
-    val pullThreshold = with(density) { 112.dp.toPx() }
+    val pullThreshold = with(density) { 96.dp.toPx() }
     val listState = rememberLazyListState()
     var reordering by remember { mutableStateOf(false) }
     val reorderingNow by rememberUpdatedState(reordering)

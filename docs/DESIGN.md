@@ -107,7 +107,7 @@ Animate transitions to explain where content moves. Keep Home mounted beneath th
 | Transition | Current treatment |
 | --- | --- |
 | Apps drawer | Follows the finger, then settles with a shared tap/Back transition; Standard settling is distance-dependent, up to 280ms |
-| Unlock shortcuts | 120ms lead-in, 360ms row fades, 24ms row stagger and up to 16dp upward movement |
+| Unlock shortcuts | 120ms lead-in, 300ms row fades, 20ms row stagger and up to 16dp upward movement |
 | Reduced | Short 120ms transitions; shortcut reveal uses a fade without the lead-in, movement or stagger |
 | Android animations disabled | Reach the settled state without animated movement, and restore input |
 
@@ -121,7 +121,7 @@ Keep text at the selected size. Transform the same clock/date continuously as th
 
 When Home fits, start the resisted Apps preview and header contraction together. Both follow the same drag and settle/reverse together on cancellation, restoring the original Home offset. Keep the header coupled while Apps is open, then expand it back as Apps closes. A canceled dismissal restores Apps and keeps that coupling for the next return. For an overflowing list, consume header movement first, then the list's scroll, then the Apps pull. Choose the sequence at the start of each gesture so a growing viewport does not switch it halfway through.
 
-The list includes every configured entry, including an optional Apps command. A grid moves as a unit with the header. Show a small chevron during the pull, with no instruction text or progress ring. Give one light haptic when opening is armed; do not buzz at the start or again on reversal. Release armed to open and reverse or release early to cancel. A fling alone cannot arm or open Apps.
+The list includes every configured entry, including an optional Apps command. A grid moves as a unit with the header. Show a small chevron during the pull, with no instruction text or progress ring. Give one light haptic when the drawer arms after 96dp of direct pull. Release once armed to open Apps. Reverse or release early to cancel. A fling alone cannot arm or open Apps.
 
 Keep direct user movement responsive to the finger and respect Reduced/disabled animations when settling. Closing Apps preserves the Home position; Android Home and fresh unlocks restore the expanded header. See the [gesture sequence](ROADMAP.md#opening-apps-from-home).
 

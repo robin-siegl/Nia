@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.4 (unreleased)
+
+- Fade in Home shortcuts faster after unlock and open Apps on release after a shorter upward pull.
+
 ## 1.5.3 (unreleased)
 
 - Add guided bug reports and feature requests, with links to installation and usage help.
